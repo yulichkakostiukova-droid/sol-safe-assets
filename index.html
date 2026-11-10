@@ -1148,7 +1148,27 @@
       if (tg && tg.showAlert && tg.isVersionAtLeast && tg.isVersionAtLeast("6.2")) tg.showAlert(msg, then);
       else { window.alert(msg); if (then) then(); }
     }
-    function setWallet(addr) { state.wallet = addr; renderWallet(); renderButtons(); }
+    // The connected address is kept in state.wallet AND window.currentWallet (global, e.g. for Buy)
+    window.currentWallet = null;
+    function setWallet(addr) {
+      state.wallet = addr;
+      window.currentWallet = addr;
+      renderWallet(); renderButtons();
+    }
+    // When the user disconnects or switches account inside Phantom, update the button
+    let walletEventsBound = false;
+    function bindWalletEvents(provider) {
+      if (walletEventsBound || !provider || typeof provider.on !== "function") return;
+      walletEventsBound = true;
+      provider.on("disconnect", () => {
+        state.wallet = null; window.currentWallet = null;
+        renderWallet(); renderButtons(); toast(t("walletRemoved"));
+      });
+      provider.on("accountChanged", (publicKey) => {
+        if (publicKey) setWallet(publicKey.toString());          // switched to another account
+        else { state.wallet = null; window.currentWallet = null; renderWallet(); renderButtons(); }
+      });
+    }
     async function connect() {
       const provider = getPhantom();
       if (!provider) {   // Telegram's in-app browser has no wallet extension -> paste the address
@@ -1162,11 +1182,14 @@
       try {
         const resp = await provider.connect();
         const key = (resp && resp.publicKey) || provider.publicKey;   // Solflare returns no object
-        setWallet(key.toString()); toast(t("walletSaved")); haptic("success");
+        const walletAddress = key.toString();
+        setWallet(walletAddress);   // button shows "Biwu…eWyr", window.currentWallet is set
+        bindWalletEvents(provider);
+        toast(t("walletSaved")); haptic("success");
       } catch (e) { toast(t("rejected")); }
     }
     function disconnect() {
-      state.wallet = null;
+      state.wallet = null; window.currentWallet = null;
       try { getPhantom()?.disconnect?.(); } catch (e) {}
       renderWallet(); renderButtons(); toast(t("walletRemoved")); haptic("light");
     }
@@ -1290,7 +1313,7 @@
       // No fullscreen: Telegram keeps its normal header (X and ⋯), coloured like the page.
     }
     const preset = params.get("wallet");          // wallet already connected in the bot
-    if (preset && isPubkey(preset)) state.wallet = preset;
+    if (preset && isPubkey(preset)) { state.wallet = preset; window.currentWallet = preset; }
     applyLanguage();
 
     // Opened from "/buy <address> <amount>": jump to Manual Trade with both fields filled in
