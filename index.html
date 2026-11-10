@@ -33,7 +33,7 @@
     button { font: inherit; border: 0; cursor: pointer; color: inherit; background: none; padding: 0; }
     [hidden] { display: none !important; }
 
-    /* ================= BACKGROUND ================= */
+    /* ================= BACKGROUND ==============    === */
     .scene { position: fixed; inset: 0; min-height: 100vh; z-index: 0; pointer-events: none; overflow: hidden; }
     /* Blue glow that starts at the very top edge (top: 0), right under Telegram's header */
     .top-glow {
@@ -85,9 +85,17 @@
     }
     .app-icon svg { width: 18px; height: 18px;
       filter: drop-shadow(0 0 3px rgba(255,255,255,.95)) drop-shadow(0 0 8px rgba(111,220,255,.9)) drop-shadow(0 0 16px rgba(55,129,252,.8)); }
-    .brand { font-size: 16px; font-weight: 500; letter-spacing: -.02em; white-space: nowrap; }
+    .brand { flex: 1; min-width: 0; line-height: 1.15; }
+    .brand-name { font-size: 16px; font-weight: 500; letter-spacing: -.02em; white-space: nowrap; }
+    .brand-sub {
+      font-size: 11px; color: var(--text-3); margin-top: 2px; letter-spacing: -.005em;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    /* "Only Solana wallets" warning (under the header pill and in the connect sheet) */
+    .wallet-note { margin: -8px 6px 14px; font-size: 11.5px; line-height: 1.45; color: rgba(255,214,140,.88); }
+    .wallet-note.in-sheet { margin: -6px 0 14px; }
     .wallet-btn {
-      margin-left: auto; height: 40px; padding: 0 16px; border-radius: 999px; min-width: 0;
+      margin-left: auto; height: 40px; padding: 0 16px; border-radius: 999px; flex: none;
       display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; letter-spacing: -.01em; white-space: nowrap;
       background: linear-gradient(180deg, #fff, #eef4ff); color: #000;
       box-shadow: 0 0 0 1px rgba(255,255,255,.6), 0 0 18px rgba(203,233,253,.35);
@@ -397,9 +405,13 @@
       <div class="app-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="#fff"><path d="M13.2 2.2 4.6 13.1c-.4.5 0 1.2.6 1.2h5.4l-1.3 7.2c-.1.7.8 1.1 1.2.5l8.6-10.9c.4-.5 0-1.2-.6-1.2h-5.4l1.3-7.2c.1-.7-.8-1.1-1.2-.5Z"/></svg>
       </div>
-      <div class="brand">SolTradeBot</div>
+      <div class="brand">
+        <div class="brand-name">SolTradeBot</div>
+        <div class="brand-sub" data-i18n="subtitle">Fast trading for Solana tokens &amp; memecoins</div>
+      </div>
       <button class="wallet-btn" id="walletBtn"></button>
     </header>
+    <p class="wallet-note" id="walletNote" data-i18n="walletWarning"></p>
 
     <!-- ================= TAB 1: TRADE ================= -->
     <section class="screen" id="screen-trade">
@@ -470,7 +482,7 @@
           </div>
           <div class="field">
             <div class="label" data-i18n="amountSol">Amount (SOL)</div>
-            <input class="input" id="buyAmount" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="0,1">
+            <input class="input" id="buyAmount" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="0,01" value="0,01">
           </div>
           <div class="error" id="manualError"></div>
           <div class="note">
@@ -724,6 +736,7 @@
   <div class="sheet" id="sheet-wallet" role="dialog" aria-modal="true">
     <div class="grabber"></div>
     <h3 data-i18n="connectWalletTitle">Connect wallet</h3>
+    <p class="wallet-note in-sheet" data-i18n="walletWarning"></p>
     <p class="sheet-sub" data-i18n="manualHint">Phantom isn't available inside Telegram. Paste your wallet's public address instead — never your seed phrase.</p>
     <input class="input mono" id="addrInput" type="text" autocomplete="off" spellcheck="false" enterkeyhint="done" data-i18n-ph="addrPh" placeholder="Public address">
     <div class="error" id="walletError"></div>
@@ -741,7 +754,8 @@
     // CONFIG
     // =====================================================================
     const CHROME_EXTENSION_URL = "";   // put your Chrome Web Store link here when it's published
-    const AMOUNT_MIN = 0.005, AMOUNT_MAX = 1000, SLIDER_MAX = 10;
+    const AMOUNT_MIN = 0.005, AMOUNT_MAX = 1000, SLIDER_MAX = 10;   // Auto-Pilot
+    const MANUAL_MIN = 0.001;                                     // Manual Trade (bot accepts 0.001+)
     const SMART_TP = 50, SMART_SL = 15;
     const PAGE_COLOR = "#050505";
     const COOLDOWN_MS = 3000;
@@ -768,7 +782,7 @@
     // =====================================================================
     const translations = {
       en: {
-        connectWallet: "Connect Wallet", connectWalletShort: "Connect Wallet", autoPilot: "Auto-Pilot", manualTrade: "Manual Trade",
+        connectWallet: "Connect Wallet", connectWalletShort: "Connect", autoPilot: "Auto-Pilot", manualTrade: "Manual Trade",
         amountPerTrade: "Amount per trade", smartMode: "Smart Mode",
         smartOn: "🤖 <b>Smart Mode:</b> the bot sets Take Profit / Stop Loss for you (now <b>+50% / −15%</b>). No settings needed.",
         setTpSl: "⚙️ Set Take Profit / Stop Loss", startAutoPilot: "Start Auto-Pilot",
@@ -777,7 +791,10 @@
         tokenAddress: "Token Address (CA)", caPh: "e.g. DezXAZ8z7Pnrn…", amountSol: "Amount (SOL)",
         feeNote: "1% fee and max 1% slippage. Nothing is bought until you confirm in the chat.",
         buyToken: "Buy Token", readyBuy: "The quote will appear in the chat",
-        badCa: "That's not a valid token address.", badAmount: "Enter an amount between 0,005 and 1 000 SOL.",
+        badCa: "That's not a valid token address.", badAmount: "Enter an amount between 0,001 and 1 000 SOL.",
+        subtitle: "Fast trading for Solana tokens & memecoins",
+        walletWarning: "⚠️ Only Solana wallets supported: Phantom, Solflare, Backpack. Do not use MetaMask.",
+        noPhantom: "Phantom wasn't found in this browser. Inside Telegram, paste your Solana wallet's public address instead.",
         sending: "Sending…", notInTelegram: "Open this app from SolTradeBot in Telegram to send orders.",
         disclaimer: "<strong>Trading memecoins involves high risk.</strong> You can lose all your funds. SolTradeBot is a tool, not a financial advisor. Always DYOR.",
         learnTitle: "Learn", learnSub: "Three things every Solana trader should know.",
@@ -817,7 +834,10 @@
         tokenAddress: "Адрес токена (CA)", caPh: "например, DezXAZ8z7Pnrn…", amountSol: "Сумма (SOL)",
         feeNote: "Комиссия 1% и проскальзывание не более 1%. Ничего не покупается, пока ты не подтвердишь в чате.",
         buyToken: "Купить токен", readyBuy: "Котировка появится в чате",
-        badCa: "Это не адрес токена.", badAmount: "Введи сумму от 0,005 до 1 000 SOL.",
+        badCa: "Это не адрес токена.", badAmount: "Введи сумму от 0,001 до 1 000 SOL.",
+        subtitle: "Быстрая торговля токенами и мемкоинами на Solana",
+        walletWarning: "⚠️ Поддерживаются только кошельки Solana: Phantom, Solflare, Backpack. Не используйте MetaMask.",
+        noPhantom: "Phantom не найден в этом браузере. Внутри Telegram вставь публичный адрес своего Solana-кошелька.",
         sending: "Отправляю…", notInTelegram: "Открой приложение из бота SolTradeBot в Telegram, чтобы отправлять заявки.",
         disclaimer: "<strong>Торговля мемкоинами связана с высоким риском.</strong> Ты можешь потерять все средства. SolTradeBot — это инструмент, а не финансовый советник. Всегда проводи собственное исследование (DYOR).",
         learnTitle: "Обучение", learnSub: "Три вещи, которые должен знать каждый трейдер Solana.",
@@ -870,7 +890,7 @@
     // Accepts "0,5", "0.5", "1 000", "100"
     function parseAmount(s) {
       const clean = String(s).replace(/[\s ]/g, "").replace(",", ".");
-      if (!/^\d+(\.\d+)?$/.test(clean)) return NaN;
+      if (!/^\d+(\.\d{1,3})?$/.test(clean)) return NaN;   // max 3 decimals (0,001 SOL steps)
       return Math.round(parseFloat(clean) * 1000) / 1000;
     }
     const B58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
@@ -946,6 +966,7 @@
     }
 
     function renderWallet() {
+      $("walletNote").hidden = !!state.wallet;   // warning only until a wallet is connected
       const btn = $("walletBtn");
       if (state.wallet) {
         btn.classList.add("connected");
@@ -1115,22 +1136,33 @@
     // =====================================================================
     // WALLET (Phantom, or paste a public address)
     // =====================================================================
+    // Solana wallets only: Phantom, Solflare, Backpack (MetaMask is not supported)
     function getPhantom() {
       if (window.phantom?.solana?.isPhantom) return window.phantom.solana;
       if (window.solana?.isPhantom) return window.solana;
+      if (window.solflare?.isSolflare) return window.solflare;
+      if (window.backpack?.solana) return window.backpack.solana;
       return null;
+    }
+    function showAlert(msg, then) {
+      if (tg && tg.showAlert && tg.isVersionAtLeast && tg.isVersionAtLeast("6.2")) tg.showAlert(msg, then);
+      else { window.alert(msg); if (then) then(); }
     }
     function setWallet(addr) { state.wallet = addr; renderWallet(); renderButtons(); }
     async function connect() {
       const provider = getPhantom();
-      if (!provider) {   // Telegram's in-app browser has no Phantom -> paste the address
-        $("walletError").textContent = ""; $("addrInput").value = "";
-        openSheet("sheet-wallet"); setTimeout(() => $("addrInput").focus(), 350);
+      if (!provider) {   // Telegram's in-app browser has no wallet extension -> paste the address
+        haptic("warning");
+        showAlert(t("noPhantom"), () => {
+          $("walletError").textContent = ""; $("addrInput").value = "";
+          openSheet("sheet-wallet"); setTimeout(() => $("addrInput").focus(), 350);
+        });
         return;
       }
       try {
         const resp = await provider.connect();
-        setWallet(resp.publicKey.toString()); toast(t("walletSaved")); haptic("success");
+        const key = (resp && resp.publicKey) || provider.publicKey;   // Solflare returns no object
+        setWallet(key.toString()); toast(t("walletSaved")); haptic("success");
       } catch (e) { toast(t("rejected")); }
     }
     function disconnect() {
@@ -1206,12 +1238,16 @@
       const ca = $("caInput").value.trim();
       const amount = parseAmount($("buyAmount").value);
       if (!isPubkey(ca)) { $("manualError").textContent = t("badCa"); haptic("error"); return; }
-      if (isNaN(amount) || amount < AMOUNT_MIN || amount > AMOUNT_MAX) { $("manualError").textContent = t("badAmount"); haptic("error"); return; }
+      if (isNaN(amount) || amount < MANUAL_MIN || amount > AMOUNT_MAX) { $("manualError").textContent = t("badAmount"); haptic("error"); return; }
       $("manualError").textContent = "";
       sendToBot({ action: "buy", token: ca, amount: amount, wallet: state.wallet }, $("buyBtn"));
     });
     $("caInput").addEventListener("keydown", (e) => { if (e.key === "Enter") $("buyAmount").focus(); });
     $("buyAmount").addEventListener("keydown", (e) => { if (e.key === "Enter") hideKeyboard(); });
+    $("buyAmount").addEventListener("blur", () => {
+      const v = parseAmount($("buyAmount").value);
+      if (!isNaN(v) && v > 0) $("buyAmount").value = fmt(v);   // always shown with a comma
+    });
     ["caInput", "buyAmount"].forEach(id => $(id).addEventListener("input", () => { $("manualError").textContent = ""; }));
 
     // =====================================================================
@@ -1244,7 +1280,7 @@
     // =====================================================================
     if (tg) {
       tg.ready();
-      tg.expand();                                  // full height/
+      tg.expand();                                  // full height
       try {
         tg.setHeaderColor(PAGE_COLOR);              // header = page colour -> no visible bar
         tg.setBackgroundColor(PAGE_COLOR);
@@ -1266,7 +1302,7 @@
       state.mode = "manual"; setSeg($("modeSeg"), 1);
       $("mode-auto").hidden = true; $("mode-manual").hidden = false;
       if (presetCa && isPubkey(presetCa)) $("caInput").value = presetCa;
-      if (!isNaN(presetAmt) && presetAmt >= AMOUNT_MIN && presetAmt <= AMOUNT_MAX) $("buyAmount").value = fmt(presetAmt);
+      if (!isNaN(presetAmt) && presetAmt >= MANUAL_MIN && presetAmt <= AMOUNT_MAX) $("buyAmount").value = fmt(presetAmt);
     }
   })();
   </script>
