@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#050505">
   <title>SolTradeBot</title>
   <!-- Official Telegram Mini App script (must be loaded from telegram.org) -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -28,12 +28,12 @@
       --font: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body { margin: 0; background: #000; color: var(--text); }
+    html, body { margin: 0; background: #050505; color: var(--text); }
     body {
       font-family: var(--font); font-optical-sizing: auto;
       -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
       min-height: 100vh; overflow-x: hidden;
-      padding: 16px 16px calc(28px + env(safe-area-inset-bottom));
+      padding: 8px 16px calc(28px + env(safe-area-inset-bottom));
     }
 
     /* =========================================================
@@ -57,7 +57,7 @@
     .beam-cut {
       position: absolute; width: 120vw; max-width: 760px; height: 80vh; left: 50%; top: 50%;
       transform: translate(-78%, -60%) rotate(28deg); border-radius: 50%;
-      background: radial-gradient(closest-side, #000 55%, transparent);
+      background: radial-gradient(closest-side, #050505 55%, transparent);
       filter: blur(30px);
       animation: beam-cut 18s ease-in-out infinite alternate;
     }
@@ -71,20 +71,23 @@
 
     /* Giant faded word behind the content, like "Pricing" in the reference */
     .ghost-word {
-      position: absolute; left: 50%; top: 74px; transform: translateX(-50%);
-      font-size: 168px; font-weight: 600; letter-spacing: -.07em; line-height: 1; white-space: nowrap;
+      position: absolute; left: 50%; top: 40px; transform: translateX(-50%);
+      font-size: 150px; font-weight: 600; letter-spacing: -.07em; line-height: 1; white-space: nowrap;
       background: linear-gradient(90deg, rgba(11, 44, 177, .55), rgba(55, 129, 252, .55) 55%, rgba(203, 233, 253, .55));
       -webkit-background-clip: text; background-clip: text; color: transparent;
       filter: blur(.4px); opacity: .55;
     }
 
     main { position: relative; z-index: 1; max-width: 440px; margin: 0 auto; }
+    body.tg-fullscreen {
+      padding-top: calc(8px + var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px));
+    }
 
     /* =========================================================
        HEADER (glass nav pill, like the reference)
        ========================================================= */
     .nav {
-      display: flex; align-items: center; gap: 10px; padding: 6px 6px 6px 6px; margin-bottom: 92px;
+      display: flex; align-items: center; gap: 10px; padding: 6px; margin-bottom: 18px;
       border-radius: 999px; border: 1px solid var(--line);
       background: rgba(10, 10, 12, .55);
       -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px);
@@ -113,7 +116,7 @@
     .status.on { background: #fff; color: #000; box-shadow: 0 0 18px rgba(203, 233, 253, .45); }
     .status.on i { background: #12c784; box-shadow: 0 0 6px #12c784; }
 
-    .eyebrow { font-size: 15px; font-weight: 500; letter-spacing: -.01em; margin: 0 4px 14px;
+    .eyebrow { font-size: 15px; font-weight: 500; letter-spacing: -.01em; margin: 0 4px 12px;
       background: linear-gradient(90deg, #fff, var(--b-100) 40%, var(--cyan));
       -webkit-background-clip: text; background-clip: text; color: transparent; }
 
@@ -338,16 +341,16 @@
     <!-- Auto-Pilot (featured card) -->
     <section class="card featured">
       <div class="card-title" data-i18n="autopilot">Auto-Pilot</div>
-      <div class="amount"><span class="value" id="amountValue">1.0</span><span class="unit">&nbsp;SOL</span></div>
+      <div class="amount"><span class="value" id="amountValue">1,0</span><span class="unit">&nbsp;SOL</span></div>
       <p class="card-desc" data-i18n="perSession">Amount per trade. Choose how much SOL Auto-Pilot may use.</p>
 
       <input class="range" type="range" id="amountSlider" min="0.1" max="10" step="0.1" value="1" aria-label="Amount in SOL">
-      <div class="range-labels"><span>0.1 SOL</span><span>10 SOL</span></div>
+      <div class="range-labels"><span>0,1 SOL</span><span>10,0 SOL</span></div>
 
       <div class="presets">
-        <button class="preset" data-v="0.5">0.5</button>
+        <button class="preset" data-v="0.5">0,5</button>
         <button class="preset" data-v="1">1</button>
-        <button class="preset" data-v="2.5">2.5</button>
+        <button class="preset" data-v="2.5">2,5</button>
         <button class="preset" data-v="5">5</button>
       </div>
 
@@ -439,10 +442,27 @@
     document.querySelectorAll("[data-i18n-html]").forEach(n => { n.innerHTML = t(n.dataset.i18nHtml); });
     document.documentElement.lang = lang;
 
+    // ---------------------------------------------------------------
+    // Telegram chrome.
+    // The header bar can't be transparent, so we paint it EXACTLY the page colour
+    // (#050505) - then it's invisible. Fullscreen (Telegram 8.0+) removes the bar
+    // completely; Telegram then shows its own small close/menu buttons over the page.
+    // ---------------------------------------------------------------
+    const USE_FULLSCREEN = false;   // set to true to hide the Telegram header bar entirely
+    const PAGE_COLOR = "#050505";   // header + page use the exact same colour
+
     if (tg) {
       tg.ready();
       tg.expand();
-      try { tg.setHeaderColor("#000000"); tg.setBackgroundColor("#000000"); } catch (e) {}
+      try {
+        tg.setHeaderColor(PAGE_COLOR);
+        tg.setBackgroundColor(PAGE_COLOR);
+        if (tg.setBottomBarColor) tg.setBottomBarColor(PAGE_COLOR);
+      } catch (e) {}
+      if (USE_FULLSCREEN && tg.isVersionAtLeast && tg.isVersionAtLeast("8.0") && tg.requestFullscreen) {
+        try { tg.requestFullscreen(); document.body.classList.add("tg-fullscreen"); } catch (e) {}
+      }
+      if (tg.disableVerticalSwipes) { try { tg.disableVerticalSwipes(); } catch (e) {} } // slider drags won't close the app
     }
 
     // ---------------------------------------------------------------
@@ -537,10 +557,13 @@
     // ---------------------------------------------------------------
     // Amount slider
     // ---------------------------------------------------------------
+    // European / Ukrainian format: comma as the decimal separator (display only)
+    const fmtComma = (v) => v.toFixed(1).replace(".", ",");
+
     const slider = el("amountSlider");
     function renderAmount() {
       const v = parseFloat(slider.value);
-      el("amountValue").textContent = v.toFixed(1);
+      el("amountValue").textContent = fmtComma(v);   // 2.5 -> "2,5"
       slider.style.setProperty("--fill", ((v - 0.1) / (10 - 0.1)) * 100 + "%");
       document.querySelectorAll(".preset").forEach(b =>
         b.classList.toggle("active", parseFloat(b.dataset.v) === v));
