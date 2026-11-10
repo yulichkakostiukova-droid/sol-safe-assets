@@ -94,18 +94,6 @@
     /* "Only Solana wallets" warning (under the header pill and in the connect sheet) */
     .wallet-note { margin: 16px 6px 14px; font-size: 11.5px; line-height: 1.45; color: rgba(255,214,140,.88); }
     .wallet-note.in-sheet { margin: -6px 0 14px; }
-    /* Connected wallet: address + "🔌 Disconnect" (replaces the warning once connected) */
-    .wallet-bar { display: flex; align-items: center; gap: 10px; margin: 18px 0 20px; padding: 6px 6px 6px 8px;
-      border-radius: 999px; background: rgba(255,255,255,.05); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); }
-    .wallet-bar .avatar { width: 26px; height: 26px; }
-    .wallet-bar-addr { flex: 1; min-width: 0; font-size: 13px; color: var(--text-2); letter-spacing: 0;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .wallet-off { flex: none; height: 34px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
-      color: #ffb4b4; background: rgba(255,90,90,.12); box-shadow: inset 0 0 0 1px rgba(255,90,90,.35); transition: transform .12s; }
-    .wallet-off:active, .wallet-back:active { transform: scale(.96); }
-    .wallet-back { flex: none; height: 34px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
-      color: #000; background: linear-gradient(180deg, #fff, #eef4ff); transition: transform .12s; }
     .wallet-btn {
       margin-left: auto; height: 40px; padding: 0 16px; border-radius: 999px; flex: none;
       display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; letter-spacing: -.01em; white-space: nowrap;
@@ -424,12 +412,6 @@
       <button class="wallet-btn" id="walletBtn"></button>
     </header>
     <p class="wallet-note" id="walletNote" data-i18n="walletWarning" style="margin-top: 24px !important; margin-bottom: 24px !important; display: block;"></p>
-    <div class="wallet-bar" id="walletBar" hidden>
-      <span class="avatar"></span>
-      <span class="wallet-bar-addr" id="walletBarAddr"></span>
-      <button class="wallet-back" id="walletBackBtn" type="button" data-i18n="backTg" hidden>↩ Telegram</button>
-      <button class="wallet-off" id="walletOffBtn" type="button" data-i18n="disconnectBtn">🔌 Disconnect</button>
-    </div>
 
     <!-- ================= TAB 1: TRADE ================= -->
     <section class="screen" id="screen-trade">
@@ -466,19 +448,19 @@
           <div class="divider"></div>
 
           <div class="card-title" data-i18n="amountPerTrade">Amount per trade</div>
-          <div class="amount"><span class="value" id="amountValue">0.01</span><span class="unit">&nbsp;SOL</span></div>
+          <div class="amount"><span class="value" id="amountValue">0,01</span><span class="unit">&nbsp;SOL</span></div>
 
           <div class="slider-row">
             <input class="range" type="range" id="amountSlider" min="0.005" max="10" step="0.005" value="0.01" aria-label="Amount in SOL">
             <label class="amount-input"><input id="amountInput" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" aria-label="Custom amount"><span>SOL</span></label>
           </div>
-          <div class="range-labels"><span>0.005</span><span>10.0+</span></div>
+          <div class="range-labels"><span>0,005</span><span>10,0+</span></div>
 
           <div class="presets">
-            <button class="preset" data-v="0.01">0.01</button>
-            <button class="preset" data-v="0.05">0.05</button>
-            <button class="preset" data-v="0.1">0.1</button>
-            <button class="preset" data-v="0.5">0.5</button>
+            <button class="preset" data-v="0.01">0,01</button>
+            <button class="preset" data-v="0.05">0,05</button>
+            <button class="preset" data-v="0.1">0,1</button>
+            <button class="preset" data-v="0.5">0,5</button>
           </div>
 
           <button class="btn-white" id="startBtn" disabled>
@@ -500,7 +482,7 @@
           </div>
           <div class="field">
             <div class="label" data-i18n="amountSol">Amount (SOL)</div>
-            <input class="input" id="buyAmount" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="0.01" value="0.01">
+            <input class="input" id="buyAmount" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="0,01" value="0,01">
           </div>
           <div class="error" id="manualError"></div>
           <div class="note">
@@ -707,7 +689,7 @@
       <div class="card">
         <div class="kv"><span data-i18n="tradingFee">Trading fee</span><b>1%</b></div>
         <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>1%</b></div>
-        <div class="kv"><span data-i18n="version">Version</span><b>1.5</b></div>
+        <div class="kv"><span data-i18n="version">Version</span><b>1.6</b></div>
       </div>
     </section>
   </main>
@@ -809,7 +791,7 @@
         tokenAddress: "Token Address (CA)", caPh: "e.g. DezXAZ8z7Pnrn…", amountSol: "Amount (SOL)",
         feeNote: "1% fee and max 1% slippage. Nothing is bought until you confirm in the chat.",
         buyToken: "Buy Token", readyBuy: "The quote will appear in the chat",
-        badCa: "That's not a valid token address.", badAmount: "Enter an amount between 0.001 and 1 000 SOL.",
+        badCa: "That's not a valid token address.", badAmount: "Enter an amount between 0,001 and 1 000 SOL.",
         subtitle: "Fast trading for Solana tokens & memecoins",
         walletWarning: "⚠️ Only Solana wallets supported: Phantom, Solflare, Backpack. Do not use MetaMask.",
         noPhantom: "Phantom wasn't found in this browser. Inside Telegram, paste your Solana wallet's public address instead.",
@@ -837,7 +819,7 @@
         takeProfit: "Take Profit", stopLoss: "Stop Loss", reset: "Reset", save: "Save", saved: "Saved",
         connectWalletTitle: "Connect wallet",
         manualHint: "Phantom isn't available inside Telegram. Paste your wallet's public address instead — never your seed phrase.",
-        disconnectBtn: "🔌 Disconnect", backTg: "↩ Telegram",
+        disconnectBtn: "🔌 Disconnect",
         addrPh: "Public address", cancel: "Cancel",
         badAddr: "That's not a valid Solana address.",
         secret: "🚨 That looks like a private key or seed phrase! Never share it — move your funds to a new wallet.",
@@ -853,7 +835,7 @@
         tokenAddress: "Адрес токена (CA)", caPh: "например, DezXAZ8z7Pnrn…", amountSol: "Сумма (SOL)",
         feeNote: "Комиссия 1% и проскальзывание не более 1%. Ничего не покупается, пока ты не подтвердишь в чате.",
         buyToken: "Купить токен", readyBuy: "Котировка появится в чате",
-        badCa: "Это не адрес токена.", badAmount: "Введи сумму от 0.001 до 1 000 SOL.",
+        badCa: "Это не адрес токена.", badAmount: "Введи сумму от 0,001 до 1 000 SOL.",
         subtitle: "Быстрая торговля токенами и мемкоинами на Solana",
         walletWarning: "⚠️ Поддерживаются только кошельки Solana: Phantom, Solflare, Backpack. Не используйте MetaMask.",
         noPhantom: "Phantom не найден в этом браузере. Внутри Telegram вставь публичный адрес своего Solana-кошелька.",
@@ -881,7 +863,7 @@
         takeProfit: "Тейк-профит", stopLoss: "Стоп-лосс", reset: "Сброс", save: "Сохранить", saved: "Сохранено",
         connectWalletTitle: "Подключить кошелёк",
         manualHint: "Phantom недоступен внутри Telegram. Вставь публичный адрес кошелька — никогда не сид-фразу.",
-        disconnectBtn: "🔌 Отключить", backTg: "↩ В Telegram",
+        disconnectBtn: "🔌 Отключить",
         addrPh: "Публичный адрес", cancel: "Отмена",
         badAddr: "Это не адрес Solana.",
         secret: "🚨 Похоже, это приватный ключ или сид-фраза! Никому их не отправляй — переведи средства на новый кошелёк.",
@@ -900,17 +882,17 @@
       set(k, v) { try { localStorage.setItem("stb_" + k, v); } catch (e) {} }
     };
 
-    // Dot formatting: 0.005 -> "0.005", 0.5 -> "0.5", 10 -> "10.0", 1000 -> "1 000.0"
+    // Comma formatting: 0.005 -> "0,005", 0.5 -> "0,5", 10 -> "10,0", 1000 -> "1 000,0"
     function fmt(v) {
       let txt = (Math.round(v * 1000) / 1000).toFixed(3).replace(/0+$/, "");
       if (txt.endsWith(".")) txt += "0";
       const [int, dec] = txt.split(".");
-      return int.replace(/\B(?=(\d{3})+(?!\d))/g, " ") + "." + dec;
+      return int.replace(/\B(?=(\d{3})+(?!\d))/g, " ") + "," + dec;
     }
-    // Accepts "0.5" (and "0,5" if someone types a comma), "1 000", "100"
+    // Accepts "0,5", "0.5", "1 000", "100"
     function parseAmount(s) {
       const clean = String(s).replace(/[\s ]/g, "").replace(",", ".");
-      if (!/^\d+(\.\d{1,3})?$/.test(clean)) return NaN;   // max 3 decimals (0.001 SOL steps)
+      if (!/^\d+(\.\d{1,3})?$/.test(clean)) return NaN;   // max 3 decimals (0,001 SOL steps)
       return Math.round(parseFloat(clean) * 1000) / 1000;
     }
     const B58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
@@ -952,8 +934,9 @@
     // STATE
     // =====================================================================
     const tgLang = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.language_code || "" : "";
-    const savedLang = store.get("lang");
-    const startLang = savedLang || params.get("lang") || tgLang || "en";
+    const urlLang = (params.get("lang") || "").toLowerCase();
+    if (urlLang === "en" || urlLang === "ru") store.set("lang", urlLang);   // the bot's choice replaces the old saved one
+    const startLang = urlLang || store.get("lang") || tgLang || "en";
     const state = {
       lang: startLang.toLowerCase().startsWith("ru") ? "ru" : "en",
       wallet: null,
@@ -986,18 +969,13 @@
     }
 
     function renderWallet() {
-      const on = !!state.wallet;
-      $("walletNote").hidden = on;                 // yellow warning only while NOT connected
-      $("walletBar").hidden = !on;                 // address + "🔌 Disconnect" only while connected
-      $("walletBarAddr").textContent = on ? state.wallet.slice(0, 6) + "…" + state.wallet.slice(-6) : "";
-      // "↩ В Telegram" only inside Phantom's browser (inside Telegram there's nowhere to go back to)
-      $("walletBackBtn").hidden = !on || inTelegram || !botName;
+      $("walletNote").hidden = !!state.wallet;     // yellow warning only while NOT connected
       const btn = $("walletBtn");
       if (state.wallet) {
         btn.classList.add("connected");
         btn.innerHTML = '<span class="avatar"></span><span>' + short(state.wallet) + '</span><span class="dot"></span>';
         $("settingsWallet").textContent = state.wallet;
-        $("settingsWalletBtn").textContent = t("disconnect");
+        $("settingsWalletBtn").textContent = t("disconnectBtn");   // "🔌 Disconnect" lives in Settings only
       } else {
         btn.classList.remove("connected");
         btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h14a2 2 0 0 1 2 2v3"/><path d="M3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3"/><path d="M21 12h-4a2 2 0 0 0 0 4h4"/></svg><span>' + t("connectWalletShort") + '</span>';
@@ -1317,8 +1295,6 @@
 
     // ---- buttons ----
     $("walletBtn").addEventListener("click", () => state.wallet ? showTab("settings") : connect());
-    $("walletOffBtn").addEventListener("click", disconnect);
-    $("walletBackBtn").addEventListener("click", () => { haptic("light"); goBackToTelegram(); });
     $("settingsWalletBtn").addEventListener("click", () => state.wallet ? disconnect() : connect());
     $("walletCancel").addEventListener("click", closeSheet);
     $("walletSave").addEventListener("click", () => {
