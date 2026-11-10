@@ -693,7 +693,7 @@
       <div class="card">
         <div class="kv"><span data-i18n="tradingFee">Trading fee</span><b>1%</b></div>
         <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>1%</b></div>
-        <div class="kv"><span data-i18n="version">Version</span><b>1.7</b></div>
+        <div class="kv"><span data-i18n="version">Version</span><b>1.8</b></div>
       </div>
     </section>
   </main>
@@ -740,7 +740,7 @@
   <div class="sheet" id="sheet-wallet" role="dialog" aria-modal="true" aria-labelledby="walletSheetTitle">
     <div class="grabber"></div>
     <h3 id="walletSheetTitle" data-i18n="connectWalletTitle">Connect Wallet</h3>
-    <p class="wallet-note in-sheet" data-i18n="walletWarning" style="margin-top: 16px; margin-bottom: 16px; display: block;"></p>
+    <p class="wallet-note in-sheet" data-i18n="walletWarning" style="margin-top: 16px !important; margin-bottom: 16px !important; display: block;"></p>
     <button class="btn-white btn-phantom" id="openPhantomBtn" type="button" data-i18n="phantomBtn">👻 Open in Phantom</button>
     <div class="or-line" data-i18n="orPaste">or paste public address</div>
     <input class="input mono" id="addrInput" type="text" autocomplete="off" spellcheck="false" enterkeyhint="done" data-i18n-ph="addrPh" placeholder="Public Address">
@@ -1196,6 +1196,7 @@
       const u = new URL(location.href);
       u.searchParams.delete("wallet");
       u.searchParams.delete("connect");
+      u.searchParams.delete("t");
       if (!keepHash) u.hash = "";        // #tgWebAppData = signed Telegram login data: never send it out
       return u.toString();
     }
@@ -1206,7 +1207,7 @@
       const fromBot = params.get("wallet");
       const urlWallet = fromBot && isPubkey(fromBot) ? fromBot : null;
       autoConnect = !inTelegram && params.get("connect") === "1";   // opened by our Connect button, inside Phantom
-      if (params.has("wallet") || params.has("connect")) {
+      if (params.has("wallet") || params.has("connect") || params.has("t")) {
         try { history.replaceState(null, "", cleanPageUrl(true)); } catch (e) {}   // a reload can't bring them back
       }
       if (autoConnect) applyWallet(null);                  // don't trust an old wallet in Phantom's browser
@@ -1231,16 +1232,26 @@
     }
 
     // ---- Connect ----
-    function openInPhantom() {
-      // Open THIS app inside Phantom's own browser (window.phantom exists only there).
-      // "connect=1" makes the page connect automatically when it opens in Phantom.
-      const u = new URL(cleanPageUrl(false));
+    // Link to THIS app for a wallet's in-app browser. It keeps ?lang= (and ?bot=), adds
+    // connect=1 and a fresh timestamp t=..., so every open is a brand-new URL: Telegram and the
+    // wallet browser can't serve a cached/frozen copy. #tgWebAppData (login data) is never included.
+    function buildWalletUrl() {
+      const u = new URL(location.origin + location.pathname);
+      u.searchParams.set("lang", state.lang);
+      if (botName) u.searchParams.set("bot", botName);
+      const v = params.get("v"); if (v) u.searchParams.set("v", v);
       u.searchParams.set("connect", "1");
-      const link = "https://phantom.app/ul/browse/" + encodeURIComponent(u.toString())
-                 + "?ref=" + encodeURIComponent(location.origin);
-      haptic("light");
+      u.searchParams.set("t", String(Date.now()));
+      return u.toString();
+    }
+    function openLinkSafe(link) {
       if (tg && tg.openLink) tg.openLink(link);   // leaves Telegram -> no frozen WebView
       else window.location.href = link;
+    }
+    function openInPhantom() {
+      haptic("light");
+      openLinkSafe("https://phantom.app/ul/browse/" + encodeURIComponent(buildWalletUrl())
+                   + "?ref=" + encodeURIComponent(location.origin));
     }
     function openConnectSheet() {
       $("walletError").textContent = ""; $("addrInput").value = "";
@@ -1319,7 +1330,8 @@
       renderWallet(); renderButtons();
       if (saved) { closeSheet(); toast(t("walletSaved")); }
     }
-    window.addEventListener("focus", checkSavedWallet);
+    window.addEventListener("focus", () => { checkSavedWallet(); });
+    window.addEventListener("pageshow", (e) => { if (e.persisted) checkSavedWallet(); });   // page restored from cache
     document.addEventListener("visibilitychange", () => { if (!document.hidden) checkSavedWallet(); });
 
     // =====================================================================
