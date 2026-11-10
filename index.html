@@ -701,7 +701,7 @@
       <div class="card">
         <div class="kv"><span data-i18n="tradingFee">Trading fee</span><b>1%</b></div>
         <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>1%</b></div>
-        <div class="kv"><span data-i18n="version">Version</span><b>1,0</b></div>
+        <div class="kv"><span data-i18n="version">Version</span><b>1,1</b></div>
       </div>
     </section>
   </main>
@@ -1204,7 +1204,10 @@
     // Telegram's in-app WebView never has window.phantom. On a phone we open this
     // same app inside Phantom's own browser, where window.phantom IS available.
     const inTelegram = !!(tg && tg.initData);
-    const isMobile = inTelegram && ["ios", "android", "android_x"].includes(tg.platform);
+    // Phone = Telegram says ios/android, OR the browser itself is an iPhone/iPad/Android.
+    // (Don't rely on Telegram data alone: a cached or plainly-opened page has none.)
+    const isMobile = (tg && ["ios", "android", "android_x"].includes(tg.platform))
+                  || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent || "");
     const botName = params.get("bot");
 
     function phantomBrowseLink() {
@@ -1266,7 +1269,7 @@
     $("walletCancel").addEventListener("click", closeSheet);
     $("openPhantomBtn").addEventListener("click", openInPhantom);
     $("returnBtn").addEventListener("click", backToTelegram);
-    $("phantomBlock").hidden = !isMobile;                       // only on phones inside Telegram
+    $("phantomBlock").hidden = !isMobile;                       // on phones (inside Phantom it's never needed)
     if (isMobile) $("manualHintText").hidden = true;            // the "or paste" line replaces it
     $("walletSave").addEventListener("click", () => {
       const v = $("addrInput").value.trim();
