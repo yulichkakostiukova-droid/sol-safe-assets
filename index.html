@@ -26,21 +26,17 @@
       font-family: var(--font); font-optical-sizing: auto;
       -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
-      /* No artificial top gap: only the phone's safe area (notch). */
-      --top-space: env(safe-area-inset-top, 0px);
-      padding: var(--top-space) 16px calc(var(--nav-h) + 34px + env(safe-area-inset-bottom));
+      /* No artificial top gap: only the phone's safe area. Telegram's own header
+         (X and ⋯) sits above the page, so the notch is never drawn over the app. */
+      padding: env(safe-area-inset-top, 0px) 16px calc(var(--nav-h) + 34px + env(safe-area-inset-bottom));
     }
-    /* Telegram fullscreen (phones): the page runs under the status bar and
-       Telegram's floating X / ⋯ buttons, so keep the content just below them. */
-    body.tg-fullscreen {
-      --top-space: calc(var(--tg-safe-area-inset-top, env(safe-area-inset-top, 0px)) + var(--tg-content-safe-area-inset-top, 0px));
-    }
+    .screen { padding-top: 10px; }   /* small breathing space; the background still starts at the very top */
     button { font: inherit; border: 0; cursor: pointer; color: inherit; background: none; padding: 0; }
     [hidden] { display: none !important; }
 
     /* ================= BACKGROUND ================= */
     .scene { position: fixed; inset: 0; min-height: 100vh; z-index: 0; pointer-events: none; overflow: hidden; }
-    /* Blue glow that starts at the very top edge (top: 0), under Telegram's buttons */
+    /* Blue glow that starts at the very top edge (top: 0), right under Telegram's header */
     .top-glow {
       position: absolute; top: -140px; left: 50%; width: 150vw; max-width: 900px; height: 380px;
       transform: translateX(-50%); border-radius: 50%;
@@ -72,38 +68,6 @@
 
     main { position: relative; z-index: 1; max-width: 440px; margin: 0 auto; }
 
-    /* ================= TOP BAR ================= */
-    .topbar {
-      display: flex; align-items: center; gap: 10px; padding: 6px; margin: 6px 0 16px;
-      border-radius: 999px; border: 1px solid var(--line); background: rgba(10,10,12,.55);
-      -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px);
-      box-shadow: 0 0 24px rgba(55,129,252,.08);
-    }
-    .app-icon {
-      width: 40px; height: 40px; border-radius: 50%; flex: none; display: grid; place-items: center;
-      background: radial-gradient(90% 70% at 50% 115%, rgba(203,233,253,.7), transparent 60%),
-                  linear-gradient(160deg, var(--b-950), var(--b-800) 45%, var(--b-600) 85%);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.25), inset 0 1px 0 rgba(255,255,255,.35), 0 0 18px rgba(55,129,252,.55);
-    }
-    .app-icon svg { width: 18px; height: 18px;
-      filter: drop-shadow(0 0 3px rgba(255,255,255,.95)) drop-shadow(0 0 8px rgba(111,220,255,.9)) drop-shadow(0 0 16px rgba(55,129,252,.8)); }
-    .brand { font-size: 16px; font-weight: 500; letter-spacing: -.02em; }
-    .wallet-btn {
-      margin-left: auto; height: 40px; padding: 0 16px; border-radius: 999px;
-      display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; letter-spacing: -.01em;
-      background: linear-gradient(180deg, #fff, #eef4ff); color: #000;
-      box-shadow: 0 0 0 1px rgba(255,255,255,.6), 0 0 18px rgba(203,233,253,.35);
-      transition: transform .12s;
-    }
-    .wallet-btn:active { transform: scale(.96); }
-    .wallet-btn svg { width: 16px; height: 16px; }
-    .wallet-btn.connected { background: rgba(255,255,255,.07); color: #fff; padding: 0 14px 0 6px;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), 0 0 14px rgba(55,129,252,.15); }
-    .avatar { width: 28px; height: 28px; border-radius: 50%; flex: none;
-      background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.9), transparent 32%),
-                  conic-gradient(from 210deg, var(--b-950), var(--b-600), var(--cyan), var(--b-100), var(--b-400), var(--b-950));
-      box-shadow: 0 0 12px rgba(55,129,252,.55); }
-    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); flex: none; }
 
     /* ================= SCREENS ================= */
     .screen { animation: fadeIn .28s ease; }
@@ -393,14 +357,6 @@
   <div class="scene" aria-hidden="true"><div class="beam"></div><div class="beam-cut"></div><div class="top-glow"></div><div class="grain"></div></div>
 
   <main>
-    <!-- ================= TOP BAR ================= -->
-    <header class="topbar">
-      <div class="app-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="#fff"><path d="M13.2 2.2 4.6 13.1c-.4.5 0 1.2.6 1.2h5.4l-1.3 7.2c-.1.7.8 1.1 1.2.5l8.6-10.9c.4-.5 0-1.2-.6-1.2h-5.4l1.3-7.2c.1-.7-.8-1.1-1.2-.5Z"/></svg>
-      </div>
-      <div class="brand">SolTradeBot</div>
-      <button class="wallet-btn" id="walletBtn"></button>
-    </header>
 
     <!-- ================= TAB 1: TRADE ================= -->
     <section class="screen" id="screen-trade">
@@ -809,7 +765,7 @@
         rejected: "Connection was cancelled in Phantom.", walletSaved: "Wallet connected", walletRemoved: "Wallet disconnected"
       },
       ru: {
-        connectWallet: "Подключить", autoPilot: "Автопилот", manualTrade: "Вручную",
+        connectWallet: "Подключить кошелёк", autoPilot: "Автопилот", manualTrade: "Вручную",
         amountPerTrade: "Сумма на сделку", smartMode: "Умный режим",
         smartOn: "🤖 <b>Умный режим:</b> бот сам выставляет Тейк-профит / Стоп-лосс (сейчас <b>+50% / −15%</b>). Ничего настраивать не нужно.",
         setTpSl: "⚙️ Настроить TP / SL", startAutoPilot: "Запустить Автопилот",
@@ -947,15 +903,11 @@
     }
 
     function renderWallet() {
-      const btn = $("walletBtn");
+      // The wallet lives in Settings; with no wallet, the main buttons say "Connect Wallet"
       if (state.wallet) {
-        btn.classList.add("connected");
-        btn.innerHTML = '<span class="avatar"></span><span>' + short(state.wallet) + '</span><span class="dot"></span>';
         $("settingsWallet").textContent = state.wallet;
         $("settingsWalletBtn").textContent = t("disconnect");
       } else {
-        btn.classList.remove("connected");
-        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h14a2 2 0 0 1 2 2v3"/><path d="M3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3"/><path d="M21 12h-4a2 2 0 0 0 0 4h4"/></svg><span>' + t("connectWallet") + '</span>';
         $("settingsWallet").textContent = t("notConnected");
         $("settingsWalletBtn").textContent = t("connect");
       }
@@ -995,8 +947,11 @@
     function renderButtons() {
       const ok = !!state.wallet;
       if (!state.cooling) {
-        $("startBtn").disabled = !ok;
-        $("buyBtn").disabled = !ok;
+        // No wallet yet -> the main buttons become "Connect Wallet"
+        $("startBtn").disabled = false;
+        $("buyBtn").disabled = false;
+        $("startBtn").querySelector("span").textContent = ok ? t("startAutoPilot") : t("connectWallet");
+        $("buyBtn").querySelector("span").textContent = ok ? t("buyToken") : t("connectWallet");
       }
       $("autoHint").textContent = ok ? t("readyAuto") : t("connectFirst");
       $("manualHint").textContent = ok ? t("readyBuy") : t("connectFirst");
@@ -1136,7 +1091,6 @@
       try { getPhantom()?.disconnect?.(); } catch (e) {}
       renderWallet(); renderButtons(); toast(t("walletRemoved")); haptic("light");
     }
-    $("walletBtn").addEventListener("click", () => state.wallet ? showTab("settings") : connect());
     $("settingsWalletBtn").addEventListener("click", () => state.wallet ? disconnect() : connect());
     $("walletCancel").addEventListener("click", closeSheet);
     $("walletSave").addEventListener("click", () => {
@@ -1187,7 +1141,7 @@
 
     $("startBtn").addEventListener("click", () => {
       hideKeyboard();
-      if (!state.wallet) return;
+      if (!state.wallet) { connect(); return; }   // button reads "Connect Wallet"
       sendToBot({
         action: "start_autopilot",
         amount: state.amount,
@@ -1200,7 +1154,7 @@
 
     $("buyBtn").addEventListener("click", () => {
       hideKeyboard();
-      if (!state.wallet) return;
+      if (!state.wallet) { connect(); return; }   // button reads "Connect Wallet"
       const ca = $("caInput").value.trim();
       const amount = parseAmount($("buyAmount").value);
       if (!isPubkey(ca)) { $("manualError").textContent = t("badCa"); haptic("error"); return; }
@@ -1249,19 +1203,7 @@
         if (tg.setBottomBarColor) tg.setBottomBarColor(PAGE_COLOR);
       } catch (e) {}
       if (tg.disableVerticalSwipes) { try { tg.disableVerticalSwipes(); } catch (e) {} }
-
-      // Phones (Telegram 8.0+): fullscreen removes the header bar entirely, so the
-      // blue glow reaches the very top, under Telegram's floating X and ⋯ buttons.
-      const mobile = ["ios", "android", "android_x"].includes(tg.platform);
-      if (mobile && tg.isVersionAtLeast && tg.isVersionAtLeast("8.0") && tg.requestFullscreen) {
-        const syncFullscreen = () => document.body.classList.toggle("tg-fullscreen", !!tg.isFullscreen);
-        try {
-          tg.onEvent("fullscreenChanged", syncFullscreen);
-          tg.onEvent("fullscreenFailed", syncFullscreen);
-          tg.requestFullscreen();
-        } catch (e) {}
-        syncFullscreen();
-      }
+      // No fullscreen: Telegram keeps its normal header (X and ⋯), coloured like the page.
     }
     const preset = params.get("wallet");          // wallet already connected in the bot
     if (preset && isPubkey(preset)) state.wallet = preset;
