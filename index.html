@@ -103,7 +103,9 @@
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .wallet-off { flex: none; height: 34px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
       color: #ffb4b4; background: rgba(255,90,90,.12); box-shadow: inset 0 0 0 1px rgba(255,90,90,.35); transition: transform .12s; }
-    .wallet-off:active { transform: scale(.96); }
+    .wallet-off:active, .wallet-back:active { transform: scale(.96); }
+    .wallet-back { flex: none; height: 34px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
+      color: #000; background: linear-gradient(180deg, #fff, #eef4ff); transition: transform .12s; }
     .wallet-btn {
       margin-left: auto; height: 40px; padding: 0 16px; border-radius: 999px; flex: none;
       display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; letter-spacing: -.01em; white-space: nowrap;
@@ -425,6 +427,7 @@
     <div class="wallet-bar" id="walletBar" hidden>
       <span class="avatar"></span>
       <span class="wallet-bar-addr" id="walletBarAddr"></span>
+      <button class="wallet-back" id="walletBackBtn" type="button" data-i18n="backTg" hidden>↩ Telegram</button>
       <button class="wallet-off" id="walletOffBtn" type="button" data-i18n="disconnectBtn">🔌 Disconnect</button>
     </div>
 
@@ -463,19 +466,19 @@
           <div class="divider"></div>
 
           <div class="card-title" data-i18n="amountPerTrade">Amount per trade</div>
-          <div class="amount"><span class="value" id="amountValue">0,01</span><span class="unit">&nbsp;SOL</span></div>
+          <div class="amount"><span class="value" id="amountValue">0.01</span><span class="unit">&nbsp;SOL</span></div>
 
           <div class="slider-row">
             <input class="range" type="range" id="amountSlider" min="0.005" max="10" step="0.005" value="0.01" aria-label="Amount in SOL">
             <label class="amount-input"><input id="amountInput" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" aria-label="Custom amount"><span>SOL</span></label>
           </div>
-          <div class="range-labels"><span>0,005</span><span>10,0+</span></div>
+          <div class="range-labels"><span>0.005</span><span>10.0+</span></div>
 
           <div class="presets">
-            <button class="preset" data-v="0.01">0,01</button>
-            <button class="preset" data-v="0.05">0,05</button>
-            <button class="preset" data-v="0.1">0,1</button>
-            <button class="preset" data-v="0.5">0,5</button>
+            <button class="preset" data-v="0.01">0.01</button>
+            <button class="preset" data-v="0.05">0.05</button>
+            <button class="preset" data-v="0.1">0.1</button>
+            <button class="preset" data-v="0.5">0.5</button>
           </div>
 
           <button class="btn-white" id="startBtn" disabled>
@@ -497,7 +500,7 @@
           </div>
           <div class="field">
             <div class="label" data-i18n="amountSol">Amount (SOL)</div>
-            <input class="input" id="buyAmount" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="0,01" value="0,01">
+            <input class="input" id="buyAmount" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="0.01" value="0.01">
           </div>
           <div class="error" id="manualError"></div>
           <div class="note">
@@ -704,7 +707,7 @@
       <div class="card">
         <div class="kv"><span data-i18n="tradingFee">Trading fee</span><b>1%</b></div>
         <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>1%</b></div>
-        <div class="kv"><span data-i18n="version">Version</span><b>1,3</b></div>
+        <div class="kv"><span data-i18n="version">Version</span><b>1.5</b></div>
       </div>
     </section>
   </main>
@@ -806,7 +809,7 @@
         tokenAddress: "Token Address (CA)", caPh: "e.g. DezXAZ8z7Pnrn…", amountSol: "Amount (SOL)",
         feeNote: "1% fee and max 1% slippage. Nothing is bought until you confirm in the chat.",
         buyToken: "Buy Token", readyBuy: "The quote will appear in the chat",
-        badCa: "That's not a valid token address.", badAmount: "Enter an amount between 0,001 and 1 000 SOL.",
+        badCa: "That's not a valid token address.", badAmount: "Enter an amount between 0.001 and 1 000 SOL.",
         subtitle: "Fast trading for Solana tokens & memecoins",
         walletWarning: "⚠️ Only Solana wallets supported: Phantom, Solflare, Backpack. Do not use MetaMask.",
         noPhantom: "Phantom wasn't found in this browser. Inside Telegram, paste your Solana wallet's public address instead.",
@@ -834,7 +837,7 @@
         takeProfit: "Take Profit", stopLoss: "Stop Loss", reset: "Reset", save: "Save", saved: "Saved",
         connectWalletTitle: "Connect wallet",
         manualHint: "Phantom isn't available inside Telegram. Paste your wallet's public address instead — never your seed phrase.",
-        disconnectBtn: "🔌 Disconnect",
+        disconnectBtn: "🔌 Disconnect", backTg: "↩ Telegram",
         addrPh: "Public address", cancel: "Cancel",
         badAddr: "That's not a valid Solana address.",
         secret: "🚨 That looks like a private key or seed phrase! Never share it — move your funds to a new wallet.",
@@ -850,7 +853,7 @@
         tokenAddress: "Адрес токена (CA)", caPh: "например, DezXAZ8z7Pnrn…", amountSol: "Сумма (SOL)",
         feeNote: "Комиссия 1% и проскальзывание не более 1%. Ничего не покупается, пока ты не подтвердишь в чате.",
         buyToken: "Купить токен", readyBuy: "Котировка появится в чате",
-        badCa: "Это не адрес токена.", badAmount: "Введи сумму от 0,001 до 1 000 SOL.",
+        badCa: "Это не адрес токена.", badAmount: "Введи сумму от 0.001 до 1 000 SOL.",
         subtitle: "Быстрая торговля токенами и мемкоинами на Solana",
         walletWarning: "⚠️ Поддерживаются только кошельки Solana: Phantom, Solflare, Backpack. Не используйте MetaMask.",
         noPhantom: "Phantom не найден в этом браузере. Внутри Telegram вставь публичный адрес своего Solana-кошелька.",
@@ -878,7 +881,7 @@
         takeProfit: "Тейк-профит", stopLoss: "Стоп-лосс", reset: "Сброс", save: "Сохранить", saved: "Сохранено",
         connectWalletTitle: "Подключить кошелёк",
         manualHint: "Phantom недоступен внутри Telegram. Вставь публичный адрес кошелька — никогда не сид-фразу.",
-        disconnectBtn: "🔌 Отключить",
+        disconnectBtn: "🔌 Отключить", backTg: "↩ В Telegram",
         addrPh: "Публичный адрес", cancel: "Отмена",
         badAddr: "Это не адрес Solana.",
         secret: "🚨 Похоже, это приватный ключ или сид-фраза! Никому их не отправляй — переведи средства на новый кошелёк.",
@@ -897,17 +900,17 @@
       set(k, v) { try { localStorage.setItem("stb_" + k, v); } catch (e) {} }
     };
 
-    // Comma formatting: 0.005 -> "0,005", 0.5 -> "0,5", 10 -> "10,0", 1000 -> "1 000,0"
+    // Dot formatting: 0.005 -> "0.005", 0.5 -> "0.5", 10 -> "10.0", 1000 -> "1 000.0"
     function fmt(v) {
       let txt = (Math.round(v * 1000) / 1000).toFixed(3).replace(/0+$/, "");
       if (txt.endsWith(".")) txt += "0";
       const [int, dec] = txt.split(".");
-      return int.replace(/\B(?=(\d{3})+(?!\d))/g, " ") + "," + dec;
+      return int.replace(/\B(?=(\d{3})+(?!\d))/g, " ") + "." + dec;
     }
-    // Accepts "0,5", "0.5", "1 000", "100"
+    // Accepts "0.5" (and "0,5" if someone types a comma), "1 000", "100"
     function parseAmount(s) {
       const clean = String(s).replace(/[\s ]/g, "").replace(",", ".");
-      if (!/^\d+(\.\d{1,3})?$/.test(clean)) return NaN;   // max 3 decimals (0,001 SOL steps)
+      if (!/^\d+(\.\d{1,3})?$/.test(clean)) return NaN;   // max 3 decimals (0.001 SOL steps)
       return Math.round(parseFloat(clean) * 1000) / 1000;
     }
     const B58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
@@ -987,6 +990,8 @@
       $("walletNote").hidden = on;                 // yellow warning only while NOT connected
       $("walletBar").hidden = !on;                 // address + "🔌 Disconnect" only while connected
       $("walletBarAddr").textContent = on ? state.wallet.slice(0, 6) + "…" + state.wallet.slice(-6) : "";
+      // "↩ В Telegram" only inside Phantom's browser (inside Telegram there's nowhere to go back to)
+      $("walletBackBtn").hidden = !on || inTelegram || !botName;
       const btn = $("walletBtn");
       if (state.wallet) {
         btn.classList.add("connected");
@@ -1173,6 +1178,7 @@
     function getPhantom() {
       if (window.phantom?.solana?.isPhantom) return window.phantom.solana;
       if (window.solana?.isPhantom) return window.solana;
+      if (window.solana && typeof window.solana.connect === "function") return window.solana;   // any other Solana wallet
       if (window.solflare?.isSolflare) return window.solflare;
       if (window.backpack?.solana) return window.backpack.solana;
       return null;
@@ -1276,14 +1282,21 @@
         toast(t("walletSaved")); haptic("success");
         // Inside Phantom's browser: Telegram can't read Phantom's storage, so the start link
         // "/start w_<address>" carries the wallet back to the bot (no banner, automatic).
-        if (!inTelegram && botName) {
-          setTimeout(() => { window.location.href = "https://t.me/" + botName + "?start=w_" + addr; }, 700);
-        }
+        if (!inTelegram && botName) setTimeout(goBackToTelegram, 700);
       } catch (e) {
         toast(t("rejected"));
       } finally {
         connecting = false;
       }
+    }
+
+    // ---- Back to Telegram ----
+    // Inside Telegram: just close the Mini App. Inside Phantom's browser Telegram.WebApp.close()
+    // does nothing (it isn't Telegram), so we open the bot with "/start w_<address>":
+    // that brings the user back to the chat AND hands the wallet to the bot.
+    function goBackToTelegram() {
+      if (inTelegram) { tg.close(); return; }
+      if (botName && state.wallet) window.location.href = "https://t.me/" + botName + "?start=w_" + state.wallet;
     }
 
     // ---- Disconnect: wipe everything, then reload ----
@@ -1305,6 +1318,7 @@
     // ---- buttons ----
     $("walletBtn").addEventListener("click", () => state.wallet ? showTab("settings") : connect());
     $("walletOffBtn").addEventListener("click", disconnect);
+    $("walletBackBtn").addEventListener("click", () => { haptic("light"); goBackToTelegram(); });
     $("settingsWalletBtn").addEventListener("click", () => state.wallet ? disconnect() : connect());
     $("walletCancel").addEventListener("click", closeSheet);
     $("walletSave").addEventListener("click", () => {
@@ -1356,7 +1370,7 @@
 
     $("startBtn").addEventListener("click", () => {
       hideKeyboard();
-      if (!state.wallet) { connect(); return; }   // button reads "Connect Wallet"
+      if (!state.wallet) { haptic("warning"); showAlert(t("connectFirst"), connect); return; }   // ask to connect first
       sendToBot({
         action: "start_autopilot",
         amount: state.amount,
@@ -1369,7 +1383,7 @@
 
     $("buyBtn").addEventListener("click", () => {
       hideKeyboard();
-      if (!state.wallet) { connect(); return; }   // button reads "Connect Wallet"
+      if (!state.wallet) { haptic("warning"); showAlert(t("connectFirst"), connect); return; }   // ask to connect first
       const ca = $("caInput").value.trim();
       const amount = parseAmount($("buyAmount").value);
       if (!isPubkey(ca)) { $("manualError").textContent = t("badCa"); haptic("error"); return; }
