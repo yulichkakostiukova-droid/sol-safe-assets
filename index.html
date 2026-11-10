@@ -107,6 +107,9 @@
     }
     .wallet-btn:active { transform: scale(.96); }
     .wallet-btn svg { width: 16px; height: 16px; flex: none; }
+    .wallet-btn.waiting { white-space: normal; text-align: center; font-size: 12px; line-height: 1.15; max-width: 132px; padding: 0 12px; }
+    .wait-row { text-align: center; margin: 14px 0 0; }
+    .link-btn { font-size: 13px; color: var(--b-100); text-decoration: underline; text-underline-offset: 3px; padding: 6px 10px; }
     .wallet-btn.connected { background: rgba(255,255,255,.07); color: #fff; padding: 0 14px 0 6px;
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), 0 0 14px rgba(55,129,252,.15); }
     .avatar { width: 28px; height: 28px; border-radius: 50%; flex: none;
@@ -415,6 +418,7 @@
       </div>
       <button class="wallet-btn" id="walletBtn"></button>
     </header>
+    <div class="wait-row" id="waitRow" hidden><button class="link-btn" id="alreadyLink" type="button" data-i18n="alreadyLink">Already connected? Click here</button></div>
     <p class="wallet-note" id="walletNote" data-i18n="walletWarning" style="margin-top: 24px !important; margin-bottom: 24px !important; display: block;"></p>
 
     <!-- ================= TAB 1: TRADE ================= -->
@@ -693,7 +697,7 @@
       <div class="card">
         <div class="kv"><span data-i18n="tradingFee">Trading fee</span><b>1%</b></div>
         <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>1%</b></div>
-        <div class="kv"><span data-i18n="version">Version</span><b>1.8</b></div>
+        <div class="kv"><span data-i18n="version">Version</span><b>1.10</b></div>
       </div>
     </section>
   </main>
@@ -742,7 +746,7 @@
     <h3 id="walletSheetTitle" data-i18n="connectWalletTitle">Connect Wallet</h3>
     <p class="wallet-note in-sheet" data-i18n="walletWarning" style="margin-top: 16px !important; margin-bottom: 16px !important; display: block;"></p>
     <button class="btn-white btn-phantom" id="openPhantomBtn" type="button" data-i18n="phantomBtn">👻 Open in Phantom</button>
-    <div class="or-line" data-i18n="orPaste">or paste public address</div>
+    <div class="or-line" id="orLine" data-i18n="orPaste">or paste public address</div>
     <input class="input mono" id="addrInput" type="text" autocomplete="off" spellcheck="false" enterkeyhint="done" data-i18n-ph="addrPh" placeholder="Public Address">
     <div class="error" id="walletError"></div>
     <div class="sheet-actions" style="margin-top:16px">
@@ -823,6 +827,8 @@
         tpslTitle: "Take Profit / Stop Loss", tpslSub: "Auto-Pilot sells when the price reaches one of these levels.",
         takeProfit: "Take Profit", stopLoss: "Stop Loss", reset: "Reset", save: "Save", saved: "Saved",
         connectWalletTitle: "Connect Wallet",
+        autoConnectFailed: "Could not auto-connect. Please paste your public address manually.",
+        waitingBtn: "⏳ Waiting for wallet...", alreadyLink: "Already connected? Click here",
         phantomBtn: "👻 Open in Phantom", orPaste: "or paste public address",
         manualHint: "Phantom isn't available inside Telegram. Paste your wallet's public address instead — never your seed phrase.",
         disconnectBtn: "🔌 Disconnect",
@@ -868,6 +874,8 @@
         tpslTitle: "Тейк-профит / Стоп-лосс", tpslSub: "Автопилот продаёт, когда цена достигает одного из этих уровней.",
         takeProfit: "Тейк-профит", stopLoss: "Стоп-лосс", reset: "Сброс", save: "Сохранить", saved: "Сохранено",
         connectWalletTitle: "Подключить кошелёк",
+        autoConnectFailed: "Не удалось подключить автоматически. Вставь публичный адрес вручную.",
+        waitingBtn: "⏳ Ожидание кошелька...", alreadyLink: "Уже подключили? Нажмите сюда",
         phantomBtn: "👻 Открыть в Phantom", orPaste: "или вставь публичный адрес",
         manualHint: "Phantom недоступен внутри Telegram. Вставь публичный адрес кошелька — никогда не сид-фразу.",
         disconnectBtn: "🔌 Отключить",
@@ -989,6 +997,11 @@
         $("settingsWallet").textContent = t("notConnected");
         $("settingsWalletBtn").textContent = t("connect");
       }
+      // Waiting for the wallet app: "⏳ Waiting for wallet..." + "Already connected? Click here"
+      const waiting = !state.wallet && isWaiting();
+      $("waitRow").hidden = !waiting;
+      btn.classList.toggle("waiting", waiting);
+      if (waiting) btn.textContent = t("waitingBtn");
     }
 
     function renderAmount(fromInput) {
@@ -1028,8 +1041,8 @@
         // No wallet yet -> the main buttons become "Connect Wallet"
         $("startBtn").disabled = false;
         $("buyBtn").disabled = false;
-        $("startBtn").querySelector("span").textContent = ok ? t("startAutoPilot") : t("connectWallet");
-        $("buyBtn").querySelector("span").textContent = ok ? t("buyToken") : t("connectWallet");
+        $("startBtn").querySelector("span").textContent = ok ? t("startAutoPilot") : (isWaiting() ? t("waitingBtn") : t("connectWallet"));
+        $("buyBtn").querySelector("span").textContent = ok ? t("buyToken") : (isWaiting() ? t("waitingBtn") : t("connectWallet"));
       }
       $("autoHint").textContent = ok ? t("readyAuto") : t("connectFirst");
       $("manualHint").textContent = ok ? t("readyBuy") : t("connectFirst");
@@ -1152,9 +1165,18 @@
     // =====================================================================
     const WALLET_KEY = "savedWallet";
     const inTelegram = !!(tg && tg.initData);
-    // Phone = Telegram says ios/android, OR the browser itself is an iPhone/iPad/Android
-    const isMobile = (tg && ["ios", "android", "android_x"].includes(tg.platform))
-                  || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent || "");
+    // Platform: Telegram tells us ("ios" / "android" / "android_x" = phone; "tdesktop", "macos",
+    // "weba", "webk", "unigram" = computer). Without Telegram data: user agent, then screen width.
+    const MOBILE_PLATFORMS = ["ios", "android", "android_x"];
+    function detectMobile() {
+      const platform = (tg && tg.platform) || "";
+      if (MOBILE_PLATFORMS.includes(platform)) return true;
+      const ua = navigator.userAgent || "";
+      if (/iPhone|iPad|iPod|Android/i.test(ua)) return true;                 // phone browser
+      if (platform && platform !== "unknown") return false;                  // known desktop client
+      return window.innerWidth < 768 && ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+    }
+    const isMobile = detectMobile();
     const botName = params.get("bot");
     window.currentWallet = null;   // global copies of the connected address (e.g. for Buy)
     window.userWallet = null;
@@ -1189,7 +1211,10 @@
       window.currentWallet = window.userWallet = state.wallet;
       writeSavedWallet(state.wallet);
     }
-    function setWallet(addr) { applyWallet(addr); renderWallet(); renderButtons(); }
+    function setWallet(addr) {
+      if (addr) { try { sessionStorage.removeItem("returningFromWallet"); sessionStorage.removeItem("returningFromWalletAt"); } catch (e) {} }
+      applyWallet(addr); renderWallet(); renderButtons();
+    }
 
     // This page's URL without the one-time params (and, if asked, without #tgWebAppData)
     function cleanPageUrl(keepHash) {
@@ -1211,7 +1236,8 @@
         try { history.replaceState(null, "", cleanPageUrl(true)); } catch (e) {}   // a reload can't bring them back
       }
       if (autoConnect) applyWallet(null);                  // don't trust an old wallet in Phantom's browser
-      else applyWallet(urlWallet || readSavedWallet());    // bot's wallet first, then this device's
+      else applyWallet(urlWallet || readSavedWallet());    // bot's wallet first, then this device's (works for any wallet)
+      if (state.wallet) { try { sessionStorage.removeItem("returningFromWallet"); sessionStorage.removeItem("returningFromWalletAt"); } catch (e) {} }
     }
     function afterWalletInit() {
       if (!autoConnect) return;
@@ -1232,6 +1258,26 @@
     }
 
     // ---- Connect ----
+    // ---- "waiting for wallet" state (any wallet) ----
+    function isWaiting() {
+      try {
+        return sessionStorage.getItem("returningFromWallet") === "true"
+            && Date.now() - (+sessionStorage.getItem("returningFromWalletAt") || 0) < 10 * 60 * 1000;
+      } catch (e) { return false; }
+    }
+    function startWaiting() {
+      try {
+        sessionStorage.setItem("returningFromWallet", "true");
+        sessionStorage.setItem("returningFromWalletAt", String(Date.now()));
+      } catch (e) {}
+      leftApp = false;
+      renderWallet(); renderButtons();
+    }
+    function clearWaiting() {
+      try { sessionStorage.removeItem("returningFromWallet"); sessionStorage.removeItem("returningFromWalletAt"); } catch (e) {}
+      renderWallet(); renderButtons();
+    }
+
     // Link to THIS app for a wallet's in-app browser. It keeps ?lang= (and ?bot=), adds
     // connect=1 and a fresh timestamp t=..., so every open is a brand-new URL: Telegram and the
     // wallet browser can't serve a cached/frozen copy. #tgWebAppData (login data) is never included.
@@ -1250,11 +1296,16 @@
     }
     function openInPhantom() {
       haptic("light");
+      startWaiting();                                   // button -> "⏳ Waiting for wallet..."
       openLinkSafe("https://phantom.app/ul/browse/" + encodeURIComponent(buildWalletUrl())
                    + "?ref=" + encodeURIComponent(location.origin));
     }
     function openConnectSheet() {
       $("walletError").textContent = ""; $("addrInput").value = "";
+      // The wallet-app deeplink only makes sense on a phone. On a computer without the
+      // extension there's no app to open -> paste the address only.
+      $("openPhantomBtn").hidden = !isMobile;
+      $("orLine").hidden = !isMobile;
       openSheet("sheet-wallet");
     }
     let connecting = false;
@@ -1330,9 +1381,35 @@
       renderWallet(); renderButtons();
       if (saved) { closeSheet(); toast(t("walletSaved")); }
     }
-    window.addEventListener("focus", () => { checkSavedWallet(); });
-    window.addEventListener("pageshow", (e) => { if (e.persisted) checkSavedWallet(); });   // page restored from cache
-    document.addEventListener("visibilitychange", () => { if (!document.hidden) checkSavedWallet(); });
+    // ---- Returning from a wallet app (Phantom / Solflare / Backpack) ----
+    // Telegram's WebView may stay frozen on the old screen, so on every "back in the app" signal
+    // we re-read the saved wallet and repaint WITHOUT reloading the page.
+    let leftApp = false;
+    // manual = true when the user taps "Already connected? Click here"
+    function handleReturnFromWallet(manual) {
+      manual = manual === true;                                 // (events pass an Event object)
+      checkSavedWallet();                                       // saved wallet -> UI updates instantly
+      if (readSavedWallet() || state.wallet) {                  // success: the wallet came through
+        clearWaiting(); renderButtons();
+        if (manual) toast(t("walletSaved"));
+        return;
+      }
+      if (!isWaiting() && !manual) return;                      // nothing to wait for
+      // Not back yet? (the event fired right after the tap, before the user really left)
+      if (!manual && !leftApp) {
+        let at = 0; try { at = +sessionStorage.getItem("returningFromWalletAt") || 0; } catch (e) {}
+        if (Date.now() - at < 4000) return;
+      }
+      clearWaiting();                                           // reset the button to "Connect"
+      haptic("warning"); toast(t("autoConnectFailed"));
+      setTimeout(openConnectSheet, 400);                        // fallback: paste the address by hand
+    }
+    $("alreadyLink").addEventListener("click", () => { haptic("light"); handleReturnFromWallet(true); });
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") handleReturnFromWallet(); else leftApp = true;
+    });
+    window.addEventListener("focus", () => handleReturnFromWallet());
+    window.addEventListener("pageshow", (e) => { if (e.persisted) handleReturnFromWallet(); });
 
     // =====================================================================
     // SEND TO BOT (closes the keyboard; 3-second double-click guard)
