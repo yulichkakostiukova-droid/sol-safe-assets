@@ -55,7 +55,6 @@
     }
     @keyframes beam     { from { transform: translate(-30%,-46%) rotate(28deg); } to { transform: translate(-26%,-50%) rotate(34deg); } }
     @keyframes beam-cut { from { transform: translate(-78%,-60%) rotate(28deg); } to { transform: translate(-74%,-63%) rotate(34deg); } }
-    @media (prefers-reduced-motion: reduce) { .beam, .beam-cut { animation: none; } }
 
     main { position: relative; z-index: 1; max-width: 440px; margin: 0 auto; }
 
@@ -113,7 +112,9 @@
     }
     .card-title { font-size: 20px; font-weight: 400; letter-spacing: -.03em; }
     .card-desc { font-size: 13.5px; line-height: 1.5; color: var(--text-2); margin: 8px 0 0; letter-spacing: -.005em; }
+    .card-desc strong { color: #fff; font-weight: 500; }
     .label { font-size: 12.5px; color: var(--text-3); letter-spacing: -.005em; margin: 0 0 8px 4px; }
+    .divider { height: 1px; background: rgba(255,255,255,.09); margin: 20px -22px; }
 
     /* ================= SEGMENTED CONTROL ================= */
     .segmented {
@@ -135,6 +136,32 @@
     .segmented button svg { width: 17px; height: 17px; }
     .segmented button.on { color: #000; }
     .segmented.small button { height: 36px; font-size: 13.5px; }
+
+    /* ================= SMART MODE (top of Auto-Pilot card) ================= */
+    .row { display: flex; align-items: center; gap: 12px; }
+    .smart-title { font-size: 17px; font-weight: 500; letter-spacing: -.02em; display: flex; align-items: center; gap: 8px; }
+    .smart-title svg { width: 18px; height: 18px; color: var(--b-100); filter: drop-shadow(0 0 6px rgba(111,220,255,.9)); }
+    .smart-info {
+      margin-top: 12px; padding: 12px 14px; border-radius: 18px; font-size: 13px; line-height: 1.5; color: var(--text-2);
+      background: linear-gradient(135deg, rgba(25,81,252,.16), rgba(111,220,255,.06));
+      box-shadow: inset 0 0 0 1px rgba(111,220,255,.22);
+    }
+    .smart-info b { color: #fff; font-weight: 500; }
+    .tpsl-link { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; margin-top: 12px;
+      padding: 13px 14px; border-radius: 18px; background: rgba(255,255,255,.04); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16);
+      font-size: 14px; font-weight: 500; color: var(--b-100); letter-spacing: -.01em; text-align: left; }
+    .tpsl-link .vals { color: var(--text-2); font-weight: 400; font-size: 13px; white-space: nowrap; }
+    .tpsl-link .vals .up { color: #6ff0b8; } .tpsl-link .vals .down { color: #ff9aaa; }
+    .tpsl-link svg { width: 16px; height: 16px; flex: none; }
+
+    /* iOS switch */
+    .switch { position: relative; width: 52px; height: 32px; flex: none; margin-left: auto; border-radius: 999px; background: rgba(255,255,255,.14);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); transition: background .25s, box-shadow .25s; }
+    .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,.4); transition: transform .28s cubic-bezier(.2,.8,.2,1); }
+    .switch[aria-checked="true"] { background: linear-gradient(90deg, var(--b-600), var(--b-400));
+      box-shadow: 0 0 16px rgba(55,129,252,.6), inset 0 0 0 1px rgba(203,233,253,.4); }
+    .switch[aria-checked="true"]::after { transform: translateX(20px); box-shadow: 0 2px 6px rgba(0,0,0,.4), 0 0 12px rgba(203,233,253,.8); }
 
     /* ================= AMOUNT ================= */
     .amount { display: flex; align-items: baseline; margin-top: 4px; }
@@ -176,28 +203,6 @@
       background: rgba(255,255,255,.04); box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); transition: background .2s, color .2s; }
     .preset.active { background: #fff; color: #000; box-shadow: 0 0 16px rgba(203,233,253,.45); }
 
-    /* ================= SMART MODE ================= */
-    .row { display: flex; align-items: center; gap: 12px; }
-    .smart { margin-top: 20px; padding: 14px 14px 14px 16px; border-radius: 22px; background: rgba(255,255,255,.04);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); }
-    .smart .title { font-size: 15px; font-weight: 500; letter-spacing: -.015em; display: flex; align-items: center; gap: 7px; }
-    .smart .title svg { width: 16px; height: 16px; color: var(--b-100); filter: drop-shadow(0 0 6px rgba(111,220,255,.9)); }
-    .smart .sub { font-size: 12.5px; color: var(--text-3); margin-top: 3px; }
-    .smart .grow { flex: 1; min-width: 0; }
-    .tpsl-link { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 12px; padding-top: 12px;
-      border-top: 1px solid rgba(255,255,255,.08); font-size: 14px; font-weight: 500; color: var(--b-100); letter-spacing: -.01em; text-align: left; }
-    .tpsl-link .vals { color: var(--text-2); font-weight: 400; font-size: 13px; white-space: nowrap; }
-    .tpsl-link svg { width: 16px; height: 16px; }
-
-    /* iOS switch */
-    .switch { position: relative; width: 52px; height: 32px; flex: none; border-radius: 999px; background: rgba(255,255,255,.14);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); transition: background .25s, box-shadow .25s; }
-    .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff;
-      box-shadow: 0 2px 6px rgba(0,0,0,.4); transition: transform .28s cubic-bezier(.2,.8,.2,1); }
-    .switch[aria-checked="true"] { background: linear-gradient(90deg, var(--b-600), var(--b-400));
-      box-shadow: 0 0 16px rgba(55,129,252,.6), inset 0 0 0 1px rgba(203,233,253,.4); }
-    .switch[aria-checked="true"]::after { transform: translateX(20px); box-shadow: 0 2px 6px rgba(0,0,0,.4), 0 0 12px rgba(203,233,253,.8); }
-
     /* ================= BUTTONS ================= */
     .btn-white {
       width: 100%; height: 56px; margin-top: 20px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 9px;
@@ -228,15 +233,49 @@
     .note { display: flex; gap: 10px; margin-top: 16px; font-size: 12.5px; line-height: 1.5; color: var(--text-2); }
     .note svg { width: 16px; height: 16px; flex: none; margin-top: 1px; color: var(--b-100); }
 
-    /* ================= LEARN / DESKTOP / SETTINGS ================= */
-    .badge { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; margin-bottom: 14px;
-      background: radial-gradient(circle at 50% 0%, rgba(255,255,255,.16), transparent 60%), linear-gradient(180deg, #171a24, #08090d);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), inset 0 1px 0 rgba(255,255,255,.2), 0 0 18px rgba(55,129,252,.25); }
-    .badge svg { width: 20px; height: 20px; color: #e3edff; filter: drop-shadow(0 0 6px rgba(55,129,252,.8)); }
-    .card .more { margin-top: 12px; }
+    /* ================= LEARN (media cards with SVG art) ================= */
+    .learn-card { padding: 0; overflow: hidden; }
+    .cover {
+      position: relative; height: 178px; overflow: hidden; border-bottom: 1px solid rgba(255,255,255,.08);
+      background:
+        radial-gradient(60% 80% at 50% 60%, rgba(25,81,252,.32), transparent 70%),
+        linear-gradient(180deg, rgba(10,18,40,.55), rgba(5,5,8,.2));
+    }
+    .cover.warn-bg { background:
+        radial-gradient(55% 75% at 50% 58%, rgba(255,92,122,.22), transparent 70%),
+        radial-gradient(70% 90% at 50% 60%, rgba(25,81,252,.25), transparent 75%),
+        linear-gradient(180deg, rgba(20,12,24,.55), rgba(5,5,8,.2)); }
+    .cover::after { /* fine grid for a "3D render" floor */
+      content: ""; position: absolute; inset: 0; opacity: .35; pointer-events: none;
+      background-image: linear-gradient(rgba(111,220,255,.10) 1px, transparent 1px), linear-gradient(90deg, rgba(111,220,255,.10) 1px, transparent 1px);
+      background-size: 22px 22px;
+      -webkit-mask: radial-gradient(70% 60% at 50% 100%, #000, transparent 75%); mask: radial-gradient(70% 60% at 50% 100%, #000, transparent 75%);
+    }
+    .cover svg { position: relative; z-index: 1; width: 100%; height: 100%; display: block; }
+    .learn-body { padding: 18px 20px 20px; }
+    .learn-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .btn-video {
+      margin-top: 16px; height: 44px; padding: 0 18px 0 6px; border-radius: 999px; display: inline-flex; align-items: center; gap: 10px;
+      font-size: 14px; font-weight: 500; letter-spacing: -.01em; color: #fff;
+      background: rgba(255,255,255,.06); box-shadow: inset 0 0 0 1px rgba(255,255,255,.26), 0 0 18px rgba(55,129,252,.18);
+      transition: transform .12s;
+    }
+    .btn-video:active { transform: scale(.97); }
+    .btn-video .play { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: #fff;
+      box-shadow: 0 0 14px rgba(203,233,253,.7); }
+    .btn-video .play svg { width: 12px; height: 12px; margin-left: 2px; }
+    @keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    @keyframes pulse  { 0%, 100% { opacity: .55; transform: scale(1); } 50% { opacity: 1; transform: scale(1.06); } }
+    @keyframes rise   { from { transform: translate(0, 0); opacity: .9; } to { transform: translate(-26px, 34px); opacity: 0; } }
+    .float { animation: floaty 4.5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+    .pulse { animation: pulse 3s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+    .spark { animation: rise 2.4s linear infinite; }
+
     .tag { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .3px; padding: 5px 10px; border-radius: 999px;
       color: var(--b-100); background: rgba(25,81,252,.14); box-shadow: inset 0 0 0 1px rgba(55,129,252,.35); }
+    .tag.red { color: #ffc2cc; background: rgba(255,92,122,.12); box-shadow: inset 0 0 0 1px rgba(255,92,122,.35); }
 
+    /* ================= DESKTOP / SETTINGS ================= */
     .laptop { position: relative; width: 210px; height: 140px; margin: 10px auto 22px; }
     .laptop .screen-l { position: absolute; left: 22px; right: 22px; top: 0; height: 118px; border-radius: 14px 14px 4px 4px;
       background: linear-gradient(160deg, #0a1440, #050814); box-shadow: inset 0 0 0 2px rgba(255,255,255,.22), 0 0 40px rgba(55,129,252,.45);
@@ -262,6 +301,7 @@
     .settings-row .t { font-size: 15px; font-weight: 500; letter-spacing: -.015em; }
     .settings-row .s { font-size: 12.5px; color: var(--text-3); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .settings-row .segmented { margin: 0; width: 116px; flex: none; }
+    .settings-row .switch { margin-left: 0; }
     .kv { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 0; color: var(--text-2); }
     .kv b { color: #fff; font-weight: 500; }
 
@@ -291,31 +331,34 @@
       background: var(--b-400); box-shadow: 0 0 10px var(--b-400), 0 0 18px var(--cyan); }
     .tab:active svg { transform: scale(.9); }
 
-    /* ================= BOTTOM SHEET (iOS style) ================= */
-    .backdrop { position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,.55); opacity: 0; pointer-events: none;
-      transition: opacity .3s; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+    /* ================= BOTTOM SHEET (iOS-style glass) ================= */
+    .backdrop { position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,.45); opacity: 0; pointer-events: none;
+      transition: opacity .3s; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
     .backdrop.open { opacity: 1; pointer-events: auto; }
     .sheet {
       position: fixed; z-index: 31; left: 50%; bottom: 0; width: 100%; max-width: 480px;
       transform: translate(-50%, 105%); transition: transform .38s cubic-bezier(.2,.85,.25,1);
-      padding: 10px 22px calc(26px + env(safe-area-inset-bottom)); border-radius: 30px 30px 0 0;
-      background: linear-gradient(180deg, rgba(22,26,38,.92), rgba(8,9,13,.96));
-      border: 1px solid var(--line); border-bottom: 0;
-      -webkit-backdrop-filter: blur(30px); backdrop-filter: blur(30px);
-      box-shadow: 0 -10px 60px rgba(0,0,0,.7), 0 -1px 30px rgba(55,129,252,.18), inset 0 1px 0 rgba(255,255,255,.12);
+      padding: 10px 22px calc(26px + env(safe-area-inset-bottom)); border-radius: 32px 32px 0 0;
+      background: linear-gradient(180deg, rgba(30,36,52,.62), rgba(10,12,18,.72));
+      border: 1px solid rgba(255,255,255,.22); border-bottom: 0;
+      -webkit-backdrop-filter: blur(34px) saturate(170%); backdrop-filter: blur(34px) saturate(170%);
+      box-shadow: 0 -10px 60px rgba(0,0,0,.6), 0 -1px 40px rgba(55,129,252,.22), inset 0 1px 0 rgba(255,255,255,.18);
     }
     .sheet.open { transform: translate(-50%, 0); }
-    .grabber { width: 40px; height: 5px; border-radius: 999px; background: rgba(255,255,255,.28); margin: 0 auto 18px; }
+    .grabber { width: 40px; height: 5px; border-radius: 999px; background: rgba(255,255,255,.32); margin: 0 auto 18px; }
     .sheet h3 { margin: 0; font-size: 21px; font-weight: 500; letter-spacing: -.03em; }
     .sheet .sheet-sub { font-size: 13px; color: var(--text-2); margin: 6px 0 18px; line-height: 1.45; }
     .sl-block { padding: 16px 0; border-top: 1px solid rgba(255,255,255,.08); }
     .sl-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
     .sl-head .n { font-size: 14.5px; font-weight: 500; }
-    .sl-head .v { font-size: 26px; font-weight: 500; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
-    .v.tp { color: #6ff0b8; text-shadow: 0 0 18px rgba(18,199,132,.45); }
-    .v.sl { color: #ff9aaa; text-shadow: 0 0 18px rgba(255,92,122,.4); }
-    .range.tp { background: linear-gradient(90deg, #0f8f62, #6ff0b8) 0 / var(--fill, 0%) 100% no-repeat, rgba(255,255,255,.16); box-shadow: 0 0 12px rgba(18,199,132,.25); }
-    .range.sl { background: linear-gradient(90deg, #ff9aaa, #c2304b) 0 / var(--fill, 0%) 100% no-repeat, rgba(255,255,255,.16); box-shadow: 0 0 12px rgba(255,92,122,.22); }
+    .sl-head .v { font-size: 30px; font-weight: 500; letter-spacing: -.045em; font-variant-numeric: tabular-nums; }
+    .v.tp { color: #6ff0b8; text-shadow: 0 0 18px rgba(18,199,132,.5); }
+    .v.sl { color: #ff9aaa; text-shadow: 0 0 18px rgba(255,92,122,.45); }
+    .range.tp { background: linear-gradient(90deg, #0f8f62, #6ff0b8) 0 / var(--fill, 0%) 100% no-repeat, rgba(255,255,255,.16); box-shadow: 0 0 14px rgba(18,199,132,.3); }
+    .range.tp::-webkit-slider-thumb { box-shadow: 0 2px 8px rgba(0,0,0,.5), 0 0 16px rgba(111,240,184,.9), 0 0 30px rgba(18,199,132,.6); }
+    .range.sl { background: linear-gradient(90deg, #ff9aaa, #c2304b) 0 / var(--fill, 0%) 100% no-repeat, rgba(255,255,255,.16); box-shadow: 0 0 14px rgba(255,92,122,.28); }
+    .range.sl::-webkit-slider-thumb { box-shadow: 0 2px 8px rgba(0,0,0,.5), 0 0 16px rgba(255,154,170,.9), 0 0 30px rgba(255,92,122,.6); }
+    .scale { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--text-3); margin-top: 10px; }
     .sheet-actions { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center; margin-top: 8px; }
     .sheet-actions .btn-white { margin-top: 0; height: 52px; }
     .sheet-actions .btn-dark { height: 52px; padding: 0 20px; }
@@ -326,6 +369,10 @@
       background: rgba(20,22,30,.9); border: 1px solid var(--line); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
       box-shadow: 0 10px 30px rgba(0,0,0,.6), 0 0 20px rgba(55,129,252,.2); transition: transform .35s cubic-bezier(.2,.85,.25,1); text-align: center; }
     .toast.show { transform: translate(-50%, 0); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .beam, .beam-cut, .float, .pulse, .spark { animation: none; }
+    }
   </style>
 </head>
 <body>
@@ -358,12 +405,29 @@
       <!-- Auto-Pilot -->
       <div id="mode-auto">
         <div class="card featured">
+          <!-- Smart Mode at the top -->
+          <div class="row">
+            <div class="smart-title">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5 13.9 8 19.5 10l-5.6 2L12 17.5 10.1 12 4.5 10l5.6-2z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" opacity=".7"/></svg>
+              <span data-i18n="smartMode">Smart Mode</span>
+            </div>
+            <button class="switch" id="smartSwitch" role="switch" aria-checked="true" aria-label="Smart Mode"></button>
+          </div>
+          <div class="smart-info" id="smartInfo" data-i18n-html="smartOn"></div>
+          <button class="tpsl-link" id="tpslLink" hidden>
+            <span data-i18n="setTpSl">⚙️ Set Take Profit / Stop Loss</span>
+            <span class="row" style="gap:6px"><span class="vals" id="tpslVals"></span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+          </button>
+
+          <div class="divider"></div>
+
           <div class="card-title" data-i18n="amountPerTrade">Amount per trade</div>
           <div class="amount"><span class="value" id="amountValue">0,01</span><span class="unit">&nbsp;SOL</span></div>
 
           <div class="slider-row">
             <input class="range" type="range" id="amountSlider" min="0.005" max="10" step="0.005" value="0.01" aria-label="Amount in SOL">
-            <label class="amount-input"><input id="amountInput" type="text" inputmode="decimal" autocomplete="off" aria-label="Custom amount"><span>SOL</span></label>
+            <label class="amount-input"><input id="amountInput" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" aria-label="Custom amount"><span>SOL</span></label>
           </div>
           <div class="range-labels"><span>0,005</span><span>10,0+</span></div>
 
@@ -372,24 +436,6 @@
             <button class="preset" data-v="0.05">0,05</button>
             <button class="preset" data-v="0.1">0,1</button>
             <button class="preset" data-v="0.5">0,5</button>
-          </div>
-
-          <div class="smart">
-            <div class="row">
-              <div class="grow">
-                <div class="title">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5 13.9 8 19.5 10l-5.6 2L12 17.5 10.1 12 4.5 10l5.6-2z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" opacity=".7"/></svg>
-                  <span data-i18n="smartMode">Smart Mode</span>
-                </div>
-                <div class="sub" id="smartSub"></div>
-              </div>
-              <button class="switch" id="smartSwitch" role="switch" aria-checked="true" aria-label="Smart Mode"></button>
-            </div>
-            <button class="tpsl-link" id="tpslLink" hidden>
-              <span data-i18n="setTpSl">⚙️ Set Take Profit / Stop Loss</span>
-              <span class="row" style="gap:6px"><span class="vals" id="tpslVals"></span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
-            </button>
           </div>
 
           <button class="btn-white" id="startBtn" disabled>
@@ -407,11 +453,11 @@
           <p class="card-desc" data-i18n="buyDesc">Paste the token address and the amount. You'll get a live quote in the chat and confirm there.</p>
           <div class="field">
             <div class="label" data-i18n="tokenAddress">Token Address (CA)</div>
-            <input class="input mono" id="caInput" type="text" autocomplete="off" spellcheck="false" data-i18n-ph="caPh" placeholder="e.g. DezXAZ8z7Pnrn…">
+            <input class="input mono" id="caInput" type="text" autocomplete="off" spellcheck="false" enterkeyhint="next" data-i18n-ph="caPh" placeholder="e.g. DezXAZ8z7Pnrn…">
           </div>
           <div class="field">
             <div class="label" data-i18n="amountSol">Amount (SOL)</div>
-            <input class="input" id="buyAmount" type="text" inputmode="decimal" autocomplete="off" placeholder="0,1">
+            <input class="input" id="buyAmount" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="0,1">
           </div>
           <div class="error" id="manualError"></div>
           <div class="note">
@@ -437,22 +483,134 @@
       <h1 class="screen-title" data-i18n="learnTitle">Learn</h1>
       <p class="screen-sub" data-i18n="learnSub">Three things every Solana trader should know.</p>
 
-      <div class="card">
-        <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
-        <div class="card-title" data-i18n="l1t">What is Slippage?</div>
-        <p class="card-desc" data-i18n="l1d"></p>
-      </div>
-      <div class="card">
-        <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></div>
-        <div class="card-title" data-i18n="l2t">How to avoid Rug Pulls?</div>
-        <p class="card-desc" data-i18n-html="l2d"></p>
-      </div>
-      <div class="card featured">
-        <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></div>
-        <div class="card-title" data-i18n="l3t">How Auto-Pilot works?</div>
-        <p class="card-desc" data-i18n="l3d"></p>
-        <div class="more"><span class="tag" data-i18n="previewTag">PREVIEW</span></div>
-      </div>
+      <!-- Card 1: Slippage - arrow hitting a target + sliding scale -->
+      <article class="card learn-card">
+        <div class="cover">
+          <svg viewBox="0 0 340 178" aria-hidden="true">
+            <defs>
+              <linearGradient id="s-arrow" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#cbe9fd"/><stop offset=".5" stop-color="#6fdcff"/><stop offset="1" stop-color="#3781fc"/></linearGradient>
+              <radialGradient id="s-ring" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#3781fc"/><stop offset=".6" stop-color="#0b2cb1"/><stop offset="1" stop-color="#03195b"/></radialGradient>
+              <radialGradient id="s-core" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#ffffff"/><stop offset=".35" stop-color="#cbe9fd"/><stop offset="1" stop-color="#3781fc"/></radialGradient>
+              <linearGradient id="s-bar" x1="0" x2="1"><stop offset="0" stop-color="#0b2cb1"/><stop offset=".6" stop-color="#3781fc"/><stop offset="1" stop-color="#6fdcff"/></linearGradient>
+              <filter id="s-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              <filter id="s-soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="14"/></filter>
+            </defs>
+            <ellipse cx="212" cy="150" rx="70" ry="9" fill="#000" opacity=".55" filter="url(#s-soft)"/>
+            <g class="float">
+              <circle cx="212" cy="82" r="58" fill="#1951fc" opacity=".35" filter="url(#s-soft)"/>
+              <circle cx="212" cy="82" r="52" fill="url(#s-ring)" stroke="rgba(203,233,253,.55)" stroke-width="1.5"/>
+              <circle cx="212" cy="82" r="38" fill="none" stroke="rgba(111,220,255,.55)" stroke-width="2"/>
+              <circle cx="212" cy="82" r="24" fill="url(#s-ring)" stroke="rgba(203,233,253,.7)" stroke-width="1.5"/>
+              <circle cx="212" cy="82" r="12" fill="url(#s-core)" filter="url(#s-glow)"/>
+              <ellipse cx="196" cy="56" rx="20" ry="8" fill="#fff" opacity=".12" transform="rotate(-25 196 56)"/>
+            </g>
+            <g filter="url(#s-glow)">
+              <line x1="70" y1="20" x2="200" y2="76" stroke="url(#s-arrow)" stroke-width="6" stroke-linecap="round"/>
+              <path d="M210 81 188 82 197 63Z" fill="#cbe9fd"/>
+              <path d="M70 20 58 10 M70 20 54 24 M80 25 68 15 M80 25 64 29" stroke="#6fdcff" stroke-width="3" stroke-linecap="round"/>
+            </g>
+            <g>
+              <rect x="40" y="152" width="260" height="6" rx="3" fill="rgba(255,255,255,.12)"/>
+              <rect x="40" y="152" width="150" height="6" rx="3" fill="url(#s-bar)" filter="url(#s-glow)"/>
+              <g fill="rgba(255,255,255,.35)"><rect x="40" y="163" width="1.5" height="5"/><rect x="105" y="163" width="1.5" height="5"/><rect x="170" y="163" width="1.5" height="5"/><rect x="235" y="163" width="1.5" height="5"/><rect x="298" y="163" width="1.5" height="5"/></g>
+              <circle cx="190" cy="155" r="9" fill="#fff" filter="url(#s-glow)"/>
+              <circle cx="190" cy="155" r="4" fill="#3781fc"/>
+            </g>
+          </svg>
+        </div>
+        <div class="learn-body">
+          <div class="learn-meta"><span class="tag" data-i18n="tagBasics">BASICS</span></div>
+          <div class="card-title" data-i18n="l1t">What is Slippage?</div>
+          <p class="card-desc" data-i18n="l1d"></p>
+          <button class="btn-video" data-video="slippage"><span class="play"><svg viewBox="0 0 24 24" fill="#000"><path d="M6 4l14 8-14 8z"/></svg></span><span data-i18n="watchVideo">Watch Video</span></button>
+        </div>
+      </article>
+
+      <!-- Card 2: Rug Pull - glowing shield with exclamation mark -->
+      <article class="card learn-card">
+        <div class="cover warn-bg">
+          <svg viewBox="0 0 340 178" aria-hidden="true">
+            <defs>
+              <linearGradient id="r-shield" x1="0" y1="0" x2=".3" y2="1"><stop offset="0" stop-color="#3781fc"/><stop offset=".55" stop-color="#0b2cb1"/><stop offset="1" stop-color="#03195b"/></linearGradient>
+              <linearGradient id="r-rim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cbe9fd"/><stop offset=".5" stop-color="#6fdcff"/><stop offset="1" stop-color="#3781fc"/></linearGradient>
+              <linearGradient id="r-shine" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+              <radialGradient id="r-warn" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff5c7a" stop-opacity=".55"/><stop offset="1" stop-color="#ff5c7a" stop-opacity="0"/></radialGradient>
+              <filter id="r-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              <filter id="r-soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="14"/></filter>
+            </defs>
+            <circle class="pulse" cx="170" cy="86" r="78" fill="url(#r-warn)"/>
+            <circle cx="170" cy="86" r="66" fill="none" stroke="rgba(255,138,155,.25)" stroke-width="1" stroke-dasharray="3 7"/>
+            <ellipse cx="170" cy="166" rx="54" ry="8" fill="#000" opacity=".6" filter="url(#r-soft)"/>
+            <g transform="translate(0 9)"><g class="float">
+              <path d="M170 20 220 38V80c0 34-22 56-50 68-28-12-50-34-50-68V38Z" fill="#1951fc" opacity=".45" filter="url(#r-soft)"/>
+              <path d="M170 20 220 38V80c0 34-22 56-50 68-28-12-50-34-50-68V38Z" fill="url(#r-shield)" stroke="url(#r-rim)" stroke-width="2.5" stroke-linejoin="round"/>
+              <path d="M170 30 211 45V80c0 28-18 47-41 57-23-10-41-29-41-57V45Z" fill="none" stroke="rgba(203,233,253,.35)" stroke-width="1.2"/>
+              <path d="M170 22 218 39V60C190 54 150 64 122 82V39Z" fill="url(#r-shine)" opacity=".5"/>
+              <g filter="url(#r-glow)">
+                <rect x="163" y="52" width="14" height="50" rx="7" fill="#ffffff"/>
+                <circle cx="170" cy="118" r="8" fill="#ffffff"/>
+              </g>
+            </g></g>
+            <g fill="#ff9aaa">
+              <circle cx="96" cy="50" r="2.4" opacity=".8"/><circle cx="252" cy="40" r="1.8" opacity=".6"/>
+              <circle cx="262" cy="118" r="2.6" opacity=".7"/><circle cx="84" cy="122" r="1.6" opacity=".6"/>
+            </g>
+          </svg>
+        </div>
+        <div class="learn-body">
+          <div class="learn-meta"><span class="tag red" data-i18n="tagSafety">SAFETY</span></div>
+          <div class="card-title" data-i18n="l2t">How to avoid Rug Pulls?</div>
+          <p class="card-desc" data-i18n-html="l2d"></p>
+          <button class="btn-video" data-video="rugpull"><span class="play"><svg viewBox="0 0 24 24" fill="#000"><path d="M6 4l14 8-14 8z"/></svg></span><span data-i18n="watchVideo">Watch Video</span></button>
+        </div>
+      </article>
+
+      <!-- Card 3: Auto-Pilot - rocket taking off with a particle trail -->
+      <article class="card learn-card featured">
+        <div class="cover">
+          <svg viewBox="0 0 340 178" aria-hidden="true">
+            <defs>
+              <linearGradient id="k-body" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8fb6ff"/><stop offset=".45" stop-color="#ffffff"/><stop offset="1" stop-color="#7d8fb8"/></linearGradient>
+              <linearGradient id="k-fin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3781fc"/><stop offset="1" stop-color="#0b2cb1"/></linearGradient>
+              <radialGradient id="k-window" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffffff"/><stop offset=".3" stop-color="#6fdcff"/><stop offset="1" stop-color="#0b2cb1"/></radialGradient>
+              <linearGradient id="k-flame" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".3" stop-color="#cbe9fd"/><stop offset=".65" stop-color="#3781fc" stop-opacity=".8"/><stop offset="1" stop-color="#1951fc" stop-opacity="0"/></linearGradient>
+              <filter id="k-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              <filter id="k-soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="12"/></filter>
+            </defs>
+            <g stroke="rgba(111,220,255,.35)" stroke-width="2" stroke-linecap="round">
+              <line x1="60" y1="40" x2="110" y2="40"/><line x1="40" y1="70" x2="78" y2="70"/><line x1="250" y1="130" x2="300" y2="130"/>
+            </g>
+            <!-- particle trail -->
+            <g fill="#6fdcff" filter="url(#k-glow)">
+              <circle class="spark" cx="150" cy="128" r="4" style="animation-delay:0s"/>
+              <circle class="spark" cx="140" cy="136" r="3" style="animation-delay:.6s"/>
+              <circle class="spark" cx="158" cy="142" r="2.5" style="animation-delay:1.2s"/>
+              <circle class="spark" cx="132" cy="122" r="2" style="animation-delay:1.8s"/>
+              <circle class="spark" cx="146" cy="150" r="2" style="animation-delay:.9s"/>
+            </g>
+            <g class="float">
+              <g transform="rotate(38 190 82)">
+                <path d="M176 104 Q190 178 204 104 Z" fill="url(#k-flame)" filter="url(#k-glow)"/>
+                <path d="M183 104 Q190 140 197 104 Z" fill="#fff" opacity=".95" filter="url(#k-glow)"/>
+                <path d="M190 18c20 18 27 46 25 80h-50c-2-34 5-62 25-80Z" fill="#1951fc" opacity=".45" filter="url(#k-soft)"/>
+                <path d="M168 84 148 110l22-6Z" fill="url(#k-fin)" stroke="rgba(203,233,253,.5)" stroke-width="1"/>
+                <path d="M212 84 232 110l-22-6Z" fill="url(#k-fin)" stroke="rgba(203,233,253,.5)" stroke-width="1"/>
+                <path d="M190 18c20 18 27 46 25 80h-50c-2-34 5-62 25-80Z" fill="url(#k-body)" stroke="rgba(255,255,255,.7)" stroke-width="1.2"/>
+                <path d="M190 18c9 8 15 18 19 30h-38c4-12 10-22 19-30Z" fill="url(#k-fin)"/>
+                <rect x="176" y="98" width="28" height="9" rx="3" fill="#3a4766"/>
+                <circle cx="190" cy="66" r="11" fill="url(#k-window)" stroke="#fff" stroke-width="2" filter="url(#k-glow)"/>
+                <path d="M174 52c2-14 7-24 14-31" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".7" fill="none"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+        <div class="learn-body">
+          <div class="learn-meta"><span class="tag" data-i18n="previewTag">PREVIEW</span></div>
+          <div class="card-title" data-i18n="l3t">How Auto-Pilot works?</div>
+          <p class="card-desc" data-i18n="l3d"></p>
+          <button class="btn-video" data-video="autopilot"><span class="play"><svg viewBox="0 0 24 24" fill="#000"><path d="M6 4l14 8-14 8z"/></svg></span><span data-i18n="watchVideo">Watch Video</span></button>
+        </div>
+      </article>
     </section>
 
     <!-- ================= TAB 3: DESKTOP ================= -->
@@ -467,7 +625,7 @@
           <div class="base"></div>
         </div>
         <div class="card-title" data-i18n="chromeTitle">SolTradeBot for Chrome</div>
-        <p class="card-desc" data-i18n="chromeDesc">For professional trading, use the browser extension: bigger charts, faster order entry and your Phantom wallet right in Chrome.</p>
+        <p class="card-desc" data-i18n="chromeDesc"></p>
         <ul class="features" style="text-align:left">
           <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span data-i18n="c1">Works directly with the Phantom extension</span></li>
           <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span data-i18n="c2">Full-size charts and order history</span></li>
@@ -537,14 +695,16 @@
     <div class="sl-block">
       <div class="sl-head"><span class="n" data-i18n="takeProfit">Take Profit</span><span class="v tp" id="tpVal">+50%</span></div>
       <input class="range tp" type="range" id="tpSlider" min="10" max="500" step="5" value="50" aria-label="Take Profit">
+      <div class="scale"><span>+10%</span><span>+500%</span></div>
     </div>
     <div class="sl-block">
       <div class="sl-head"><span class="n" data-i18n="stopLoss">Stop Loss</span><span class="v sl" id="slVal">−15%</span></div>
       <input class="range sl" type="range" id="slSlider" min="5" max="90" step="1" value="15" aria-label="Stop Loss">
+      <div class="scale"><span>−5%</span><span>−90%</span></div>
     </div>
     <div class="sheet-actions">
       <button class="btn-dark" id="tpslReset" data-i18n="reset">Reset</button>
-      <button class="btn-white" id="tpslDone" data-i18n="done">Done</button>
+      <button class="btn-white" id="tpslSave" data-i18n="save">Save</button>
     </div>
   </div>
 
@@ -552,7 +712,7 @@
     <div class="grabber"></div>
     <h3 data-i18n="connectWalletTitle">Connect wallet</h3>
     <p class="sheet-sub" data-i18n="manualHint">Phantom isn't available inside Telegram. Paste your wallet's public address instead — never your seed phrase.</p>
-    <input class="input mono" id="addrInput" type="text" autocomplete="off" spellcheck="false" data-i18n-ph="addrPh" placeholder="Public address">
+    <input class="input mono" id="addrInput" type="text" autocomplete="off" spellcheck="false" enterkeyhint="done" data-i18n-ph="addrPh" placeholder="Public address">
     <div class="error" id="walletError"></div>
     <div class="sheet-actions" style="margin-top:16px">
       <button class="btn-dark" id="walletCancel" data-i18n="cancel">Cancel</button>
@@ -573,6 +733,23 @@
     const PAGE_COLOR = "#050505";
     const COOLDOWN_MS = 3000;
 
+    // "Watch Video" links per language. Placeholders: they open a YouTube search
+    // for the topic. Replace each with your own video link, e.g.
+    // "https://www.youtube.com/watch?v=YOUR_VIDEO_ID"
+    const yt = (q) => "https://www.youtube.com/results?search_query=" + encodeURIComponent(q);
+    const VIDEO_LINKS = {
+      en: {
+        slippage:  yt("what is slippage crypto solana"),
+        rugpull:   yt("how to avoid rug pull solana memecoin"),
+        autopilot: yt("take profit stop loss explained crypto")
+      },
+      ru: {
+        slippage:  yt("что такое проскальзывание криптовалюта"),
+        rugpull:   yt("как избежать рагпула мемкоины solana"),
+        autopilot: yt("тейк профит и стоп лосс что это")
+      }
+    };
+
     // =====================================================================
     // TRANSLATIONS
     // =====================================================================
@@ -580,7 +757,7 @@
       en: {
         connectWallet: "Connect Wallet", autoPilot: "Auto-Pilot", manualTrade: "Manual Trade",
         amountPerTrade: "Amount per trade", smartMode: "Smart Mode",
-        smartOn: "Safe defaults: TP +50% · SL −15%", smartOff: "Your own Take Profit / Stop Loss",
+        smartOn: "🤖 <b>Smart Mode:</b> the bot sets Take Profit / Stop Loss for you (now <b>+50% / −15%</b>). No settings needed.",
         setTpSl: "⚙️ Set Take Profit / Stop Loss", startAutoPilot: "Start Auto-Pilot",
         connectFirst: "Connect a wallet to continue", readyAuto: "Settings go to the bot — it confirms in the chat",
         buyAToken: "Buy a token", buyDesc: "Paste the token address and the amount. You'll get a live quote in the chat and confirm there.",
@@ -591,13 +768,13 @@
         sending: "Sending…", notInTelegram: "Open this app from SolTradeBot in Telegram to send orders.",
         disclaimer: "<strong>Trading memecoins involves high risk.</strong> You can lose all your funds. SolTradeBot is a tool, not a financial advisor. Always DYOR.",
         learnTitle: "Learn", learnSub: "Three things every Solana trader should know.",
+        tagBasics: "BASICS", tagSafety: "SAFETY", previewTag: "PREVIEW", watchVideo: "Watch Video",
         l1t: "What is Slippage?",
         l1d: "Slippage is the difference between the price you see and the price you actually get. Memecoin prices move in seconds, so a swap can fill slightly worse than quoted. SolTradeBot allows at most 1%: if the price moves more, the swap is cancelled instead of filling at a bad price.",
         l2t: "How to avoid Rug Pulls?",
         l2d: "A rug pull is when the creators drain the liquidity and the price drops to zero. Red flags: <strong>a token younger than 24 hours</strong>, <strong>liquidity under $10k</strong>, <strong>a few wallets holding most of the supply</strong>, and a creator who can still mint new tokens. Check before you buy, and only trade what you can afford to lose.",
         l3t: "How Auto-Pilot works?",
         l3d: "You choose an amount per trade and your exit rules. Take Profit sells when the price rises by your target, Stop Loss sells when it falls by your limit. Smart Mode uses +50% / −15%. Auto-Pilot is in preview: your settings are saved, but it doesn't place trades yet.",
-        previewTag: "PREVIEW",
         desktopTitle: "Desktop", desktopSub: "Professional trading on a big screen.",
         chromeTitle: "SolTradeBot for Chrome",
         chromeDesc: "For professional trading, use the browser extension: bigger charts, faster order entry and your Phantom wallet right in Chrome.",
@@ -609,10 +786,10 @@
         tradingFee: "Trading fee", maxSlippage: "Max slippage", version: "Version",
         tabTrade: "Trade", tabLearn: "Learn", tabDesktop: "Desktop", tabSettings: "Settings",
         tpslTitle: "Take Profit / Stop Loss", tpslSub: "Auto-Pilot sells when the price reaches one of these levels.",
-        takeProfit: "Take Profit", stopLoss: "Stop Loss", reset: "Reset", done: "Done",
+        takeProfit: "Take Profit", stopLoss: "Stop Loss", reset: "Reset", save: "Save", saved: "Saved",
         connectWalletTitle: "Connect wallet",
         manualHint: "Phantom isn't available inside Telegram. Paste your wallet's public address instead — never your seed phrase.",
-        addrPh: "Public address", cancel: "Cancel", save: "Save",
+        addrPh: "Public address", cancel: "Cancel",
         badAddr: "That's not a valid Solana address.",
         secret: "🚨 That looks like a private key or seed phrase! Never share it — move your funds to a new wallet.",
         rejected: "Connection was cancelled in Phantom.", walletSaved: "Wallet connected", walletRemoved: "Wallet disconnected"
@@ -620,7 +797,7 @@
       ru: {
         connectWallet: "Подключить", autoPilot: "Автопилот", manualTrade: "Вручную",
         amountPerTrade: "Сумма на сделку", smartMode: "Умный режим",
-        smartOn: "Безопасно: TP +50% · SL −15%", smartOff: "Свои Тейк-профит / Стоп-лосс",
+        smartOn: "🤖 <b>Умный режим:</b> бот сам выставляет Тейк-профит / Стоп-лосс (сейчас <b>+50% / −15%</b>). Ничего настраивать не нужно.",
         setTpSl: "⚙️ Настроить TP / SL", startAutoPilot: "Запустить Автопилот",
         connectFirst: "Подключи кошелёк, чтобы продолжить", readyAuto: "Настройки уйдут боту — он подтвердит в чате",
         buyAToken: "Купить токен", buyDesc: "Вставь адрес токена и сумму. Котировка придёт в чат, там же подтвердишь покупку.",
@@ -631,13 +808,13 @@
         sending: "Отправляю…", notInTelegram: "Открой приложение из бота SolTradeBot в Telegram, чтобы отправлять заявки.",
         disclaimer: "<strong>Торговля мемкоинами связана с высоким риском.</strong> Ты можешь потерять все средства. SolTradeBot — это инструмент, а не финансовый советник. Всегда проводи собственное исследование (DYOR).",
         learnTitle: "Обучение", learnSub: "Три вещи, которые должен знать каждый трейдер Solana.",
+        tagBasics: "ОСНОВЫ", tagSafety: "БЕЗОПАСНОСТЬ", previewTag: "ПРЕДПРОСМОТР", watchVideo: "Смотреть видео",
         l1t: "Что такое проскальзывание?",
         l1d: "Проскальзывание — это разница между ценой, которую ты видишь, и ценой, по которой реально проходит сделка. Цены мемкоинов меняются за секунды, поэтому обмен может пройти чуть хуже котировки. SolTradeBot допускает максимум 1%: если цена уходит дальше, обмен отменяется, а не проходит по плохой цене.",
         l2t: "Как избежать рагпула?",
         l2d: "Рагпул — это когда создатели забирают ликвидность и цена падает до нуля. Тревожные признаки: <strong>токену меньше 24 часов</strong>, <strong>ликвидность меньше $10k</strong>, <strong>несколько кошельков держат большую часть токенов</strong>, а создатель всё ещё может выпускать новые токены. Проверяй перед покупкой и торгуй только тем, что готов потерять.",
         l3t: "Как работает Автопилот?",
         l3d: "Ты выбираешь сумму на сделку и правила выхода. Тейк-профит продаёт, когда цена выросла на твою цель, Стоп-лосс — когда упала на твой лимит. Умный режим использует +50% / −15%. Автопилот в режиме предпросмотра: настройки сохраняются, но сделки пока не совершаются.",
-        previewTag: "ПРЕДПРОСМОТР",
         desktopTitle: "Компьютер", desktopSub: "Профессиональная торговля на большом экране.",
         chromeTitle: "SolTradeBot для Chrome",
         chromeDesc: "Для профессиональной торговли используй расширение для браузера: большие графики, быстрый ввод заявок и кошелёк Phantom прямо в Chrome.",
@@ -649,10 +826,10 @@
         tradingFee: "Комиссия", maxSlippage: "Макс. проскальзывание", version: "Версия",
         tabTrade: "Торговля", tabLearn: "Обучение", tabDesktop: "Компьютер", tabSettings: "Настройки",
         tpslTitle: "Тейк-профит / Стоп-лосс", tpslSub: "Автопилот продаёт, когда цена достигает одного из этих уровней.",
-        takeProfit: "Тейк-профит", stopLoss: "Стоп-лосс", reset: "Сброс", done: "Готово",
+        takeProfit: "Тейк-профит", stopLoss: "Стоп-лосс", reset: "Сброс", save: "Сохранить", saved: "Сохранено",
         connectWalletTitle: "Подключить кошелёк",
         manualHint: "Phantom недоступен внутри Telegram. Вставь публичный адрес кошелька — никогда не сид-фразу.",
-        addrPh: "Публичный адрес", cancel: "Отмена", save: "Сохранить",
+        addrPh: "Публичный адрес", cancel: "Отмена",
         badAddr: "Это не адрес Solana.",
         secret: "🚨 Похоже, это приватный ключ или сид-фраза! Никому их не отправляй — переведи средства на новый кошелёк.",
         rejected: "Подключение отменено в Phantom.", walletSaved: "Кошелёк подключён", walletRemoved: "Кошелёк отключён"
@@ -709,6 +886,14 @@
       const el = $("toast"); el.textContent = msg; el.classList.add("show");
       clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
     }
+    // Close the mobile keyboard
+    function hideKeyboard() {
+      const a = document.activeElement;
+      if (a && a.matches && a.matches("input, textarea")) a.blur();
+    }
+    function openLink(url) {
+      if (tg && tg.openLink) tg.openLink(url); else window.open(url, "_blank", "noopener");
+    }
 
     // =====================================================================
     // STATE
@@ -723,7 +908,8 @@
       amount: 0.01,
       smartDefault: store.get("smartDefault") !== "0",
       smart: true,
-      tp: SMART_TP, sl: SMART_SL,
+      tp: SMART_TP, sl: SMART_SL,     // saved values
+      draftTp: SMART_TP, draftSl: SMART_SL,   // values while the sheet is open
       cooling: false
     };
     state.smart = state.smartDefault;
@@ -774,20 +960,19 @@
 
     function renderSmart() {
       $("smartSwitch").setAttribute("aria-checked", String(state.smart));
-      $("smartSub").textContent = state.smart ? t("smartOn") : t("smartOff");
+      $("smartInfo").hidden = !state.smart;
       $("tpslLink").hidden = state.smart;
-      $("tpslVals").textContent = "+" + state.tp + "% · −" + state.sl + "%";
+      $("tpslVals").innerHTML = '<span class="up">+' + state.tp + '%</span> · <span class="down">−' + state.sl + '%</span>';
       $("smartDefaultSwitch").setAttribute("aria-checked", String(state.smartDefault));
     }
 
-    function renderTpSl() {
+    function renderSheet() {
       const tp = $("tpSlider"), sl = $("slSlider");
-      $("tpVal").textContent = "+" + state.tp + "%";
-      $("slVal").textContent = "−" + state.sl + "%";
-      tp.value = state.tp; sl.value = state.sl;
-      tp.style.setProperty("--fill", ((state.tp - tp.min) / (tp.max - tp.min)) * 100 + "%");
-      sl.style.setProperty("--fill", ((state.sl - sl.min) / (sl.max - sl.min)) * 100 + "%");
-      $("tpslVals").textContent = "+" + state.tp + "% · −" + state.sl + "%";
+      $("tpVal").textContent = "+" + state.draftTp + "%";
+      $("slVal").textContent = "−" + state.draftSl + "%";
+      tp.value = state.draftTp; sl.value = state.draftSl;
+      tp.style.setProperty("--fill", ((state.draftTp - tp.min) / (tp.max - tp.min)) * 100 + "%");
+      sl.style.setProperty("--fill", ((state.draftSl - sl.min) / (sl.max - sl.min)) * 100 + "%");
     }
 
     function renderButtons() {
@@ -801,12 +986,20 @@
       $("chromeHint").textContent = CHROME_EXTENSION_URL ? "" : t("comingSoon");
     }
 
-    function renderAll() { renderWallet(); renderAmount(); renderSmart(); renderTpSl(); renderButtons(); }
+    function renderAll() { renderWallet(); renderAmount(); renderSmart(); renderSheet(); renderButtons(); }
+
+    // =====================================================================
+    // KEYBOARD: tap outside a text field -> close the keyboard
+    // =====================================================================
+    document.addEventListener("pointerdown", (e) => {
+      if (!e.target.closest("input[type=text], textarea, .amount-input")) hideKeyboard();
+    }, true);
 
     // =====================================================================
     // TABS
     // =====================================================================
     function showTab(name) {
+      hideKeyboard();
       document.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
       ["trade", "learn", "desktop", "settings"].forEach(n => { $("screen-" + n).hidden = n !== name; });
       window.scrollTo({ top: 0 });
@@ -814,7 +1007,6 @@
     }
     document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
 
-    // Auto-Pilot / Manual
     $("modeSeg").querySelectorAll("button").forEach((b, i) => b.addEventListener("click", () => {
       state.mode = b.dataset.mode; setSeg($("modeSeg"), i);
       $("mode-auto").hidden = state.mode !== "auto";
@@ -844,21 +1036,27 @@
     }));
 
     // =====================================================================
-    // SMART MODE + TP/SL SHEET
+    // SMART MODE + TP/SL SHEET (values apply only on Save)
     // =====================================================================
     $("smartSwitch").addEventListener("click", () => {
       state.smart = !state.smart;
-      if (state.smart) { state.tp = SMART_TP; state.sl = SMART_SL; renderTpSl(); }
+      if (state.smart) { state.tp = SMART_TP; state.sl = SMART_SL; }
       renderSmart(); haptic("light");
     });
-    $("tpslLink").addEventListener("click", () => openSheet("sheet-tpsl"));
-    $("tpSlider").addEventListener("input", (e) => { state.tp = parseInt(e.target.value, 10); renderTpSl(); haptic("select"); });
-    $("slSlider").addEventListener("input", (e) => { state.sl = parseInt(e.target.value, 10); renderTpSl(); haptic("select"); });
-    $("tpslReset").addEventListener("click", () => { state.tp = SMART_TP; state.sl = SMART_SL; renderTpSl(); haptic("light"); });
-    $("tpslDone").addEventListener("click", () => closeSheet());
+    $("tpslLink").addEventListener("click", () => {
+      state.draftTp = state.tp; state.draftSl = state.sl; renderSheet(); openSheet("sheet-tpsl");
+    });
+    $("tpSlider").addEventListener("input", (e) => { state.draftTp = parseInt(e.target.value, 10); renderSheet(); haptic("select"); });
+    $("slSlider").addEventListener("input", (e) => { state.draftSl = parseInt(e.target.value, 10); renderSheet(); haptic("select"); });
+    $("tpslReset").addEventListener("click", () => { state.draftTp = SMART_TP; state.draftSl = SMART_SL; renderSheet(); haptic("light"); });
+    $("tpslSave").addEventListener("click", () => {
+      state.tp = state.draftTp; state.sl = state.draftSl;
+      renderSmart(); closeSheet(); toast(t("saved")); haptic("success");
+    });
 
     let openId = null;
     function openSheet(id) {
+      hideKeyboard();
       openId = id;
       $(id).classList.add("open"); $("backdrop").classList.add("open");
       if (tg && tg.BackButton) { try { tg.BackButton.show(); } catch (e) {} }
@@ -866,6 +1064,7 @@
     }
     function closeSheet() {
       if (!openId) return;
+      hideKeyboard();
       $(openId).classList.remove("open"); $("backdrop").classList.remove("open");
       $(openId).style.transform = "";
       openId = null;
@@ -874,7 +1073,7 @@
     $("backdrop").addEventListener("click", closeSheet);
     if (tg && tg.BackButton) { try { tg.BackButton.onClick(closeSheet); } catch (e) {} }
 
-    // Swipe a sheet down to close it (drag from anywhere except sliders/inputs)
+    // Swipe a sheet down to close it (drag anywhere except sliders/inputs)
     document.querySelectorAll(".sheet").forEach(sheet => {
       let y0 = null, dy = 0;
       sheet.addEventListener("touchstart", (e) => {
@@ -932,9 +1131,10 @@
     $("addrInput").addEventListener("keydown", (e) => { if (e.key === "Enter") $("walletSave").click(); });
 
     // =====================================================================
-    // SEND TO BOT (with a 3-second double-click guard)
+    // SEND TO BOT (closes the keyboard; 3-second double-click guard)
     // =====================================================================
     function sendToBot(payload, btn) {
+      hideKeyboard();
       if (state.cooling) return;
       if (!tg || !tg.initData) { toast(t("notInTelegram")); return; }
       state.cooling = true;
@@ -949,6 +1149,7 @@
     }
 
     $("startBtn").addEventListener("click", () => {
+      hideKeyboard();
       if (!state.wallet) return;
       sendToBot({
         action: "start_autopilot",
@@ -961,6 +1162,7 @@
     });
 
     $("buyBtn").addEventListener("click", () => {
+      hideKeyboard();
       if (!state.wallet) return;
       const ca = $("caInput").value.trim();
       const amount = parseAmount($("buyAmount").value);
@@ -969,14 +1171,24 @@
       $("manualError").textContent = "";
       sendToBot({ action: "buy", token: ca, amount: amount, wallet: state.wallet }, $("buyBtn"));
     });
+    $("caInput").addEventListener("keydown", (e) => { if (e.key === "Enter") $("buyAmount").focus(); });
+    $("buyAmount").addEventListener("keydown", (e) => { if (e.key === "Enter") hideKeyboard(); });
     ["caInput", "buyAmount"].forEach(id => $(id).addEventListener("input", () => { $("manualError").textContent = ""; }));
+
+    // =====================================================================
+    // LEARN: Watch Video (link matches the selected language)
+    // =====================================================================
+    document.querySelectorAll(".btn-video").forEach(b => b.addEventListener("click", () => {
+      const url = (VIDEO_LINKS[state.lang] || VIDEO_LINKS.en)[b.dataset.video];
+      if (url) { haptic("light"); openLink(url); }
+    }));
 
     // =====================================================================
     // DESKTOP + SETTINGS
     // =====================================================================
     $("chromeBtn").addEventListener("click", () => {
       if (!CHROME_EXTENSION_URL) { toast(t("comingSoon")); haptic("light"); return; }
-      if (tg && tg.openLink) tg.openLink(CHROME_EXTENSION_URL); else window.open(CHROME_EXTENSION_URL, "_blank");
+      openLink(CHROME_EXTENSION_URL);
     });
     $("langSeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
       state.lang = b.dataset.lang; store.set("lang", state.lang); applyLanguage(); haptic("select");
@@ -984,7 +1196,7 @@
     $("smartDefaultSwitch").addEventListener("click", () => {
       state.smartDefault = !state.smartDefault; store.set("smartDefault", state.smartDefault ? "1" : "0");
       state.smart = state.smartDefault;
-      if (state.smart) { state.tp = SMART_TP; state.sl = SMART_SL; renderTpSl(); }
+      if (state.smart) { state.tp = SMART_TP; state.sl = SMART_SL; }
       renderSmart(); haptic("light");
     });
 
@@ -992,8 +1204,13 @@
     // TELEGRAM SETUP + START
     // =====================================================================
     if (tg) {
-      tg.ready(); tg.expand();
-      try { tg.setHeaderColor(PAGE_COLOR); tg.setBackgroundColor(PAGE_COLOR); if (tg.setBottomBarColor) tg.setBottomBarColor(PAGE_COLOR); } catch (e) {}
+      tg.ready();
+      tg.expand();                                  // full height, no gap
+      try {
+        tg.setHeaderColor(PAGE_COLOR);              // header = page colour -> blends in
+        tg.setBackgroundColor(PAGE_COLOR);
+        if (tg.setBottomBarColor) tg.setBottomBarColor(PAGE_COLOR);
+      } catch (e) {}
       if (tg.disableVerticalSwipes) { try { tg.disableVerticalSwipes(); } catch (e) {} }
     }
     const preset = params.get("wallet");          // wallet already connected in the bot
