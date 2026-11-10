@@ -12,593 +12,994 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --b-950: #03195b;
-      --b-800: #0b2cb1;
-      --b-600: #1951fc;
-      --b-400: #3781fc;
-      --b-100: #cbe9fd;
-      --cyan: #6fdcff;
-
-      --text: #ffffff;
-      --text-2: rgba(255, 255, 255, .72);
-      --text-3: rgba(255, 255, 255, .45);
-      --line: rgba(255, 255, 255, .28);
-      --danger: #ff8a9b;
-
+      --b-950: #03195b; --b-800: #0b2cb1; --b-600: #1951fc; --b-400: #3781fc; --b-100: #cbe9fd; --cyan: #6fdcff;
+      --bg: #050505;
+      --text: #ffffff; --text-2: rgba(255,255,255,.72); --text-3: rgba(255,255,255,.45);
+      --line: rgba(255,255,255,.26); --line-soft: rgba(255,255,255,.14);
+      --green: #12c784; --danger: #ff8a9b;
       --font: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --nav-h: 74px;
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body { margin: 0; background: #050505; color: var(--text); }
+    html, body { margin: 0; background: var(--bg); color: var(--text); }
     body {
       font-family: var(--font); font-optical-sizing: auto;
       -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
       min-height: 100vh; overflow-x: hidden;
-      padding: 8px 16px calc(28px + env(safe-area-inset-bottom));
+      padding: 8px 16px calc(var(--nav-h) + 34px + env(safe-area-inset-bottom));
     }
+    button { font: inherit; border: 0; cursor: pointer; color: inherit; background: none; padding: 0; }
+    [hidden] { display: none !important; }
 
-    /* =========================================================
-       BACKGROUND: one huge grainy light beam behind the cards
-       ========================================================= */
+    /* ================= BACKGROUND ================= */
     .scene { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-
-    /* The beam: a giant tilted ribbon, deep blue body with an ice-white edge */
     .beam {
       position: absolute; width: 150vw; max-width: 900px; height: 125vh; left: 50%; top: 50%;
-      transform: translate(-30%, -46%) rotate(28deg);
-      border-radius: 50%;
+      transform: translate(-30%, -46%) rotate(28deg); border-radius: 50%;
       background:
-        radial-gradient(60% 50% at 30% 62%, rgba(203, 233, 253, .95) 0%, rgba(111, 220, 255, .65) 18%, transparent 45%),
-        radial-gradient(70% 60% at 45% 50%, var(--b-400) 0%, rgba(25, 81, 252, .85) 35%, transparent 70%),
-        radial-gradient(80% 70% at 60% 40%, var(--b-800) 0%, rgba(3, 25, 91, .9) 40%, transparent 75%);
-      filter: blur(38px); opacity: .95;
+        radial-gradient(60% 50% at 30% 62%, rgba(203,233,253,.9) 0%, rgba(111,220,255,.6) 18%, transparent 45%),
+        radial-gradient(70% 60% at 45% 50%, var(--b-400) 0%, rgba(25,81,252,.85) 35%, transparent 70%),
+        radial-gradient(80% 70% at 60% 40%, var(--b-800) 0%, rgba(3,25,91,.9) 40%, transparent 75%);
+      filter: blur(38px); opacity: .9;
       animation: beam 18s ease-in-out infinite alternate;
     }
-    /* A dark "shadow" sweeping across the beam gives it the folded-ribbon shape */
     .beam-cut {
       position: absolute; width: 120vw; max-width: 760px; height: 80vh; left: 50%; top: 50%;
       transform: translate(-78%, -60%) rotate(28deg); border-radius: 50%;
-      background: radial-gradient(closest-side, #050505 55%, transparent);
-      filter: blur(30px);
+      background: radial-gradient(closest-side, var(--bg) 55%, transparent); filter: blur(30px);
       animation: beam-cut 18s ease-in-out infinite alternate;
     }
     .grain {
       position: absolute; inset: -50%; opacity: .16; mix-blend-mode: soft-light;
       background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
     }
-    @keyframes beam     { from { transform: translate(-30%, -46%) rotate(28deg); } to { transform: translate(-26%, -50%) rotate(34deg); } }
-    @keyframes beam-cut { from { transform: translate(-78%, -60%) rotate(28deg); } to { transform: translate(-74%, -63%) rotate(34deg); } }
+    @keyframes beam     { from { transform: translate(-30%,-46%) rotate(28deg); } to { transform: translate(-26%,-50%) rotate(34deg); } }
+    @keyframes beam-cut { from { transform: translate(-78%,-60%) rotate(28deg); } to { transform: translate(-74%,-63%) rotate(34deg); } }
     @media (prefers-reduced-motion: reduce) { .beam, .beam-cut { animation: none; } }
 
-    /* Giant faded word behind the content, like "Pricing" in the reference */
-    .ghost-word {
-      position: absolute; left: 50%; top: 40px; transform: translateX(-50%);
-      font-size: 150px; font-weight: 600; letter-spacing: -.07em; line-height: 1; white-space: nowrap;
-      background: linear-gradient(90deg, rgba(11, 44, 177, .55), rgba(55, 129, 252, .55) 55%, rgba(203, 233, 253, .55));
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-      filter: blur(.4px); opacity: .55;
-    }
-
     main { position: relative; z-index: 1; max-width: 440px; margin: 0 auto; }
-    body.tg-fullscreen {
-      padding-top: calc(8px + var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px));
-    }
 
-    /* =========================================================
-       HEADER (glass nav pill, like the reference)
-       ========================================================= */
-    .nav {
-      display: flex; align-items: center; gap: 10px; padding: 6px; margin-bottom: 18px;
-      border-radius: 999px; border: 1px solid var(--line);
-      background: rgba(10, 10, 12, .55);
+    /* ================= TOP BAR ================= */
+    .topbar {
+      display: flex; align-items: center; gap: 10px; padding: 6px; margin-bottom: 16px;
+      border-radius: 999px; border: 1px solid var(--line); background: rgba(10,10,12,.55);
       -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px);
-      box-shadow: 0 0 24px rgba(55, 129, 252, .08);
+      box-shadow: 0 0 24px rgba(55,129,252,.08);
     }
     .app-icon {
       width: 40px; height: 40px; border-radius: 50%; flex: none; display: grid; place-items: center;
-      background:
-        radial-gradient(90% 70% at 50% 115%, rgba(203, 233, 253, .7), transparent 60%),
-        linear-gradient(160deg, var(--b-950), var(--b-800) 45%, var(--b-600) 85%);
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .25), inset 0 1px 0 rgba(255, 255, 255, .35),
-                  0 0 18px rgba(55, 129, 252, .55);
+      background: radial-gradient(90% 70% at 50% 115%, rgba(203,233,253,.7), transparent 60%),
+                  linear-gradient(160deg, var(--b-950), var(--b-800) 45%, var(--b-600) 85%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.25), inset 0 1px 0 rgba(255,255,255,.35), 0 0 18px rgba(55,129,252,.55);
     }
-    .app-icon svg {
-      width: 18px; height: 18px;
-      filter: drop-shadow(0 0 3px rgba(255, 255, 255, .95)) drop-shadow(0 0 8px rgba(111, 220, 255, .9))
-              drop-shadow(0 0 16px rgba(55, 129, 252, .8));
-    }
+    .app-icon svg { width: 18px; height: 18px;
+      filter: drop-shadow(0 0 3px rgba(255,255,255,.95)) drop-shadow(0 0 8px rgba(111,220,255,.9)) drop-shadow(0 0 16px rgba(55,129,252,.8)); }
     .brand { font-size: 16px; font-weight: 500; letter-spacing: -.02em; }
-    .status {
+    .wallet-btn {
       margin-left: auto; height: 40px; padding: 0 16px; border-radius: 999px;
-      display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; letter-spacing: -.01em;
-      color: var(--text-2); background: rgba(255, 255, 255, .06);
+      display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; letter-spacing: -.01em;
+      background: linear-gradient(180deg, #fff, #eef4ff); color: #000;
+      box-shadow: 0 0 0 1px rgba(255,255,255,.6), 0 0 18px rgba(203,233,253,.35);
+      transition: transform .12s;
     }
-    .status i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, .35); }
-    .status.on { background: #fff; color: #000; box-shadow: 0 0 18px rgba(203, 233, 253, .45); }
-    .status.on i { background: #12c784; box-shadow: 0 0 6px #12c784; }
+    .wallet-btn:active { transform: scale(.96); }
+    .wallet-btn svg { width: 16px; height: 16px; }
+    .wallet-btn.connected { background: rgba(255,255,255,.07); color: #fff; padding: 0 14px 0 6px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), 0 0 14px rgba(55,129,252,.15); }
+    .avatar { width: 28px; height: 28px; border-radius: 50%; flex: none;
+      background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.9), transparent 32%),
+                  conic-gradient(from 210deg, var(--b-950), var(--b-600), var(--cyan), var(--b-100), var(--b-400), var(--b-950));
+      box-shadow: 0 0 12px rgba(55,129,252,.55); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); flex: none; }
 
-    .eyebrow { font-size: 15px; font-weight: 500; letter-spacing: -.01em; margin: 0 4px 12px;
-      background: linear-gradient(90deg, #fff, var(--b-100) 40%, var(--cyan));
-      -webkit-background-clip: text; background-clip: text; color: transparent; }
+    /* ================= SCREENS ================= */
+    .screen { animation: fadeIn .28s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    .screen-title { font-size: 30px; font-weight: 500; letter-spacing: -.045em; margin: 6px 4px 4px; }
+    .screen-sub { font-size: 14px; color: var(--text-2); margin: 0 4px 18px; letter-spacing: -.01em; line-height: 1.45; }
 
-    /* =========================================================
-       GLASS CARDS
-       ========================================================= */
+    /* ================= GLASS CARDS ================= */
     .card {
-      position: relative; padding: 26px 24px; margin-bottom: 14px; border-radius: 34px;
-      background: rgba(8, 8, 10, .52);
-      border: 1px solid var(--line);
+      position: relative; padding: 22px; margin-bottom: 14px; border-radius: 30px;
+      background: rgba(8,8,10,.52); border: 1px solid var(--line);
       -webkit-backdrop-filter: blur(30px) saturate(160%); backdrop-filter: blur(30px) saturate(160%);
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .08),
-        0 0 22px rgba(55, 129, 252, .07),
-        0 30px 60px -20px rgba(0, 0, 0, .9);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 0 22px rgba(55,129,252,.07), 0 30px 60px -20px rgba(0,0,0,.9);
     }
-    /* Featured card = the glowing "Pro" card */
     .card.featured {
-      background: linear-gradient(180deg, rgba(20, 30, 46, .55), rgba(8, 10, 16, .55));
-      border-color: rgba(203, 233, 253, .65);
-      box-shadow:
-        inset 0 0 0 1px rgba(203, 233, 253, .08),
-        inset 0 0 26px rgba(111, 220, 255, .22),
-        inset 0 1px 0 rgba(255, 255, 255, .35),
-        0 0 28px rgba(111, 220, 255, .28),
-        0 0 70px rgba(55, 129, 252, .25),
-        0 30px 60px -20px rgba(0, 0, 0, .9);
+      background: linear-gradient(180deg, rgba(20,30,46,.55), rgba(8,10,16,.55));
+      border-color: rgba(203,233,253,.6);
+      box-shadow: inset 0 0 0 1px rgba(203,233,253,.08), inset 0 0 26px rgba(111,220,255,.2), inset 0 1px 0 rgba(255,255,255,.35),
+                  0 0 28px rgba(111,220,255,.25), 0 0 70px rgba(55,129,252,.22), 0 30px 60px -20px rgba(0,0,0,.9);
     }
+    .card-title { font-size: 20px; font-weight: 400; letter-spacing: -.03em; }
+    .card-desc { font-size: 13.5px; line-height: 1.5; color: var(--text-2); margin: 8px 0 0; letter-spacing: -.005em; }
+    .label { font-size: 12.5px; color: var(--text-3); letter-spacing: -.005em; margin: 0 0 8px 4px; }
 
-    .card-title { font-size: 22px; font-weight: 400; letter-spacing: -.03em; line-height: 1.1; }
-    .card-desc { font-size: 13.5px; line-height: 1.45; color: var(--text-2); margin: 10px 0 0; letter-spacing: -.005em; }
+    /* ================= SEGMENTED CONTROL ================= */
+    .segmented {
+      position: relative; display: grid; grid-template-columns: 1fr 1fr; padding: 4px; margin-bottom: 14px;
+      border-radius: 999px; background: rgba(10,10,12,.6); border: 1px solid var(--line-soft);
+      -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px);
+    }
+    .segmented .thumb {
+      position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 999px;
+      background: linear-gradient(180deg, #fff, #eaf2ff);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.7), 0 0 20px rgba(203,233,253,.4);
+      transition: transform .32s cubic-bezier(.2,.8,.2,1);
+    }
+    .segmented[data-pos="1"] .thumb { transform: translateX(100%); }
+    .segmented button {
+      position: relative; z-index: 1; height: 42px; display: flex; align-items: center; justify-content: center; gap: 7px;
+      font-size: 14.5px; font-weight: 500; letter-spacing: -.01em; color: var(--text-2); transition: color .25s;
+    }
+    .segmented button svg { width: 17px; height: 17px; }
+    .segmented button.on { color: #000; }
+    .segmented.small button { height: 36px; font-size: 13.5px; }
 
-    /* Big number, tight and expensive - like "$19,99/m" */
-    .amount { display: flex; align-items: baseline; gap: 2px; margin-top: 6px; }
+    /* ================= AMOUNT ================= */
+    .amount { display: flex; align-items: baseline; margin-top: 4px; }
     .amount .value {
-      font-size: 64px; font-weight: 500; letter-spacing: -.06em; line-height: 1; font-variant-numeric: tabular-nums;
-      background: linear-gradient(180deg, #ffffff 35%, #d6e7ff 100%);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-      text-shadow: 0 0 40px rgba(111, 220, 255, .25);
+      font-size: 60px; font-weight: 500; letter-spacing: -.06em; line-height: 1; font-variant-numeric: tabular-nums;
+      background: linear-gradient(180deg, #fff 35%, #d6e7ff 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 75%;
     }
-    .amount .unit { font-size: 40px; font-weight: 400; letter-spacing: -.05em; color: rgba(255, 255, 255, .92); }
+    .amount .unit { font-size: 36px; font-weight: 400; letter-spacing: -.05em; color: rgba(255,255,255,.92); }
 
-    /* Feature list with grey check circles */
-    .features { list-style: none; padding: 0; margin: 22px 0 0; display: grid; gap: 12px; }
-    .features li { display: flex; align-items: center; gap: 12px; font-size: 13.5px; color: var(--text-2); letter-spacing: -.005em; }
-    .check {
-      width: 26px; height: 26px; border-radius: 50%; flex: none; display: grid; place-items: center;
-      background: rgba(255, 255, 255, .16); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15);
-    }
-    .check svg { width: 13px; height: 13px; }
-
-    /* =========================================================
-       BUTTONS
-       ========================================================= */
-    button { font: inherit; border: 0; cursor: pointer; color: inherit; background: none; }
-
-    /* White pill - like "Choose Plan" / "Download" */
-    .btn-white {
-      height: 50px; padding: 0 30px; border-radius: 999px;
-      display: inline-flex; align-items: center; justify-content: center; gap: 9px;
-      background: linear-gradient(180deg, #ffffff, #eef4ff);
-      color: #000; font-size: 16px; font-weight: 500; letter-spacing: -.02em;
-      box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .08), 0 0 0 1px rgba(255, 255, 255, .6), 0 6px 18px rgba(0, 0, 0, .45);
-      transition: transform .12s ease, box-shadow .25s ease, opacity .2s ease;
-    }
-    .btn-white svg { width: 17px; height: 17px; }
-    .btn-white:active { transform: scale(.97); }
-    .btn-block { width: 100%; margin-top: 24px; }
-    /* Glowing white pill for the main action */
-    .btn-glow {
-      height: 56px; font-size: 17px;
-      box-shadow:
-        inset 0 -1px 0 rgba(0, 0, 0, .1),
-        0 0 0 1px rgba(255, 255, 255, .85),
-        0 0 0 5px rgba(203, 233, 253, .10),
-        0 0 26px rgba(203, 233, 253, .55),
-        0 0 60px rgba(55, 129, 252, .45);
-    }
-    .btn-glow:disabled {
-      cursor: not-allowed; background: rgba(255, 255, 255, .04); color: var(--text-3);
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22);
-    }
-
-    /* Dark pill with thin light border */
-    .btn-dark {
-      height: 40px; padding: 0 18px; border-radius: 999px; font-size: 14px; font-weight: 500; letter-spacing: -.01em;
-      color: #fff; background: rgba(255, 255, 255, .06);
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .28), 0 0 14px rgba(55, 129, 252, .12);
-    }
-    .btn-dark:active { background: rgba(255, 255, 255, .12); }
-
-    /* =========================================================
-       WALLET
-       ========================================================= */
-    .wallet-connected {
-      display: none; align-items: center; gap: 12px; margin-top: 20px; padding: 10px 10px 10px 12px;
-      border-radius: 999px; background: rgba(255, 255, 255, .05); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16);
-    }
-    .avatar {
-      width: 36px; height: 36px; border-radius: 50%; flex: none;
-      background:
-        radial-gradient(circle at 30% 25%, rgba(255, 255, 255, .9), transparent 32%),
-        conic-gradient(from 210deg, var(--b-950), var(--b-600), var(--cyan), var(--b-100), var(--b-400), var(--b-950));
-      box-shadow: 0 0 14px rgba(55, 129, 252, .55);
-    }
-    .wallet-meta { flex: 1; min-width: 0; }
-    .wallet-meta .addr { font-size: 15.5px; font-weight: 500; letter-spacing: -.01em; }
-    .wallet-meta .sub { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-3); margin-top: 1px; }
-    .wallet-meta .sub i { width: 6px; height: 6px; border-radius: 50%; background: #12c784; box-shadow: 0 0 6px #12c784; }
-
-    .manual { display: none; margin-top: 18px; }
-    .manual p { margin: 0 0 10px; font-size: 13px; line-height: 1.5; color: var(--text-2); }
-    .input-row { display: flex; gap: 8px; }
-    .input {
-      flex: 1; min-width: 0; height: 48px; padding: 0 18px; border-radius: 999px; outline: none; border: 0;
-      background: rgba(0, 0, 0, .5); color: #fff; font: 400 14px var(--font); letter-spacing: -.005em;
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .2);
-      transition: box-shadow .2s;
-    }
-    .input::placeholder { color: var(--text-3); }
-    .input:focus { box-shadow: inset 0 0 0 1px rgba(203, 233, 253, .7), 0 0 18px rgba(111, 220, 255, .3); }
-    .btn-save { height: 48px; padding: 0 22px; font-size: 15px; }
-    .error { color: var(--danger); font-size: 13px; line-height: 1.45; margin-top: 10px; }
-    .error:empty { display: none; }
-
-    /* =========================================================
-       AUTO-PILOT controls
-       ========================================================= */
+    .slider-row { display: flex; align-items: center; gap: 12px; margin-top: 20px; }
+    .slider-row .range { flex: 1; margin: 0; }
     .range {
-      -webkit-appearance: none; appearance: none; width: 100%; height: 4px; margin: 26px 0 12px; border-radius: 999px; outline: none;
-      background:
-        linear-gradient(90deg, var(--b-400), var(--b-100) 70%, #fff) 0 / var(--fill, 0%) 100% no-repeat,
-        rgba(255, 255, 255, .16);
-      box-shadow: 0 0 12px rgba(111, 220, 255, .25);
+      -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 999px; outline: none;
+      background: linear-gradient(90deg, var(--b-400), var(--b-100) 70%, #fff) 0 / var(--fill, 0%) 100% no-repeat, rgba(255,255,255,.16);
+      box-shadow: 0 0 12px rgba(111,220,255,.22);
     }
-    /* White knob, like the "Yearly" toggle */
     .range::-webkit-slider-thumb {
-      -webkit-appearance: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
-      background: #fff;
-      box-shadow: 0 0 0 1px rgba(0, 0, 0, .2), 0 2px 8px rgba(0, 0, 0, .5),
-                  0 0 16px rgba(203, 233, 253, .8), 0 0 34px rgba(55, 129, 252, .55);
+      -webkit-appearance: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; background: #fff;
+      box-shadow: 0 0 0 1px rgba(0,0,0,.2), 0 2px 8px rgba(0,0,0,.5), 0 0 16px rgba(203,233,253,.8), 0 0 34px rgba(55,129,252,.55);
       transition: transform .15s;
     }
     .range:active::-webkit-slider-thumb { transform: scale(1.12); }
-    .range::-moz-range-thumb {
-      width: 24px; height: 24px; border: 0; border-radius: 50%; cursor: pointer; background: #fff;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, .5), 0 0 16px rgba(203, 233, 253, .8);
-    }
-    .range-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-3); letter-spacing: -.005em; }
+    .range::-moz-range-thumb { width: 24px; height: 24px; border: 0; border-radius: 50%; background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,.5), 0 0 16px rgba(203,233,253,.8); }
+    .range-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-3); margin-top: 10px; padding-right: 108px; }
 
-    .presets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 18px; }
-    .preset {
-      height: 38px; border-radius: 999px; font-size: 14px; font-weight: 500; letter-spacing: -.01em;
-      color: var(--text-2); background: rgba(255, 255, 255, .04); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .2);
-      font-variant-numeric: tabular-nums; transition: background .2s, color .2s, box-shadow .2s;
+    .amount-input {
+      width: 96px; height: 42px; display: flex; align-items: center; border-radius: 999px; padding: 0 12px 0 14px; gap: 4px;
+      background: rgba(0,0,0,.5); box-shadow: inset 0 0 0 1px rgba(255,255,255,.22); transition: box-shadow .2s;
     }
-    .preset.active { background: #fff; color: #000; box-shadow: 0 0 16px rgba(203, 233, 253, .45); }
-    .hint { text-align: center; font-size: 12.5px; color: var(--text-3); margin-top: 14px; letter-spacing: -.005em; }
+    .amount-input:focus-within { box-shadow: inset 0 0 0 1px rgba(203,233,253,.75), 0 0 16px rgba(111,220,255,.3); }
+    .amount-input input { width: 100%; min-width: 0; border: 0; outline: none; background: transparent; color: #fff;
+      font: 500 15px var(--font); letter-spacing: -.01em; text-align: right; }
+    .amount-input span { font-size: 12px; color: var(--text-3); }
 
-    /* =========================================================
-       DISCLAIMER
-       ========================================================= */
-    .disclaimer { display: flex; gap: 12px; padding: 18px 20px; border-radius: 26px; }
-    .disclaimer .warn {
-      width: 26px; height: 26px; border-radius: 50%; flex: none; display: grid; place-items: center;
-      background: rgba(255, 138, 155, .14); box-shadow: inset 0 0 0 1px rgba(255, 138, 155, .3);
+    .presets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 16px; }
+    .preset { height: 36px; border-radius: 999px; font-size: 13.5px; font-weight: 500; color: var(--text-2);
+      background: rgba(255,255,255,.04); box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); transition: background .2s, color .2s; }
+    .preset.active { background: #fff; color: #000; box-shadow: 0 0 16px rgba(203,233,253,.45); }
+
+    /* ================= SMART MODE ================= */
+    .row { display: flex; align-items: center; gap: 12px; }
+    .smart { margin-top: 20px; padding: 14px 14px 14px 16px; border-radius: 22px; background: rgba(255,255,255,.04);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); }
+    .smart .title { font-size: 15px; font-weight: 500; letter-spacing: -.015em; display: flex; align-items: center; gap: 7px; }
+    .smart .title svg { width: 16px; height: 16px; color: var(--b-100); filter: drop-shadow(0 0 6px rgba(111,220,255,.9)); }
+    .smart .sub { font-size: 12.5px; color: var(--text-3); margin-top: 3px; }
+    .smart .grow { flex: 1; min-width: 0; }
+    .tpsl-link { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 12px; padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,.08); font-size: 14px; font-weight: 500; color: var(--b-100); letter-spacing: -.01em; text-align: left; }
+    .tpsl-link .vals { color: var(--text-2); font-weight: 400; font-size: 13px; white-space: nowrap; }
+    .tpsl-link svg { width: 16px; height: 16px; }
+
+    /* iOS switch */
+    .switch { position: relative; width: 52px; height: 32px; flex: none; border-radius: 999px; background: rgba(255,255,255,.14);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); transition: background .25s, box-shadow .25s; }
+    .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,.4); transition: transform .28s cubic-bezier(.2,.8,.2,1); }
+    .switch[aria-checked="true"] { background: linear-gradient(90deg, var(--b-600), var(--b-400));
+      box-shadow: 0 0 16px rgba(55,129,252,.6), inset 0 0 0 1px rgba(203,233,253,.4); }
+    .switch[aria-checked="true"]::after { transform: translateX(20px); box-shadow: 0 2px 6px rgba(0,0,0,.4), 0 0 12px rgba(203,233,253,.8); }
+
+    /* ================= BUTTONS ================= */
+    .btn-white {
+      width: 100%; height: 56px; margin-top: 20px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 9px;
+      background: linear-gradient(180deg, #fff, #eef4ff); color: #000; font-size: 17px; font-weight: 500; letter-spacing: -.02em;
+      box-shadow: inset 0 -1px 0 rgba(0,0,0,.1), 0 0 0 1px rgba(255,255,255,.85), 0 0 0 5px rgba(203,233,253,.10),
+                  0 0 26px rgba(203,233,253,.5), 0 0 60px rgba(55,129,252,.4);
+      transition: transform .12s ease, opacity .2s;
     }
-    .disclaimer .warn svg { width: 14px; height: 14px; color: var(--danger); }
+    .btn-white svg { width: 19px; height: 19px; }
+    .btn-white:active { transform: scale(.975); }
+    .btn-white:disabled { cursor: not-allowed; background: rgba(255,255,255,.04); color: var(--text-3); box-shadow: inset 0 0 0 1px rgba(255,255,255,.22); }
+    .btn-white.busy { opacity: .75; }
+    .btn-dark { height: 40px; padding: 0 18px; border-radius: 999px; font-size: 14px; font-weight: 500; letter-spacing: -.01em; color: #fff;
+      background: rgba(255,255,255,.06); box-shadow: inset 0 0 0 1px rgba(255,255,255,.26), 0 0 14px rgba(55,129,252,.12); }
+    .btn-dark:active { background: rgba(255,255,255,.12); }
+    .hint { text-align: center; font-size: 12.5px; color: var(--text-3); margin-top: 12px; }
+
+    /* ================= INPUTS ================= */
+    .field { margin-top: 16px; }
+    .input { width: 100%; height: 50px; padding: 0 18px; border-radius: 999px; border: 0; outline: none;
+      background: rgba(0,0,0,.5); color: #fff; font: 400 15px var(--font); letter-spacing: -.005em;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); transition: box-shadow .2s; }
+    .input::placeholder { color: var(--text-3); }
+    .input:focus { box-shadow: inset 0 0 0 1px rgba(203,233,253,.7), 0 0 18px rgba(111,220,255,.3); }
+    .input.mono { font-size: 13px; letter-spacing: 0; }
+    .error { color: var(--danger); font-size: 13px; line-height: 1.45; margin: 10px 4px 0; }
+    .error:empty { display: none; }
+    .note { display: flex; gap: 10px; margin-top: 16px; font-size: 12.5px; line-height: 1.5; color: var(--text-2); }
+    .note svg { width: 16px; height: 16px; flex: none; margin-top: 1px; color: var(--b-100); }
+
+    /* ================= LEARN / DESKTOP / SETTINGS ================= */
+    .badge { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; margin-bottom: 14px;
+      background: radial-gradient(circle at 50% 0%, rgba(255,255,255,.16), transparent 60%), linear-gradient(180deg, #171a24, #08090d);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), inset 0 1px 0 rgba(255,255,255,.2), 0 0 18px rgba(55,129,252,.25); }
+    .badge svg { width: 20px; height: 20px; color: #e3edff; filter: drop-shadow(0 0 6px rgba(55,129,252,.8)); }
+    .card .more { margin-top: 12px; }
+    .tag { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .3px; padding: 5px 10px; border-radius: 999px;
+      color: var(--b-100); background: rgba(25,81,252,.14); box-shadow: inset 0 0 0 1px rgba(55,129,252,.35); }
+
+    .laptop { position: relative; width: 210px; height: 140px; margin: 10px auto 22px; }
+    .laptop .screen-l { position: absolute; left: 22px; right: 22px; top: 0; height: 118px; border-radius: 14px 14px 4px 4px;
+      background: linear-gradient(160deg, #0a1440, #050814); box-shadow: inset 0 0 0 2px rgba(255,255,255,.22), 0 0 40px rgba(55,129,252,.45);
+      overflow: hidden; }
+    .laptop .screen-l::before { content: ""; position: absolute; inset: 10px; border-radius: 8px;
+      background: radial-gradient(80% 60% at 30% 80%, rgba(111,220,255,.55), transparent 60%),
+                  radial-gradient(70% 70% at 70% 30%, rgba(25,81,252,.8), transparent 70%); filter: blur(6px); }
+    .laptop .chart { position: absolute; inset: 22px 20px 20px; width: calc(100% - 40px); height: calc(100% - 42px); }
+    .laptop .base { position: absolute; left: 0; right: 0; bottom: 6px; height: 14px; border-radius: 3px 3px 14px 14px;
+      background: linear-gradient(180deg, #d9e4f5, #7d8aa3); box-shadow: 0 10px 30px rgba(55,129,252,.35); }
+    .laptop .base::after { content: ""; position: absolute; left: 42%; right: 42%; top: 0; height: 4px; border-radius: 0 0 4px 4px; background: #5c6780; }
+    .features { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 12px; }
+    .features li { display: flex; align-items: center; gap: 12px; font-size: 13.5px; color: var(--text-2); }
+    .check { width: 26px; height: 26px; border-radius: 50%; flex: none; display: grid; place-items: center; background: rgba(255,255,255,.16); }
+    .check svg { width: 13px; height: 13px; }
+
+    .settings-row { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .settings-row:last-child { border-bottom: 0; padding-bottom: 2px; }
+    .settings-row:first-child { padding-top: 2px; }
+    .settings-row .ic { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; flex: none; background: rgba(255,255,255,.07); }
+    .settings-row .ic svg { width: 17px; height: 17px; color: var(--b-100); }
+    .settings-row .grow { flex: 1; min-width: 0; }
+    .settings-row .t { font-size: 15px; font-weight: 500; letter-spacing: -.015em; }
+    .settings-row .s { font-size: 12.5px; color: var(--text-3); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .settings-row .segmented { margin: 0; width: 116px; flex: none; }
+    .kv { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 0; color: var(--text-2); }
+    .kv b { color: #fff; font-weight: 500; }
+
+    .disclaimer { display: flex; gap: 12px; padding: 16px 18px; border-radius: 24px; }
+    .disclaimer .warn { width: 24px; height: 24px; border-radius: 50%; flex: none; display: grid; place-items: center;
+      background: rgba(255,138,155,.14); box-shadow: inset 0 0 0 1px rgba(255,138,155,.3); }
+    .disclaimer .warn svg { width: 13px; height: 13px; color: var(--danger); }
     .disclaimer p { margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--text-2); }
     .disclaimer strong { color: #fff; font-weight: 500; }
+
+    /* ================= BOTTOM NAVIGATION ================= */
+    .tabbar {
+      position: fixed; z-index: 20; left: 50%; transform: translateX(-50%);
+      bottom: calc(10px + env(safe-area-inset-bottom)); width: calc(100% - 24px); max-width: 440px; height: var(--nav-h);
+      display: grid; grid-template-columns: repeat(4, 1fr); padding: 6px; border-radius: 30px;
+      background: rgba(12,12,16,.62); border: 1px solid var(--line);
+      -webkit-backdrop-filter: blur(28px) saturate(170%); backdrop-filter: blur(28px) saturate(170%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 10px 40px rgba(0,0,0,.7), 0 0 30px rgba(55,129,252,.1);
+    }
+    .tab { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+      border-radius: 24px; color: var(--text-3); font-size: 11.5px; font-weight: 500; letter-spacing: -.005em; transition: color .25s, background .25s; }
+    .tab svg { width: 23px; height: 23px; transition: filter .25s, transform .25s; }
+    .tab.active { color: var(--b-400); background: radial-gradient(70% 90% at 50% 100%, rgba(25,81,252,.22), transparent 70%); }
+    .tab.active svg { color: #7fb0ff; transform: translateY(-1px);
+      filter: drop-shadow(0 0 6px rgba(55,129,252,.95)) drop-shadow(0 0 14px rgba(111,220,255,.6)); }
+    .tab.active::after { content: ""; position: absolute; bottom: 3px; width: 18px; height: 3px; border-radius: 999px;
+      background: var(--b-400); box-shadow: 0 0 10px var(--b-400), 0 0 18px var(--cyan); }
+    .tab:active svg { transform: scale(.9); }
+
+    /* ================= BOTTOM SHEET (iOS style) ================= */
+    .backdrop { position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,.55); opacity: 0; pointer-events: none;
+      transition: opacity .3s; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+    .backdrop.open { opacity: 1; pointer-events: auto; }
+    .sheet {
+      position: fixed; z-index: 31; left: 50%; bottom: 0; width: 100%; max-width: 480px;
+      transform: translate(-50%, 105%); transition: transform .38s cubic-bezier(.2,.85,.25,1);
+      padding: 10px 22px calc(26px + env(safe-area-inset-bottom)); border-radius: 30px 30px 0 0;
+      background: linear-gradient(180deg, rgba(22,26,38,.92), rgba(8,9,13,.96));
+      border: 1px solid var(--line); border-bottom: 0;
+      -webkit-backdrop-filter: blur(30px); backdrop-filter: blur(30px);
+      box-shadow: 0 -10px 60px rgba(0,0,0,.7), 0 -1px 30px rgba(55,129,252,.18), inset 0 1px 0 rgba(255,255,255,.12);
+    }
+    .sheet.open { transform: translate(-50%, 0); }
+    .grabber { width: 40px; height: 5px; border-radius: 999px; background: rgba(255,255,255,.28); margin: 0 auto 18px; }
+    .sheet h3 { margin: 0; font-size: 21px; font-weight: 500; letter-spacing: -.03em; }
+    .sheet .sheet-sub { font-size: 13px; color: var(--text-2); margin: 6px 0 18px; line-height: 1.45; }
+    .sl-block { padding: 16px 0; border-top: 1px solid rgba(255,255,255,.08); }
+    .sl-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
+    .sl-head .n { font-size: 14.5px; font-weight: 500; }
+    .sl-head .v { font-size: 26px; font-weight: 500; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+    .v.tp { color: #6ff0b8; text-shadow: 0 0 18px rgba(18,199,132,.45); }
+    .v.sl { color: #ff9aaa; text-shadow: 0 0 18px rgba(255,92,122,.4); }
+    .range.tp { background: linear-gradient(90deg, #0f8f62, #6ff0b8) 0 / var(--fill, 0%) 100% no-repeat, rgba(255,255,255,.16); box-shadow: 0 0 12px rgba(18,199,132,.25); }
+    .range.sl { background: linear-gradient(90deg, #ff9aaa, #c2304b) 0 / var(--fill, 0%) 100% no-repeat, rgba(255,255,255,.16); box-shadow: 0 0 12px rgba(255,92,122,.22); }
+    .sheet-actions { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center; margin-top: 8px; }
+    .sheet-actions .btn-white { margin-top: 0; height: 52px; }
+    .sheet-actions .btn-dark { height: 52px; padding: 0 20px; }
+
+    /* ================= TOAST ================= */
+    .toast { position: fixed; z-index: 40; left: 50%; top: calc(14px + env(safe-area-inset-top)); transform: translate(-50%, -150%);
+      max-width: calc(100% - 32px); padding: 12px 18px; border-radius: 999px; font-size: 13.5px; font-weight: 500; letter-spacing: -.01em;
+      background: rgba(20,22,30,.9); border: 1px solid var(--line); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+      box-shadow: 0 10px 30px rgba(0,0,0,.6), 0 0 20px rgba(55,129,252,.2); transition: transform .35s cubic-bezier(.2,.85,.25,1); text-align: center; }
+    .toast.show { transform: translate(-50%, 0); }
   </style>
 </head>
 <body>
-  <div class="scene" aria-hidden="true">
-    <div class="beam"></div>
-    <div class="beam-cut"></div>
-    <div class="ghost-word">SOL</div>
-    <div class="grain"></div>
-  </div>
+  <div class="scene" aria-hidden="true"><div class="beam"></div><div class="beam-cut"></div><div class="grain"></div></div>
 
   <main>
-    <!-- Header -->
-    <header class="nav">
+    <!-- ================= TOP BAR ================= -->
+    <header class="topbar">
       <div class="app-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="#fff"><path d="M13.2 2.2 4.6 13.1c-.4.5 0 1.2.6 1.2h5.4l-1.3 7.2c-.1.7.8 1.1 1.2.5l8.6-10.9c.4-.5 0-1.2-.6-1.2h-5.4l1.3-7.2c.1-.7-.8-1.1-1.2-.5Z"/></svg>
       </div>
       <div class="brand">SolTradeBot</div>
-      <div class="status" id="statusPill"><i></i><span data-i18n="offline">No wallet</span></div>
+      <button class="wallet-btn" id="walletBtn"></button>
     </header>
 
-    <div class="eyebrow" data-i18n="subtitle">Solana trading terminal</div>
-
-    <!-- Wallet -->
-    <section class="card">
-      <div class="card-title" data-i18n="walletTitle">Wallet</div>
-      <p class="card-desc" data-i18n="walletDesc">Connect Phantom or paste your public address. Only your public address is ever shared.</p>
-
-      <button class="btn-white btn-block" id="connectBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h14a2 2 0 0 1 2 2v3"/><path d="M3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3"/><path d="M21 12h-4a2 2 0 0 0 0 4h4"/></svg>
-        <span data-i18n="connect">Connect Phantom Wallet</span>
-      </button>
-
-      <div class="wallet-connected" id="walletBox">
-        <div class="avatar" aria-hidden="true"></div>
-        <div class="wallet-meta">
-          <div class="addr" id="walletAddr"></div>
-          <div class="sub"><i></i><span data-i18n="connected">Connected</span></div>
-        </div>
-        <button class="btn-dark" id="changeBtn" data-i18n="change">Change</button>
+    <!-- ================= TAB 1: TRADE ================= -->
+    <section class="screen" id="screen-trade">
+      <div class="segmented" id="modeSeg" data-pos="0">
+        <div class="thumb"></div>
+        <button class="on" data-mode="auto">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+          <span data-i18n="autoPilot">Auto-Pilot</span>
+        </button>
+        <button data-mode="manual">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="22" x2="18" y1="12" y2="12"/><line x1="6" x2="2" y1="12" y2="12"/><line x1="12" x2="12" y1="6" y2="2"/><line x1="12" x2="12" y1="22" y2="18"/></svg>
+          <span data-i18n="manualTrade">Manual Trade</span>
+        </button>
       </div>
 
-      <div class="manual" id="manualBox">
-        <p data-i18n="manualHint">Phantom isn't available inside Telegram. Paste your wallet's public address instead (never your seed phrase).</p>
-        <div class="input-row">
-          <input class="input" type="text" id="addrInput" autocomplete="off" spellcheck="false" placeholder="Public address">
-          <button class="btn-white btn-save" id="saveAddrBtn" data-i18n="save">Save</button>
+      <!-- Auto-Pilot -->
+      <div id="mode-auto">
+        <div class="card featured">
+          <div class="card-title" data-i18n="amountPerTrade">Amount per trade</div>
+          <div class="amount"><span class="value" id="amountValue">0,01</span><span class="unit">&nbsp;SOL</span></div>
+
+          <div class="slider-row">
+            <input class="range" type="range" id="amountSlider" min="0.005" max="10" step="0.005" value="0.01" aria-label="Amount in SOL">
+            <label class="amount-input"><input id="amountInput" type="text" inputmode="decimal" autocomplete="off" aria-label="Custom amount"><span>SOL</span></label>
+          </div>
+          <div class="range-labels"><span>0,005</span><span>10,0+</span></div>
+
+          <div class="presets">
+            <button class="preset" data-v="0.01">0,01</button>
+            <button class="preset" data-v="0.05">0,05</button>
+            <button class="preset" data-v="0.1">0,1</button>
+            <button class="preset" data-v="0.5">0,5</button>
+          </div>
+
+          <div class="smart">
+            <div class="row">
+              <div class="grow">
+                <div class="title">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5 13.9 8 19.5 10l-5.6 2L12 17.5 10.1 12 4.5 10l5.6-2z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" opacity=".7"/></svg>
+                  <span data-i18n="smartMode">Smart Mode</span>
+                </div>
+                <div class="sub" id="smartSub"></div>
+              </div>
+              <button class="switch" id="smartSwitch" role="switch" aria-checked="true" aria-label="Smart Mode"></button>
+            </div>
+            <button class="tpsl-link" id="tpslLink" hidden>
+              <span data-i18n="setTpSl">⚙️ Set Take Profit / Stop Loss</span>
+              <span class="row" style="gap:6px"><span class="vals" id="tpslVals"></span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+            </button>
+          </div>
+
+          <button class="btn-white" id="startBtn" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09Z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2Z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+            <span data-i18n="startAutoPilot">Start Auto-Pilot</span>
+          </button>
+          <div class="hint" id="autoHint"></div>
         </div>
       </div>
-      <div class="error" id="walletError"></div>
+
+      <!-- Manual Trade -->
+      <div id="mode-manual" hidden>
+        <div class="card featured">
+          <div class="card-title" data-i18n="buyAToken">Buy a token</div>
+          <p class="card-desc" data-i18n="buyDesc">Paste the token address and the amount. You'll get a live quote in the chat and confirm there.</p>
+          <div class="field">
+            <div class="label" data-i18n="tokenAddress">Token Address (CA)</div>
+            <input class="input mono" id="caInput" type="text" autocomplete="off" spellcheck="false" data-i18n-ph="caPh" placeholder="e.g. DezXAZ8z7Pnrn…">
+          </div>
+          <div class="field">
+            <div class="label" data-i18n="amountSol">Amount (SOL)</div>
+            <input class="input" id="buyAmount" type="text" inputmode="decimal" autocomplete="off" placeholder="0,1">
+          </div>
+          <div class="error" id="manualError"></div>
+          <div class="note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <span data-i18n="feeNote">1% fee and max 1% slippage. Nothing is bought until you confirm in the chat.</span>
+          </div>
+          <button class="btn-white" id="buyBtn" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+            <span data-i18n="buyToken">Buy Token</span>
+          </button>
+          <div class="hint" id="manualHint"></div>
+        </div>
+      </div>
+
+      <section class="card disclaimer">
+        <span class="warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 8v5"/><path d="M12 17h.01"/></svg></span>
+        <p data-i18n-html="disclaimer"></p>
+      </section>
     </section>
 
-    <!-- Auto-Pilot (featured card) -->
-    <section class="card featured">
-      <div class="card-title" data-i18n="autopilot">Auto-Pilot</div>
-      <div class="amount"><span class="value" id="amountValue">1,0</span><span class="unit">&nbsp;SOL</span></div>
-      <p class="card-desc" data-i18n="perSession">Amount per trade. Choose how much SOL Auto-Pilot may use.</p>
+    <!-- ================= TAB 2: LEARN ================= -->
+    <section class="screen" id="screen-learn" hidden>
+      <h1 class="screen-title" data-i18n="learnTitle">Learn</h1>
+      <p class="screen-sub" data-i18n="learnSub">Three things every Solana trader should know.</p>
 
-      <input class="range" type="range" id="amountSlider" min="0.1" max="10" step="0.1" value="1" aria-label="Amount in SOL">
-      <div class="range-labels"><span>0,1 SOL</span><span>10,0 SOL</span></div>
-
-      <div class="presets">
-        <button class="preset" data-v="0.5">0,5</button>
-        <button class="preset" data-v="1">1</button>
-        <button class="preset" data-v="2.5">2,5</button>
-        <button class="preset" data-v="5">5</button>
+      <div class="card">
+        <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+        <div class="card-title" data-i18n="l1t">What is Slippage?</div>
+        <p class="card-desc" data-i18n="l1d"></p>
       </div>
-
-      <ul class="features">
-        <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span data-i18n="f1">Live price quote before every trade</span></li>
-        <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span data-i18n="f2">1% fee per trade, shown before you confirm</span></li>
-        <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span data-i18n="f3">Your keys never leave your wallet</span></li>
-      </ul>
-
-      <button class="btn-white btn-glow btn-block" id="startBtn" disabled>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09Z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2Z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
-        <span data-i18n="start">Start Auto-Pilot</span>
-      </button>
-      <div class="hint" id="startHint" data-i18n="connectFirst">Connect a wallet to continue</div>
+      <div class="card">
+        <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></div>
+        <div class="card-title" data-i18n="l2t">How to avoid Rug Pulls?</div>
+        <p class="card-desc" data-i18n-html="l2d"></p>
+      </div>
+      <div class="card featured">
+        <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></div>
+        <div class="card-title" data-i18n="l3t">How Auto-Pilot works?</div>
+        <p class="card-desc" data-i18n="l3d"></p>
+        <div class="more"><span class="tag" data-i18n="previewTag">PREVIEW</span></div>
+      </div>
     </section>
 
-    <!-- Disclaimer -->
-    <section class="card disclaimer">
-      <span class="warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5"/><path d="M12 17h.01"/></svg></span>
-      <p data-i18n-html="disclaimer"><strong>Trading memecoins involves high risk.</strong> You can lose all your funds. SolTradeBot is a tool, not a financial advisor. Always DYOR.</p>
+    <!-- ================= TAB 3: DESKTOP ================= -->
+    <section class="screen" id="screen-desktop" hidden>
+      <h1 class="screen-title" data-i18n="desktopTitle">Desktop</h1>
+      <p class="screen-sub" data-i18n="desktopSub">Professional trading on a big screen.</p>
+      <div class="card featured" style="text-align:center">
+        <div class="laptop" aria-hidden="true">
+          <div class="screen-l">
+            <svg class="chart" viewBox="0 0 160 70" preserveAspectRatio="none"><polyline points="0,60 18,52 32,56 48,38 62,44 80,26 96,32 112,14 128,22 146,6 160,10" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="filter:drop-shadow(0 0 4px #6fdcff)"/></svg>
+          </div>
+          <div class="base"></div>
+        </div>
+        <div class="card-title" data-i18n="chromeTitle">SolTradeBot for Chrome</div>
+        <p class="card-desc" data-i18n="chromeDesc">For professional trading, use the browser extension: bigger charts, faster order entry and your Phantom wallet right in Chrome.</p>
+        <ul class="features" style="text-align:left">
+          <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span data-i18n="c1">Works directly with the Phantom extension</span></li>
+          <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span data-i18n="c2">Full-size charts and order history</span></li>
+          <li><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span data-i18n="c3">Same settings as your Telegram bot</span></li>
+        </ul>
+        <button class="btn-white" id="chromeBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          <span data-i18n="downloadChrome">Download for Chrome</span>
+        </button>
+        <div class="hint" id="chromeHint"></div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 4: SETTINGS ================= -->
+    <section class="screen" id="screen-settings" hidden>
+      <h1 class="screen-title" data-i18n="settingsTitle">Settings</h1>
+      <p class="screen-sub" data-i18n="settingsSub">Saved on this device.</p>
+      <div class="card">
+        <div class="settings-row">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+          <div class="grow"><div class="t" data-i18n="language">Language</div></div>
+          <div class="segmented small" id="langSeg" data-pos="0"><div class="thumb"></div>
+            <button data-lang="en">EN</button><button data-lang="ru">RU</button></div>
+        </div>
+        <div class="settings-row">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5 13.9 8 19.5 10l-5.6 2L12 17.5 10.1 12 4.5 10l5.6-2z"/></svg></div>
+          <div class="grow"><div class="t" data-i18n="smartDefault">Smart Mode by default</div><div class="s" data-i18n="smartDefaultSub">TP +50% · SL −15%</div></div>
+          <button class="switch" id="smartDefaultSwitch" role="switch" aria-checked="true" aria-label="Smart Mode by default"></button>
+        </div>
+        <div class="settings-row">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h14a2 2 0 0 1 2 2v3"/><path d="M3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3"/><path d="M21 12h-4a2 2 0 0 0 0 4h4"/></svg></div>
+          <div class="grow"><div class="t" data-i18n="wallet">Wallet</div><div class="s" id="settingsWallet"></div></div>
+          <button class="btn-dark" id="settingsWalletBtn"></button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="kv"><span data-i18n="tradingFee">Trading fee</span><b>1%</b></div>
+        <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>1%</b></div>
+        <div class="kv"><span data-i18n="version">Version</span><b>1,0</b></div>
+      </div>
     </section>
   </main>
 
+  <!-- ================= BOTTOM NAVIGATION ================= -->
+  <nav class="tabbar" id="tabbar">
+    <button class="tab active" data-tab="trade">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      <span data-i18n="tabTrade">Trade</span></button>
+    <button class="tab" data-tab="learn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      <span data-i18n="tabLearn">Learn</span></button>
+    <button class="tab" data-tab="desktop">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"/></svg>
+      <span data-i18n="tabDesktop">Desktop</span></button>
+    <button class="tab" data-tab="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>
+      <span data-i18n="tabSettings">Settings</span></button>
+  </nav>
+
+  <!-- ================= BOTTOM SHEETS ================= -->
+  <div class="backdrop" id="backdrop"></div>
+
+  <div class="sheet" id="sheet-tpsl" role="dialog" aria-modal="true">
+    <div class="grabber"></div>
+    <h3 data-i18n="tpslTitle">Take Profit / Stop Loss</h3>
+    <p class="sheet-sub" data-i18n="tpslSub">Auto-Pilot sells when the price reaches one of these levels.</p>
+    <div class="sl-block">
+      <div class="sl-head"><span class="n" data-i18n="takeProfit">Take Profit</span><span class="v tp" id="tpVal">+50%</span></div>
+      <input class="range tp" type="range" id="tpSlider" min="10" max="500" step="5" value="50" aria-label="Take Profit">
+    </div>
+    <div class="sl-block">
+      <div class="sl-head"><span class="n" data-i18n="stopLoss">Stop Loss</span><span class="v sl" id="slVal">−15%</span></div>
+      <input class="range sl" type="range" id="slSlider" min="5" max="90" step="1" value="15" aria-label="Stop Loss">
+    </div>
+    <div class="sheet-actions">
+      <button class="btn-dark" id="tpslReset" data-i18n="reset">Reset</button>
+      <button class="btn-white" id="tpslDone" data-i18n="done">Done</button>
+    </div>
+  </div>
+
+  <div class="sheet" id="sheet-wallet" role="dialog" aria-modal="true">
+    <div class="grabber"></div>
+    <h3 data-i18n="connectWalletTitle">Connect wallet</h3>
+    <p class="sheet-sub" data-i18n="manualHint">Phantom isn't available inside Telegram. Paste your wallet's public address instead — never your seed phrase.</p>
+    <input class="input mono" id="addrInput" type="text" autocomplete="off" spellcheck="false" data-i18n-ph="addrPh" placeholder="Public address">
+    <div class="error" id="walletError"></div>
+    <div class="sheet-actions" style="margin-top:16px">
+      <button class="btn-dark" id="walletCancel" data-i18n="cancel">Cancel</button>
+      <button class="btn-white" id="walletSave" data-i18n="save">Save</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
   <script>
-    // ---------------------------------------------------------------
-    // Texts (EN / RU). Language comes from ?lang=ru in the URL (set by the bot)
-    // or from the user's Telegram language.
-    // ---------------------------------------------------------------
+  (() => {
+    // =====================================================================
+    // CONFIG
+    // =====================================================================
+    const CHROME_EXTENSION_URL = "";   // put your Chrome Web Store link here when it's published
+    const AMOUNT_MIN = 0.005, AMOUNT_MAX = 1000, SLIDER_MAX = 10;
+    const SMART_TP = 50, SMART_SL = 15;
+    const PAGE_COLOR = "#050505";
+    const COOLDOWN_MS = 3000;
+
+    // =====================================================================
+    // TRANSLATIONS
+    // =====================================================================
     const translations = {
       en: {
-        subtitle: "Solana trading terminal",
-        offline: "No wallet",
-        online: "Connected",
-        walletTitle: "Wallet",
-        walletDesc: "Connect Phantom or paste your public address. Only your public address is ever shared.",
-        connect: "Connect Phantom Wallet",
-        connected: "Connected",
-        change: "Change",
-        manualHint: "Phantom isn't available inside Telegram. Paste your wallet's public address instead (never your seed phrase).",
-        save: "Save",
-        autopilot: "Auto-Pilot",
-        perSession: "Amount per trade. Choose how much SOL Auto-Pilot may use.",
-        f1: "Live price quote before every trade",
-        f2: "1% fee per trade, shown before you confirm",
-        f3: "Your keys never leave your wallet",
-        start: "Start Auto-Pilot",
-        connectFirst: "Connect a wallet to continue",
-        ready: "Your settings will be sent to the bot",
+        connectWallet: "Connect Wallet", autoPilot: "Auto-Pilot", manualTrade: "Manual Trade",
+        amountPerTrade: "Amount per trade", smartMode: "Smart Mode",
+        smartOn: "Safe defaults: TP +50% · SL −15%", smartOff: "Your own Take Profit / Stop Loss",
+        setTpSl: "⚙️ Set Take Profit / Stop Loss", startAutoPilot: "Start Auto-Pilot",
+        connectFirst: "Connect a wallet to continue", readyAuto: "Settings go to the bot — it confirms in the chat",
+        buyAToken: "Buy a token", buyDesc: "Paste the token address and the amount. You'll get a live quote in the chat and confirm there.",
+        tokenAddress: "Token Address (CA)", caPh: "e.g. DezXAZ8z7Pnrn…", amountSol: "Amount (SOL)",
+        feeNote: "1% fee and max 1% slippage. Nothing is bought until you confirm in the chat.",
+        buyToken: "Buy Token", readyBuy: "The quote will appear in the chat",
+        badCa: "That's not a valid token address.", badAmount: "Enter an amount between 0,005 and 1 000 SOL.",
+        sending: "Sending…", notInTelegram: "Open this app from SolTradeBot in Telegram to send orders.",
+        disclaimer: "<strong>Trading memecoins involves high risk.</strong> You can lose all your funds. SolTradeBot is a tool, not a financial advisor. Always DYOR.",
+        learnTitle: "Learn", learnSub: "Three things every Solana trader should know.",
+        l1t: "What is Slippage?",
+        l1d: "Slippage is the difference between the price you see and the price you actually get. Memecoin prices move in seconds, so a swap can fill slightly worse than quoted. SolTradeBot allows at most 1%: if the price moves more, the swap is cancelled instead of filling at a bad price.",
+        l2t: "How to avoid Rug Pulls?",
+        l2d: "A rug pull is when the creators drain the liquidity and the price drops to zero. Red flags: <strong>a token younger than 24 hours</strong>, <strong>liquidity under $10k</strong>, <strong>a few wallets holding most of the supply</strong>, and a creator who can still mint new tokens. Check before you buy, and only trade what you can afford to lose.",
+        l3t: "How Auto-Pilot works?",
+        l3d: "You choose an amount per trade and your exit rules. Take Profit sells when the price rises by your target, Stop Loss sells when it falls by your limit. Smart Mode uses +50% / −15%. Auto-Pilot is in preview: your settings are saved, but it doesn't place trades yet.",
+        previewTag: "PREVIEW",
+        desktopTitle: "Desktop", desktopSub: "Professional trading on a big screen.",
+        chromeTitle: "SolTradeBot for Chrome",
+        chromeDesc: "For professional trading, use the browser extension: bigger charts, faster order entry and your Phantom wallet right in Chrome.",
+        c1: "Works directly with the Phantom extension", c2: "Full-size charts and order history", c3: "Same settings as your Telegram bot",
+        downloadChrome: "Download for Chrome", comingSoon: "The Chrome extension is coming soon.",
+        settingsTitle: "Settings", settingsSub: "Saved on this device.", language: "Language",
+        smartDefault: "Smart Mode by default", smartDefaultSub: "TP +50% · SL −15%", wallet: "Wallet",
+        notConnected: "Not connected", connect: "Connect", disconnect: "Disconnect",
+        tradingFee: "Trading fee", maxSlippage: "Max slippage", version: "Version",
+        tabTrade: "Trade", tabLearn: "Learn", tabDesktop: "Desktop", tabSettings: "Settings",
+        tpslTitle: "Take Profit / Stop Loss", tpslSub: "Auto-Pilot sells when the price reaches one of these levels.",
+        takeProfit: "Take Profit", stopLoss: "Stop Loss", reset: "Reset", done: "Done",
+        connectWalletTitle: "Connect wallet",
+        manualHint: "Phantom isn't available inside Telegram. Paste your wallet's public address instead — never your seed phrase.",
+        addrPh: "Public address", cancel: "Cancel", save: "Save",
         badAddr: "That's not a valid Solana address.",
         secret: "🚨 That looks like a private key or seed phrase! Never share it — move your funds to a new wallet.",
-        rejected: "Connection was cancelled in Phantom.",
-        notInTelegram: "Open this app from SolTradeBot in Telegram to start Auto-Pilot.",
-        disclaimer: "<strong>Trading memecoins involves high risk.</strong> You can lose all your funds. SolTradeBot is a tool, not a financial advisor. Always DYOR."
+        rejected: "Connection was cancelled in Phantom.", walletSaved: "Wallet connected", walletRemoved: "Wallet disconnected"
       },
       ru: {
-        subtitle: "Торговый терминал Solana",
-        offline: "Нет кошелька",
-        online: "Подключён",
-        walletTitle: "Кошелёк",
-        walletDesc: "Подключи Phantom или вставь публичный адрес. Мы видим только твой публичный адрес.",
-        connect: "Подключить Phantom",
-        connected: "Подключён",
-        change: "Сменить",
-        manualHint: "Phantom недоступен внутри Telegram. Вставь публичный адрес своего кошелька (никогда не сид-фразу).",
-        save: "Сохранить",
-        autopilot: "Автопилот",
-        perSession: "Сумма на сделку. Выбери, сколько SOL может использовать Автопилот.",
-        f1: "Живая котировка перед каждой сделкой",
-        f2: "Комиссия 1% — видна до подтверждения",
-        f3: "Твои ключи никогда не покидают кошелёк",
-        start: "Запустить Автопилот",
-        connectFirst: "Подключи кошелёк, чтобы продолжить",
-        ready: "Настройки будут отправлены боту",
+        connectWallet: "Подключить", autoPilot: "Автопилот", manualTrade: "Вручную",
+        amountPerTrade: "Сумма на сделку", smartMode: "Умный режим",
+        smartOn: "Безопасно: TP +50% · SL −15%", smartOff: "Свои Тейк-профит / Стоп-лосс",
+        setTpSl: "⚙️ Настроить TP / SL", startAutoPilot: "Запустить Автопилот",
+        connectFirst: "Подключи кошелёк, чтобы продолжить", readyAuto: "Настройки уйдут боту — он подтвердит в чате",
+        buyAToken: "Купить токен", buyDesc: "Вставь адрес токена и сумму. Котировка придёт в чат, там же подтвердишь покупку.",
+        tokenAddress: "Адрес токена (CA)", caPh: "например, DezXAZ8z7Pnrn…", amountSol: "Сумма (SOL)",
+        feeNote: "Комиссия 1% и проскальзывание не более 1%. Ничего не покупается, пока ты не подтвердишь в чате.",
+        buyToken: "Купить токен", readyBuy: "Котировка появится в чате",
+        badCa: "Это не адрес токена.", badAmount: "Введи сумму от 0,005 до 1 000 SOL.",
+        sending: "Отправляю…", notInTelegram: "Открой приложение из бота SolTradeBot в Telegram, чтобы отправлять заявки.",
+        disclaimer: "<strong>Торговля мемкоинами связана с высоким риском.</strong> Ты можешь потерять все средства. SolTradeBot — это инструмент, а не финансовый советник. Всегда проводи собственное исследование (DYOR).",
+        learnTitle: "Обучение", learnSub: "Три вещи, которые должен знать каждый трейдер Solana.",
+        l1t: "Что такое проскальзывание?",
+        l1d: "Проскальзывание — это разница между ценой, которую ты видишь, и ценой, по которой реально проходит сделка. Цены мемкоинов меняются за секунды, поэтому обмен может пройти чуть хуже котировки. SolTradeBot допускает максимум 1%: если цена уходит дальше, обмен отменяется, а не проходит по плохой цене.",
+        l2t: "Как избежать рагпула?",
+        l2d: "Рагпул — это когда создатели забирают ликвидность и цена падает до нуля. Тревожные признаки: <strong>токену меньше 24 часов</strong>, <strong>ликвидность меньше $10k</strong>, <strong>несколько кошельков держат большую часть токенов</strong>, а создатель всё ещё может выпускать новые токены. Проверяй перед покупкой и торгуй только тем, что готов потерять.",
+        l3t: "Как работает Автопилот?",
+        l3d: "Ты выбираешь сумму на сделку и правила выхода. Тейк-профит продаёт, когда цена выросла на твою цель, Стоп-лосс — когда упала на твой лимит. Умный режим использует +50% / −15%. Автопилот в режиме предпросмотра: настройки сохраняются, но сделки пока не совершаются.",
+        previewTag: "ПРЕДПРОСМОТР",
+        desktopTitle: "Компьютер", desktopSub: "Профессиональная торговля на большом экране.",
+        chromeTitle: "SolTradeBot для Chrome",
+        chromeDesc: "Для профессиональной торговли используй расширение для браузера: большие графики, быстрый ввод заявок и кошелёк Phantom прямо в Chrome.",
+        c1: "Работает напрямую с расширением Phantom", c2: "Полноразмерные графики и история сделок", c3: "Те же настройки, что и в Telegram-боте",
+        downloadChrome: "Скачать для Chrome", comingSoon: "Расширение для Chrome скоро появится.",
+        settingsTitle: "Настройки", settingsSub: "Сохраняются на этом устройстве.", language: "Язык",
+        smartDefault: "Умный режим по умолчанию", smartDefaultSub: "TP +50% · SL −15%", wallet: "Кошелёк",
+        notConnected: "Не подключён", connect: "Подключить", disconnect: "Отключить",
+        tradingFee: "Комиссия", maxSlippage: "Макс. проскальзывание", version: "Версия",
+        tabTrade: "Торговля", tabLearn: "Обучение", tabDesktop: "Компьютер", tabSettings: "Настройки",
+        tpslTitle: "Тейк-профит / Стоп-лосс", tpslSub: "Автопилот продаёт, когда цена достигает одного из этих уровней.",
+        takeProfit: "Тейк-профит", stopLoss: "Стоп-лосс", reset: "Сброс", done: "Готово",
+        connectWalletTitle: "Подключить кошелёк",
+        manualHint: "Phantom недоступен внутри Telegram. Вставь публичный адрес кошелька — никогда не сид-фразу.",
+        addrPh: "Публичный адрес", cancel: "Отмена", save: "Сохранить",
         badAddr: "Это не адрес Solana.",
         secret: "🚨 Похоже, это приватный ключ или сид-фраза! Никому их не отправляй — переведи средства на новый кошелёк.",
-        rejected: "Подключение отменено в Phantom.",
-        notInTelegram: "Открой это приложение из бота SolTradeBot в Telegram, чтобы запустить Автопилот.",
-        disclaimer: "<strong>Торговля мемкоинами связана с высоким риском.</strong> Ты можешь потерять все средства. SolTradeBot — это инструмент, а не финансовый советник. Всегда проводи собственное исследование (DYOR)."
+        rejected: "Подключение отменено в Phantom.", walletSaved: "Кошелёк подключён", walletRemoved: "Кошелёк отключён"
       }
     };
 
+    // =====================================================================
+    // HELPERS
+    // =====================================================================
+    const $ = (id) => document.getElementById(id);
     const tg = window.Telegram ? window.Telegram.WebApp : null;
     const params = new URLSearchParams(location.search);
-    const tgLang = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.language_code : "";
-    const lang = (params.get("lang") || tgLang || "en").startsWith("ru") ? "ru" : "en";
-    const t = (k) => translations[lang][k];
+    const store = {
+      get(k) { try { return localStorage.getItem("stb_" + k); } catch (e) { return null; } },
+      set(k, v) { try { localStorage.setItem("stb_" + k, v); } catch (e) {} }
+    };
 
-    document.querySelectorAll("[data-i18n]").forEach(n => { n.textContent = t(n.dataset.i18n); });
-    document.querySelectorAll("[data-i18n-html]").forEach(n => { n.innerHTML = t(n.dataset.i18nHtml); });
-    document.documentElement.lang = lang;
-
-    // ---------------------------------------------------------------
-    // Telegram chrome.
-    // The header bar can't be transparent, so we paint it EXACTLY the page colour
-    // (#050505) - then it's invisible. Fullscreen (Telegram 8.0+) removes the bar
-    // completely; Telegram then shows its own small close/menu buttons over the page.
-    // ---------------------------------------------------------------
-    const USE_FULLSCREEN = false;   // set to true to hide the Telegram header bar entirely
-    const PAGE_COLOR = "#050505";   // header + page use the exact same colour
-
-    if (tg) {
-      tg.ready();
-      tg.expand();
-      try {
-        tg.setHeaderColor(PAGE_COLOR);
-        tg.setBackgroundColor(PAGE_COLOR);
-        if (tg.setBottomBarColor) tg.setBottomBarColor(PAGE_COLOR);
-      } catch (e) {}
-      if (USE_FULLSCREEN && tg.isVersionAtLeast && tg.isVersionAtLeast("8.0") && tg.requestFullscreen) {
-        try { tg.requestFullscreen(); document.body.classList.add("tg-fullscreen"); } catch (e) {}
-      }
-      if (tg.disableVerticalSwipes) { try { tg.disableVerticalSwipes(); } catch (e) {} } // slider drags won't close the app
+    // Comma formatting: 0.005 -> "0,005", 0.5 -> "0,5", 10 -> "10,0", 1000 -> "1 000,0"
+    function fmt(v) {
+      let txt = (Math.round(v * 1000) / 1000).toFixed(3).replace(/0+$/, "");
+      if (txt.endsWith(".")) txt += "0";
+      const [int, dec] = txt.split(".");
+      return int.replace(/\B(?=(\d{3})+(?!\d))/g, " ") + "," + dec;
     }
-
-    // ---------------------------------------------------------------
-    // Solana address check: base58 that decodes to exactly 32 bytes
-    // ---------------------------------------------------------------
+    // Accepts "0,5", "0.5", "1 000", "100"
+    function parseAmount(s) {
+      const clean = String(s).replace(/[\s ]/g, "").replace(",", ".");
+      if (!/^\d+(\.\d+)?$/.test(clean)) return NaN;
+      return Math.round(parseFloat(clean) * 1000) / 1000;
+    }
     const B58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
     function b58Length(s) {
       let n = 0n;
-      for (const c of s) {
-        const i = B58.indexOf(c);
-        if (i < 0) return -1;
-        n = n * 58n + BigInt(i);
-      }
-      let bytes = 0;
-      while (n > 0n) { n >>= 8n; bytes++; }
-      let zeros = 0;
-      while (zeros < s.length && s[zeros] === "1") zeros++;
+      for (const c of s) { const i = B58.indexOf(c); if (i < 0) return -1; n = n * 58n + BigInt(i); }
+      let bytes = 0; while (n > 0n) { n >>= 8n; bytes++; }
+      let zeros = 0; while (zeros < s.length && s[zeros] === "1") zeros++;
       return bytes + zeros;
     }
     const isPubkey = (s) => /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(s) && b58Length(s) === 32;
     const looksLikeSecret = (s) => {
-      const words = s.trim().split(/\s+/);
-      if ((words.length === 12 || words.length === 24) && words.every(w => /^[a-z]+$/.test(w))) return true;
+      const w = s.trim().split(/\s+/);
+      if ((w.length === 12 || w.length === 24) && w.every(x => /^[a-z]+$/.test(x))) return true;
       return /^[1-9A-HJ-NP-Za-km-z]{80,90}$/.test(s.trim()) && b58Length(s.trim()) === 64;
     };
+    const short = (a) => a.slice(0, 4) + "…" + a.slice(-4);
+    function haptic(kind) {
+      if (!tg || !tg.HapticFeedback) return;
+      try { kind === "select" ? tg.HapticFeedback.selectionChanged()
+          : ["light", "medium"].includes(kind) ? tg.HapticFeedback.impactOccurred(kind)
+          : tg.HapticFeedback.notificationOccurred(kind); } catch (e) {}
+    }
+    let toastTimer;
+    function toast(msg) {
+      const el = $("toast"); el.textContent = msg; el.classList.add("show");
+      clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
+    }
 
-    // ---------------------------------------------------------------
-    // Wallet
-    // ---------------------------------------------------------------
-    const el = (id) => document.getElementById(id);
-    let publicKey = null;
+    // =====================================================================
+    // STATE
+    // =====================================================================
+    const tgLang = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.language_code || "" : "";
+    const savedLang = store.get("lang");
+    const startLang = savedLang || params.get("lang") || tgLang || "en";
+    const state = {
+      lang: startLang.toLowerCase().startsWith("ru") ? "ru" : "en",
+      wallet: null,
+      mode: "auto",
+      amount: 0.01,
+      smartDefault: store.get("smartDefault") !== "0",
+      smart: true,
+      tp: SMART_TP, sl: SMART_SL,
+      cooling: false
+    };
+    state.smart = state.smartDefault;
+    const t = (k) => (translations[state.lang] && translations[state.lang][k]) || translations.en[k] || k;
 
+    // =====================================================================
+    // RENDER
+    // =====================================================================
+    function applyLanguage() {
+      document.documentElement.lang = state.lang;
+      document.querySelectorAll("[data-i18n]").forEach(n => { n.textContent = t(n.dataset.i18n); });
+      document.querySelectorAll("[data-i18n-html]").forEach(n => { n.innerHTML = t(n.dataset.i18nHtml); });
+      document.querySelectorAll("[data-i18n-ph]").forEach(n => { n.placeholder = t(n.dataset.i18nPh); });
+      setSeg($("langSeg"), state.lang === "ru" ? 1 : 0);
+      renderAll();
+    }
+
+    function setSeg(seg, pos) {
+      seg.dataset.pos = String(pos);
+      [...seg.querySelectorAll("button")].forEach((b, i) => b.classList.toggle("on", i === pos));
+    }
+
+    function renderWallet() {
+      const btn = $("walletBtn");
+      if (state.wallet) {
+        btn.classList.add("connected");
+        btn.innerHTML = '<span class="avatar"></span><span>' + short(state.wallet) + '</span><span class="dot"></span>';
+        $("settingsWallet").textContent = state.wallet;
+        $("settingsWalletBtn").textContent = t("disconnect");
+      } else {
+        btn.classList.remove("connected");
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h14a2 2 0 0 1 2 2v3"/><path d="M3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3"/><path d="M21 12h-4a2 2 0 0 0 0 4h4"/></svg><span>' + t("connectWallet") + '</span>';
+        $("settingsWallet").textContent = t("notConnected");
+        $("settingsWalletBtn").textContent = t("connect");
+      }
+    }
+
+    function renderAmount(fromInput) {
+      const v = state.amount;
+      $("amountValue").textContent = fmt(v);
+      const slider = $("amountSlider");
+      const sv = Math.min(v, SLIDER_MAX);
+      if (Math.abs(parseFloat(slider.value) - sv) > 1e-9) slider.value = String(sv);
+      slider.style.setProperty("--fill", ((sv - AMOUNT_MIN) / (SLIDER_MAX - AMOUNT_MIN)) * 100 + "%");
+      if (!fromInput) $("amountInput").value = fmt(v);
+      document.querySelectorAll(".preset").forEach(b => b.classList.toggle("active", parseFloat(b.dataset.v) === v));
+    }
+
+    function renderSmart() {
+      $("smartSwitch").setAttribute("aria-checked", String(state.smart));
+      $("smartSub").textContent = state.smart ? t("smartOn") : t("smartOff");
+      $("tpslLink").hidden = state.smart;
+      $("tpslVals").textContent = "+" + state.tp + "% · −" + state.sl + "%";
+      $("smartDefaultSwitch").setAttribute("aria-checked", String(state.smartDefault));
+    }
+
+    function renderTpSl() {
+      const tp = $("tpSlider"), sl = $("slSlider");
+      $("tpVal").textContent = "+" + state.tp + "%";
+      $("slVal").textContent = "−" + state.sl + "%";
+      tp.value = state.tp; sl.value = state.sl;
+      tp.style.setProperty("--fill", ((state.tp - tp.min) / (tp.max - tp.min)) * 100 + "%");
+      sl.style.setProperty("--fill", ((state.sl - sl.min) / (sl.max - sl.min)) * 100 + "%");
+      $("tpslVals").textContent = "+" + state.tp + "% · −" + state.sl + "%";
+    }
+
+    function renderButtons() {
+      const ok = !!state.wallet;
+      if (!state.cooling) {
+        $("startBtn").disabled = !ok;
+        $("buyBtn").disabled = !ok;
+      }
+      $("autoHint").textContent = ok ? t("readyAuto") : t("connectFirst");
+      $("manualHint").textContent = ok ? t("readyBuy") : t("connectFirst");
+      $("chromeHint").textContent = CHROME_EXTENSION_URL ? "" : t("comingSoon");
+    }
+
+    function renderAll() { renderWallet(); renderAmount(); renderSmart(); renderTpSl(); renderButtons(); }
+
+    // =====================================================================
+    // TABS
+    // =====================================================================
+    function showTab(name) {
+      document.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
+      ["trade", "learn", "desktop", "settings"].forEach(n => { $("screen-" + n).hidden = n !== name; });
+      window.scrollTo({ top: 0 });
+      haptic("select");
+    }
+    document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
+
+    // Auto-Pilot / Manual
+    $("modeSeg").querySelectorAll("button").forEach((b, i) => b.addEventListener("click", () => {
+      state.mode = b.dataset.mode; setSeg($("modeSeg"), i);
+      $("mode-auto").hidden = state.mode !== "auto";
+      $("mode-manual").hidden = state.mode !== "manual";
+      haptic("select");
+    }));
+
+    // =====================================================================
+    // AMOUNT: slider + custom input + presets
+    // =====================================================================
+    $("amountSlider").addEventListener("input", (e) => {
+      state.amount = Math.round(parseFloat(e.target.value) * 1000) / 1000;
+      renderAmount(); haptic("select");
+    });
+    $("amountInput").addEventListener("input", (e) => {
+      const v = parseAmount(e.target.value);
+      if (!isNaN(v) && v >= AMOUNT_MIN && v <= AMOUNT_MAX) { state.amount = v; renderAmount(true); }
+    });
+    $("amountInput").addEventListener("blur", () => {
+      const v = parseAmount($("amountInput").value);
+      if (!isNaN(v)) state.amount = Math.min(AMOUNT_MAX, Math.max(AMOUNT_MIN, v));
+      renderAmount();
+    });
+    $("amountInput").addEventListener("keydown", (e) => { if (e.key === "Enter") e.target.blur(); });
+    document.querySelectorAll(".preset").forEach(b => b.addEventListener("click", () => {
+      state.amount = parseFloat(b.dataset.v); renderAmount(); haptic("select");
+    }));
+
+    // =====================================================================
+    // SMART MODE + TP/SL SHEET
+    // =====================================================================
+    $("smartSwitch").addEventListener("click", () => {
+      state.smart = !state.smart;
+      if (state.smart) { state.tp = SMART_TP; state.sl = SMART_SL; renderTpSl(); }
+      renderSmart(); haptic("light");
+    });
+    $("tpslLink").addEventListener("click", () => openSheet("sheet-tpsl"));
+    $("tpSlider").addEventListener("input", (e) => { state.tp = parseInt(e.target.value, 10); renderTpSl(); haptic("select"); });
+    $("slSlider").addEventListener("input", (e) => { state.sl = parseInt(e.target.value, 10); renderTpSl(); haptic("select"); });
+    $("tpslReset").addEventListener("click", () => { state.tp = SMART_TP; state.sl = SMART_SL; renderTpSl(); haptic("light"); });
+    $("tpslDone").addEventListener("click", () => closeSheet());
+
+    let openId = null;
+    function openSheet(id) {
+      openId = id;
+      $(id).classList.add("open"); $("backdrop").classList.add("open");
+      if (tg && tg.BackButton) { try { tg.BackButton.show(); } catch (e) {} }
+      haptic("light");
+    }
+    function closeSheet() {
+      if (!openId) return;
+      $(openId).classList.remove("open"); $("backdrop").classList.remove("open");
+      $(openId).style.transform = "";
+      openId = null;
+      if (tg && tg.BackButton) { try { tg.BackButton.hide(); } catch (e) {} }
+    }
+    $("backdrop").addEventListener("click", closeSheet);
+    if (tg && tg.BackButton) { try { tg.BackButton.onClick(closeSheet); } catch (e) {} }
+
+    // Swipe a sheet down to close it (drag from anywhere except sliders/inputs)
+    document.querySelectorAll(".sheet").forEach(sheet => {
+      let y0 = null, dy = 0;
+      sheet.addEventListener("touchstart", (e) => {
+        if (e.target.closest("input")) return;
+        y0 = e.touches[0].clientY; dy = 0; sheet.style.transition = "none";
+      }, { passive: true });
+      sheet.addEventListener("touchmove", (e) => {
+        if (y0 === null) return;
+        dy = Math.max(0, e.touches[0].clientY - y0);
+        sheet.style.transform = "translate(-50%, " + dy + "px)";
+      }, { passive: true });
+      sheet.addEventListener("touchend", () => {
+        if (y0 === null) return;
+        sheet.style.transition = ""; sheet.style.transform = "";
+        if (dy > 90) closeSheet();
+        y0 = null;
+      });
+    });
+
+    // =====================================================================
+    // WALLET (Phantom, or paste a public address)
+    // =====================================================================
     function getPhantom() {
       if (window.phantom?.solana?.isPhantom) return window.phantom.solana;
       if (window.solana?.isPhantom) return window.solana;
       return null;
     }
-
-    function setWallet(addr) {
-      publicKey = addr;
-      el("walletAddr").textContent = addr.slice(0, 4) + "…" + addr.slice(-4);
-      el("walletAddr").title = addr;
-      el("walletBox").style.display = "flex";
-      el("connectBtn").style.display = "none";
-      el("manualBox").style.display = "none";
-      el("walletError").textContent = "";
-      el("statusPill").classList.add("on");
-      el("statusPill").querySelector("span").textContent = t("online");
-      updateStart();
-    }
-
-    function showManual() {
-      el("manualBox").style.display = "block";
-      el("addrInput").focus();
-    }
-
-    el("connectBtn").addEventListener("click", async () => {
+    function setWallet(addr) { state.wallet = addr; renderWallet(); renderButtons(); }
+    async function connect() {
       const provider = getPhantom();
-      if (!provider) { showManual(); return; }   // Telegram's in-app browser has no Phantom
+      if (!provider) {   // Telegram's in-app browser has no Phantom -> paste the address
+        $("walletError").textContent = ""; $("addrInput").value = "";
+        openSheet("sheet-wallet"); setTimeout(() => $("addrInput").focus(), 350);
+        return;
+      }
       try {
         const resp = await provider.connect();
-        setWallet(resp.publicKey.toString());
-        haptic("success");
-      } catch (e) {
-        el("walletError").textContent = t("rejected");
-      }
-    });
-
-    el("saveAddrBtn").addEventListener("click", () => {
-      const v = el("addrInput").value.trim();
-      if (looksLikeSecret(v)) { el("addrInput").value = ""; el("walletError").textContent = t("secret"); haptic("error"); return; }
-      if (!isPubkey(v)) { el("walletError").textContent = t("badAddr"); haptic("error"); return; }
-      setWallet(v);
-      haptic("success");
-    });
-    el("addrInput").addEventListener("keydown", (e) => { if (e.key === "Enter") el("saveAddrBtn").click(); });
-
-    el("changeBtn").addEventListener("click", () => {
-      publicKey = null;
-      el("walletBox").style.display = "none";
-      el("connectBtn").style.display = "flex";
-      el("statusPill").classList.remove("on");
-      el("statusPill").querySelector("span").textContent = t("offline");
-      updateStart();
-      if (!getPhantom()) showManual();
-    });
-
-    // Wallet already connected in the bot? It passes it as ?wallet=...
-    const preset = params.get("wallet");
-    if (preset && isPubkey(preset)) setWallet(preset);
-
-    // ---------------------------------------------------------------
-    // Amount slider
-    // ---------------------------------------------------------------
-    // European / Ukrainian format: comma as the decimal separator (display only)
-    const fmtComma = (v) => v.toFixed(1).replace(".", ",");
-
-    const slider = el("amountSlider");
-    function renderAmount() {
-      const v = parseFloat(slider.value);
-      el("amountValue").textContent = fmtComma(v);   // 2.5 -> "2,5"
-      slider.style.setProperty("--fill", ((v - 0.1) / (10 - 0.1)) * 100 + "%");
-      document.querySelectorAll(".preset").forEach(b =>
-        b.classList.toggle("active", parseFloat(b.dataset.v) === v));
+        setWallet(resp.publicKey.toString()); toast(t("walletSaved")); haptic("success");
+      } catch (e) { toast(t("rejected")); }
     }
-    slider.addEventListener("input", () => { renderAmount(); haptic("select"); });
-    document.querySelectorAll(".preset").forEach(b => b.addEventListener("click", () => {
-      slider.value = b.dataset.v; renderAmount(); haptic("select");
+    function disconnect() {
+      state.wallet = null;
+      try { getPhantom()?.disconnect?.(); } catch (e) {}
+      renderWallet(); renderButtons(); toast(t("walletRemoved")); haptic("light");
+    }
+    $("walletBtn").addEventListener("click", () => state.wallet ? showTab("settings") : connect());
+    $("settingsWalletBtn").addEventListener("click", () => state.wallet ? disconnect() : connect());
+    $("walletCancel").addEventListener("click", closeSheet);
+    $("walletSave").addEventListener("click", () => {
+      const v = $("addrInput").value.trim();
+      if (looksLikeSecret(v)) { $("addrInput").value = ""; $("walletError").textContent = t("secret"); haptic("error"); return; }
+      if (!isPubkey(v)) { $("walletError").textContent = t("badAddr"); haptic("error"); return; }
+      setWallet(v); closeSheet(); toast(t("walletSaved")); haptic("success");
+    });
+    $("addrInput").addEventListener("keydown", (e) => { if (e.key === "Enter") $("walletSave").click(); });
+
+    // =====================================================================
+    // SEND TO BOT (with a 3-second double-click guard)
+    // =====================================================================
+    function sendToBot(payload, btn) {
+      if (state.cooling) return;
+      if (!tg || !tg.initData) { toast(t("notInTelegram")); return; }
+      state.cooling = true;
+      const label = btn.querySelector("span");
+      const original = label.textContent;
+      btn.disabled = true; btn.classList.add("busy"); label.textContent = t("sending");
+      setTimeout(() => {
+        state.cooling = false; btn.classList.remove("busy"); label.textContent = original; renderButtons();
+      }, COOLDOWN_MS);
+      haptic("success");
+      tg.sendData(JSON.stringify(payload));   // Telegram delivers it to the bot and closes the app
+    }
+
+    $("startBtn").addEventListener("click", () => {
+      if (!state.wallet) return;
+      sendToBot({
+        action: "start_autopilot",
+        amount: state.amount,
+        wallet: state.wallet,
+        smart_mode: state.smart,
+        tp: state.smart ? SMART_TP : state.tp,
+        sl: state.smart ? SMART_SL : state.sl
+      }, $("startBtn"));
+    });
+
+    $("buyBtn").addEventListener("click", () => {
+      if (!state.wallet) return;
+      const ca = $("caInput").value.trim();
+      const amount = parseAmount($("buyAmount").value);
+      if (!isPubkey(ca)) { $("manualError").textContent = t("badCa"); haptic("error"); return; }
+      if (isNaN(amount) || amount < AMOUNT_MIN || amount > AMOUNT_MAX) { $("manualError").textContent = t("badAmount"); haptic("error"); return; }
+      $("manualError").textContent = "";
+      sendToBot({ action: "buy", token: ca, amount: amount, wallet: state.wallet }, $("buyBtn"));
+    });
+    ["caInput", "buyAmount"].forEach(id => $(id).addEventListener("input", () => { $("manualError").textContent = ""; }));
+
+    // =====================================================================
+    // DESKTOP + SETTINGS
+    // =====================================================================
+    $("chromeBtn").addEventListener("click", () => {
+      if (!CHROME_EXTENSION_URL) { toast(t("comingSoon")); haptic("light"); return; }
+      if (tg && tg.openLink) tg.openLink(CHROME_EXTENSION_URL); else window.open(CHROME_EXTENSION_URL, "_blank");
+    });
+    $("langSeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+      state.lang = b.dataset.lang; store.set("lang", state.lang); applyLanguage(); haptic("select");
     }));
-    renderAmount();
-
-    // ---------------------------------------------------------------
-    // Start Auto-Pilot -> send to bot
-    // ---------------------------------------------------------------
-    function updateStart() {
-      el("startBtn").disabled = !publicKey;
-      el("startHint").textContent = publicKey ? t("ready") : t("connectFirst");
-    }
-
-    el("startBtn").addEventListener("click", () => {
-      if (!publicKey) return;
-      const amount = Math.round(parseFloat(slider.value) * 10) / 10;
-      const payload = JSON.stringify({ action: "start_autopilot", amount: amount, wallet: publicKey });
-      // sendData only works when the app was opened from the bot's keyboard button
-      if (!tg || !tg.initData) { el("startHint").textContent = t("notInTelegram"); return; }
-      haptic("success");
-      tg.sendData(payload);   // Telegram closes the app and delivers the data to the bot
+    $("smartDefaultSwitch").addEventListener("click", () => {
+      state.smartDefault = !state.smartDefault; store.set("smartDefault", state.smartDefault ? "1" : "0");
+      state.smart = state.smartDefault;
+      if (state.smart) { state.tp = SMART_TP; state.sl = SMART_SL; renderTpSl(); }
+      renderSmart(); haptic("light");
     });
 
-    function haptic(kind) {
-      if (!tg || !tg.HapticFeedback) return;
-      try {
-        if (kind === "select") tg.HapticFeedback.selectionChanged();
-        else tg.HapticFeedback.notificationOccurred(kind);
-      } catch (e) {}
+    // =====================================================================
+    // TELEGRAM SETUP + START
+    // =====================================================================
+    if (tg) {
+      tg.ready(); tg.expand();
+      try { tg.setHeaderColor(PAGE_COLOR); tg.setBackgroundColor(PAGE_COLOR); if (tg.setBottomBarColor) tg.setBottomBarColor(PAGE_COLOR); } catch (e) {}
+      if (tg.disableVerticalSwipes) { try { tg.disableVerticalSwipes(); } catch (e) {} }
     }
+    const preset = params.get("wallet");          // wallet already connected in the bot
+    if (preset && isPubkey(preset)) state.wallet = preset;
+    applyLanguage();
+  })();
   </script>
 </body>
 </html>
