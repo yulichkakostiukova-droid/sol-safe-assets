@@ -1268,8 +1268,9 @@
     applyLanguage();
 
     // Opened from "/buy <address> <amount>": jump to Manual Trade with both fields filled in
-    const presetCa = params.get("ca");
-    const presetAmt = parseAmount(params.get("amt") || "");
+    // Opened from "/buy <address> <amount>": ?buy=<address>&amount=<amount> (older links: ?ca=&amt=)
+    const presetCa = params.get("buy") || params.get("ca");
+    const presetAmt = parseAmount(params.get("amount") || params.get("amt") || "");
     if (params.get("mode") === "manual" || presetCa) {
       const manualBtn = $("modeSeg").querySelector('button[data-mode="manual"]');
       state.mode = "manual"; setSeg($("modeSeg"), 1);
