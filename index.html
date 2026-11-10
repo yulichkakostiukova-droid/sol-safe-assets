@@ -94,6 +94,14 @@
     /* "Only Solana wallets" warning (under the header pill and in the connect sheet) */
     .wallet-note { margin: -8px 6px 14px; font-size: 11.5px; line-height: 1.45; color: rgba(255,214,140,.88); }
     .wallet-note.in-sheet { margin: -6px 0 14px; }
+    .phantom-block { margin-bottom: 16px; }
+    .phantom-block p { margin: 0 0 12px; font-size: 13.5px; line-height: 1.5; color: var(--text-2); }
+    .btn-phantom { margin-top: 0; background: linear-gradient(180deg, #ab9ff2, #8f7ff0); color: #120d2b;
+      box-shadow: 0 0 0 1px rgba(255,255,255,.5), 0 0 26px rgba(171,159,242,.55); }
+    .or-line { text-align: center; font-size: 12px; color: var(--text-3); margin: 16px 0 10px; }
+    .return-card { display: flex; align-items: center; gap: 12px; padding: 14px 16px; margin-bottom: 14px; }
+    .return-card p { margin: 0; flex: 1; font-size: 13px; line-height: 1.45; color: var(--text-2); }
+    .return-card .btn-white { width: auto; height: 42px; margin: 0; padding: 0 16px; font-size: 14px; white-space: nowrap; }
     .wallet-btn {
       margin-left: auto; height: 40px; padding: 0 16px; border-radius: 999px; flex: none;
       display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; letter-spacing: -.01em; white-space: nowrap;
@@ -415,6 +423,10 @@
 
     <!-- ================= TAB 1: TRADE ================= -->
     <section class="screen" id="screen-trade">
+      <div class="card return-card" id="returnCard" hidden>
+        <p data-i18n="returnHint">Wallet connected. Go back to Telegram to save it in the bot.</p>
+        <button class="btn-white" id="returnBtn"><span data-i18n="backToTelegram">↩ Telegram</span></button>
+      </div>
       <div class="segmented" id="modeSeg" data-pos="0">
         <div class="thumb"></div>
         <button class="on" data-mode="auto">
@@ -737,7 +749,15 @@
     <div class="grabber"></div>
     <h3 data-i18n="connectWalletTitle">Connect wallet</h3>
     <p class="wallet-note in-sheet" data-i18n="walletWarning"></p>
-    <p class="sheet-sub" data-i18n="manualHint">Phantom isn't available inside Telegram. Paste your wallet's public address instead — never your seed phrase.</p>
+    <div class="phantom-block" id="phantomBlock" hidden>
+      <p data-i18n="phantomExplain">To connect your wallet, open this app inside the Phantom browser.</p>
+      <button class="btn-white btn-phantom" id="openPhantomBtn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C7 3 3 7.1 3 12.3V19a1.7 1.7 0 0 0 2.9 1.2l1.1-1.1 1.2 1.2a1.7 1.7 0 0 0 2.4 0L12 19l1.4 1.3a1.7 1.7 0 0 0 2.4 0l1.2-1.2 1.1 1.1A1.7 1.7 0 0 0 21 19v-6.7C21 7.1 17 3 12 3Zm-3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Zm6 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Z"/></svg>
+        <span data-i18n="openInPhantom">Open in Phantom</span>
+      </button>
+      <div class="or-line" data-i18n="orPaste">or paste your public address</div>
+    </div>
+    <p class="sheet-sub" id="manualHintText" data-i18n="manualHint">Phantom isn't available inside Telegram. Paste your wallet's public address instead — never your seed phrase.</p>
     <input class="input mono" id="addrInput" type="text" autocomplete="off" spellcheck="false" enterkeyhint="done" data-i18n-ph="addrPh" placeholder="Public address">
     <div class="error" id="walletError"></div>
     <div class="sheet-actions" style="margin-top:16px">
@@ -819,6 +839,11 @@
         takeProfit: "Take Profit", stopLoss: "Stop Loss", reset: "Reset", save: "Save", saved: "Saved",
         connectWalletTitle: "Connect wallet",
         manualHint: "Phantom isn't available inside Telegram. Paste your wallet's public address instead — never your seed phrase.",
+        phantomExplain: "To connect your wallet, open this app inside the Phantom browser.",
+        openInPhantom: "Open in Phantom",
+        orPaste: "or paste your public address",
+        returnHint: "Wallet connected. Go back to Telegram to save it in the bot.",
+        backToTelegram: "↩ Telegram",
         addrPh: "Public address", cancel: "Cancel",
         badAddr: "That's not a valid Solana address.",
         secret: "🚨 That looks like a private key or seed phrase! Never share it — move your funds to a new wallet.",
@@ -862,6 +887,11 @@
         takeProfit: "Тейк-профит", stopLoss: "Стоп-лосс", reset: "Сброс", save: "Сохранить", saved: "Сохранено",
         connectWalletTitle: "Подключить кошелёк",
         manualHint: "Phantom недоступен внутри Telegram. Вставь публичный адрес кошелька — никогда не сид-фразу.",
+        phantomExplain: "Чтобы подключить кошелёк, открой это приложение внутри браузера Phantom.",
+        openInPhantom: "Открыть в Phantom",
+        orPaste: "или вставь публичный адрес",
+        returnHint: "Кошелёк подключён. Вернись в Telegram, чтобы сохранить его в боте.",
+        backToTelegram: "↩ В Telegram",
         addrPh: "Публичный адрес", cancel: "Отмена",
         badAddr: "Это не адрес Solana.",
         secret: "🚨 Похоже, это приватный ключ или сид-фраза! Никому их не отправляй — переведи средства на новый кошелёк.",
@@ -1026,7 +1056,7 @@
       $("chromeHint").textContent = CHROME_EXTENSION_URL ? "" : t("comingSoon");
     }
 
-    function renderAll() { renderWallet(); renderAmount(); renderSmart(); renderSheet(); renderButtons(); }
+    function renderAll() { renderWallet(); renderAmount(); renderSmart(); renderSheet(); renderButtons(); renderReturnCard(); }
 
     // =====================================================================
     // KEYBOARD: tap outside a text field -> close the keyboard
@@ -1154,6 +1184,7 @@
       state.wallet = addr;
       window.currentWallet = addr;
       renderWallet(); renderButtons();
+      if (typeof renderReturnCard === "function") renderReturnCard();
     }
     // When the user disconnects or switches account inside Phantom, update the button
     let walletEventsBound = false;
@@ -1169,9 +1200,46 @@
         else { state.wallet = null; window.currentWallet = null; renderWallet(); renderButtons(); }
       });
     }
+    // ---- Phantom on phones -------------------------------------------------
+    // Telegram's in-app WebView never has window.phantom. On a phone we open this
+    // same app inside Phantom's own browser, where window.phantom IS available.
+    const inTelegram = !!(tg && tg.initData);
+    const isMobile = inTelegram && ["ios", "android", "android_x"].includes(tg.platform);
+    const botName = params.get("bot");
+
+    function phantomBrowseLink() {
+      // Same page and settings (?lang, ?bot), WITHOUT the #tgWebAppData part:
+      // that's the user's signed Telegram login data and must not leave Telegram.
+      const page = location.origin + location.pathname + location.search;
+      const ref = location.origin;
+      return "https://phantom.app/ul/browse/" + encodeURIComponent(page) + "?ref=" + encodeURIComponent(ref);
+    }
+    function openInPhantom() {
+      haptic("light");
+      const url = phantomBrowseLink();
+      // openLink leaves Telegram; Phantom's universal link then opens the Phantom app
+      if (tg && tg.openLink) tg.openLink(url); else window.location.href = url;
+    }
+    function backToTelegram() {
+      // Opens the bot with "/start w_<public address>" - the bot saves the wallet
+      if (!botName || !state.wallet) return;
+      window.location.href = "https://t.me/" + botName + "?start=w_" + state.wallet;
+    }
+    function renderReturnCard() {
+      // Only inside the Phantom browser (not in Telegram), once a wallet is connected
+      $("returnCard").hidden = inTelegram || !state.wallet || !botName;
+    }
+
     async function connect() {
       const provider = getPhantom();
-      if (!provider) {   // Telegram's in-app browser has no wallet extension -> paste the address
+      if (!provider) {
+        if (isMobile) {
+          // Phone inside Telegram: offer "Open in Phantom" (+ paste as a fallback)
+          $("walletError").textContent = ""; $("addrInput").value = "";
+          openSheet("sheet-wallet");
+          return;
+        }
+        // Desktop / other browsers: explain, then let the user paste the address
         haptic("warning");
         showAlert(t("noPhantom"), () => {
           $("walletError").textContent = ""; $("addrInput").value = "";
@@ -1196,6 +1264,10 @@
     $("walletBtn").addEventListener("click", () => state.wallet ? showTab("settings") : connect());
     $("settingsWalletBtn").addEventListener("click", () => state.wallet ? disconnect() : connect());
     $("walletCancel").addEventListener("click", closeSheet);
+    $("openPhantomBtn").addEventListener("click", openInPhantom);
+    $("returnBtn").addEventListener("click", backToTelegram);
+    $("phantomBlock").hidden = !isMobile;                       // only on phones inside Telegram
+    if (isMobile) $("manualHintText").hidden = true;            // the "or paste" line replaces it
     $("walletSave").addEventListener("click", () => {
       const v = $("addrInput").value.trim();
       if (looksLikeSecret(v)) { $("addrInput").value = ""; $("walletError").textContent = t("secret"); haptic("error"); return; }
@@ -1220,10 +1292,10 @@
     function sendToBot(payload, btn) {
       hideKeyboard();
       if (state.cooling) return;
-      if (!tg || !tg.initData) { toast(t("notInTelegram")); return; }
+      // Outside Telegram (e.g. inside the Phantom browser) orders also go back via a start link
+      if (!inTelegram && (!botName || !startCode(payload))) { toast(t("notInTelegram")); return; }
       // Opened from an inline/menu button -> Telegram gives a query_id and sendData() is ignored.
-      const viaKeyboard = !(tg.initDataUnsafe && tg.initDataUnsafe.query_id);
-      const botName = params.get("bot");
+      const viaKeyboard = inTelegram && !(tg.initDataUnsafe && tg.initDataUnsafe.query_id);
       const code = viaKeyboard ? null : startCode(payload);
       if (!viaKeyboard && (!botName || !code)) { toast(t("notInTelegram")); return; }
       state.cooling = true;
@@ -1238,7 +1310,8 @@
         tg.sendData(JSON.stringify(payload));   // Telegram delivers it to the bot and closes the app
       } else {
         // Opens the bot chat and sends "/start <code>"; the bot reads the order from it
-        tg.openTelegramLink("https://t.me/" + botName + "?start=" + code);
+        const link = "https://t.me/" + botName + "?start=" + code;
+        if (inTelegram) tg.openTelegramLink(link); else window.location.href = link;
       }
     }
 
