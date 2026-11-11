@@ -141,6 +141,27 @@
       border: 2px solid currentColor; border-right-color: transparent; animation: spin .7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .sell-btn { display: flex; align-items: center; justify-content: center; gap: 9px; }
+    .reentry-row { margin-top: 14px; padding: 12px 14px; border-radius: 18px; background: rgba(255,255,255,.04);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.16); }
+    .reentry-label { font-size: 14px; font-weight: 500; letter-spacing: -.01em; }
+    .reentry-sub { font-size: 12px; line-height: 1.45; color: var(--text-3); margin: 8px 4px 0; }
+    /* Auto-Pilot popup (glass modal) */
+    .modal-wrap { position: fixed; inset: 0; z-index: 35; display: grid; place-items: center; padding: 24px;
+      background: rgba(0,0,0,.5); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+      opacity: 0; pointer-events: none; transition: opacity .25s; }
+    .modal-wrap.open { opacity: 1; pointer-events: auto; }
+    .modal { position: relative; width: 100%; max-width: 360px; padding: 30px 24px 24px; border-radius: 30px; text-align: center;
+      background: linear-gradient(180deg, rgba(30,36,52,.72), rgba(10,12,18,.8)); border: 1px solid rgba(203,233,253,.45);
+      -webkit-backdrop-filter: blur(34px) saturate(170%); backdrop-filter: blur(34px) saturate(170%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 0 40px rgba(55,129,252,.3), 0 30px 60px -20px rgba(0,0,0,.9);
+      transform: scale(.94) translateY(8px); transition: transform .3s cubic-bezier(.2,.85,.25,1); }
+    .modal-wrap.open .modal { transform: none; }
+    .modal-x { position: absolute; top: 12px; right: 12px; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+      font-size: 16px; color: var(--text-2); background: rgba(255,255,255,.08); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16); }
+    .modal-icon { font-size: 44px; line-height: 1; margin-bottom: 12px; filter: drop-shadow(0 0 16px rgba(111,220,255,.6)); }
+    .modal h3 { margin: 0; font-size: 21px; font-weight: 500; letter-spacing: -.03em; }
+    .modal p { margin: 10px 0 0; font-size: 14px; line-height: 1.5; color: var(--text-2); }
+    .modal .btn-white { margin-top: 22px; }
     .wait-row { text-align: center; margin: 14px 0 0; }
     .link-btn { font-size: 13px; color: var(--b-100); text-decoration: underline; text-underline-offset: 3px; padding: 6px 10px; }
     .wallet-btn.connected { background: rgba(255,255,255,.07); color: #fff; padding: 0 14px 0 6px;
@@ -505,6 +526,12 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
           </button>
 
+          <div class="row reentry-row">
+            <div class="reentry-label" data-i18n="notifyReentry">🔔 Notify me on re-entry</div>
+            <button class="switch" id="reentrySwitch" role="switch" aria-checked="false" aria-label="Notify me on re-entry"></button>
+          </div>
+          <div class="reentry-sub" data-i18n="notifyReentrySub">After a Take Profit sale the bot watches the token for 30 minutes and messages you if it breaks its high.</div>
+
           <div class="divider"></div>
 
           <div class="card-title" data-i18n="amountPerTrade">Amount per trade</div>
@@ -773,7 +800,7 @@
       <div class="card">
         <div class="kv"><span data-i18n="tradingFee">Trading fee</span><b>1%</b></div>
         <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>1%</b></div>
-        <div class="kv"><span data-i18n="version">Version</span><b>1.15</b></div>
+        <div class="kv"><span data-i18n="version">Version</span><b>1.17</b></div>
       </div>
     </section>
   </main>
@@ -831,6 +858,16 @@
     </div>
   </div>
 
+  <div class="modal-wrap" id="apModal" role="dialog" aria-modal="true" aria-labelledby="apModalTitle">
+    <div class="modal">
+      <button class="modal-x" id="apModalClose" type="button" aria-label="Close">✕</button>
+      <div class="modal-icon" aria-hidden="true">🤖</div>
+      <h3 id="apModalTitle" data-i18n="apModalTitle">Turn on Auto-Pilot</h3>
+      <p data-i18n="apModalText">Tap the button to turn it on and go back to the Telegram chat. The bot will scan the market and send you a message when a safe token is found.</p>
+      <button class="btn-white" id="apModalGo" type="button"><span data-i18n="apModalGo">↩️ Turn on &amp; go to chat</span></button>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <script>
@@ -871,7 +908,7 @@
         amountPerTrade: "Amount per trade", smartMode: "Smart Mode",
         smartOn: "🤖 <b>Smart Mode:</b> the bot sets Take Profit / Stop Loss for you (now <b>+50% / −15%</b>). No settings needed.",
         setTpSl: "⚙️ Set Take Profit / Stop Loss", startAutoPilot: "Start Auto-Pilot",
-        connectFirst: "Connect a wallet to continue", readyAuto: "Settings go to the bot — it confirms in the chat",
+        connectFirst: "Connect a wallet to continue", readyAuto: "The bot finds tokens; you approve every trade in your wallet",
         buyAToken: "Buy a token", buyDesc: "Paste the token address and the amount. Your wallet opens with a fresh quote, and you approve the trade there.",
         tokenAddress: "Token Address (CA)", caPh: "e.g. DezXAZ8z7Pnrn…", amountSol: "Amount (SOL)",
         feeNote: "1% fee and max 1% slippage. Nothing is bought until you approve it in your wallet.",
@@ -883,13 +920,13 @@
         sending: "Sending…", notInTelegram: "Open this app from SolTradeBot in Telegram to send orders.",
         disclaimer: "<strong>Trading memecoins involves high risk.</strong> You can lose all your funds. SolTradeBot is a tool, not a financial advisor. Always DYOR.",
         learnTitle: "Learn", learnSub: "Three things every Solana trader should know.",
-        tagBasics: "BASICS", tagSafety: "SAFETY", previewTag: "PREVIEW", watchVideo: "Watch Video",
+        tagBasics: "BASICS", tagSafety: "SAFETY", previewTag: "AUTO-PILOT", watchVideo: "Watch Video",
         l1t: "What is Slippage?",
         l1d: "Slippage is the difference between the price you see and the price you actually get. Memecoin prices move in seconds, so a swap can fill slightly worse than quoted. SolTradeBot allows at most 1%: if the price moves more, the swap is cancelled instead of filling at a bad price.",
         l2t: "How to avoid Rug Pulls?",
         l2d: "A rug pull is when the creators drain the liquidity and the price drops to zero. Red flags: <strong>a token younger than 24 hours</strong>, <strong>liquidity under $10k</strong>, <strong>a few wallets holding most of the supply</strong>, and a creator who can still mint new tokens. Check before you buy, and only trade what you can afford to lose.",
         l3t: "How Auto-Pilot works?",
-        l3d: "You choose an amount per trade and your exit rules. Take Profit sells when the price rises by your target, Stop Loss sells when it falls by your limit. Smart Mode uses +50% / −15%. Auto-Pilot is in preview: your settings are saved, but it doesn't place trades yet.",
+        l3d: "You choose an amount per trade and your exit rules. Every 2 minutes the bot looks for a trending token that passes safety filters and sends it to the chat. You approve the buy in your wallet. When the price hits your Take Profit or Stop Loss, the bot sends a sell link to approve. The bot never moves funds itself.",
         desktopTitle: "Desktop", desktopSub: "Professional trading on a big screen.",
         chromeTitle: "SolTradeBot for Chrome",
         chromeDesc: "For professional trading, use the browser extension: bigger charts, faster order entry and your Phantom wallet right in Chrome.",
@@ -928,6 +965,10 @@
         riskNoData: "• No market data for this token",
         signDescSellPct: "You sell {pct}% of your {sym} for SOL. The price is fetched fresh when you tap the button, then your wallet asks you to approve.",
         signNoBalance: "This wallet has none of this token to sell.", signFeeWaived: "0% (sale at a loss)",
+        notifyReentry: "🔔 Notify me on re-entry",
+        notifyReentrySub: "After a Take Profit sale the bot watches the token for 30 minutes and messages you if it breaks its high.",
+        apModalTitle: "Turn on Auto-Pilot", apModalGo: "↩️ Turn on & go to chat",
+        apModalText: "Tap the button to turn it on and go back to the Telegram chat. The bot will scan the market and send you a message when a safe token is found.",
         signTitleBuy: "Buy {sym}", signTitleSell: "Sell {sym}",
         signDescBuy: "You spend {ui} SOL. The price is fetched fresh when you tap the button, then your wallet asks you to approve.",
         signDescSell: "You sell {ui} {sym} for SOL. The price is fetched fresh when you tap the button, then your wallet asks you to approve.",
@@ -954,7 +995,7 @@
         amountPerTrade: "Сумма на сделку", smartMode: "Умный режим",
         smartOn: "🤖 <b>Умный режим:</b> бот сам выставляет Тейк-профит / Стоп-лосс (сейчас <b>+50% / −15%</b>). Ничего настраивать не нужно.",
         setTpSl: "⚙️ Настроить TP / SL", startAutoPilot: "Запустить Автопилот",
-        connectFirst: "Подключи кошелёк, чтобы продолжить", readyAuto: "Настройки уйдут боту — он подтвердит в чате",
+        connectFirst: "Подключи кошелёк, чтобы продолжить", readyAuto: "Бот находит токены, а каждую сделку ты подтверждаешь в кошельке",
         buyAToken: "Купить токен", buyDesc: "Вставь адрес токена и сумму. Откроется кошелёк со свежей котировкой, там ты подтверждаешь сделку.",
         tokenAddress: "Адрес токена (CA)", caPh: "например, DezXAZ8z7Pnrn…", amountSol: "Сумма (SOL)",
         feeNote: "Комиссия 1% и проскальзывание не более 1%. Ничего не покупается, пока ты не подтвердишь в кошельке.",
@@ -966,13 +1007,13 @@
         sending: "Отправляю…", notInTelegram: "Открой приложение из бота SolTradeBot в Telegram, чтобы отправлять заявки.",
         disclaimer: "<strong>Торговля мемкоинами связана с высоким риском.</strong> Ты можешь потерять все средства. SolTradeBot — это инструмент, а не финансовый советник. Всегда проводи собственное исследование (DYOR).",
         learnTitle: "Обучение", learnSub: "Три вещи, которые должен знать каждый трейдер Solana.",
-        tagBasics: "ОСНОВЫ", tagSafety: "БЕЗОПАСНОСТЬ", previewTag: "ПРЕДПРОСМОТР", watchVideo: "Смотреть видео",
+        tagBasics: "ОСНОВЫ", tagSafety: "БЕЗОПАСНОСТЬ", previewTag: "АВТОПИЛОТ", watchVideo: "Смотреть видео",
         l1t: "Что такое проскальзывание?",
         l1d: "Проскальзывание — это разница между ценой, которую ты видишь, и ценой, по которой реально проходит сделка. Цены мемкоинов меняются за секунды, поэтому обмен может пройти чуть хуже котировки. SolTradeBot допускает максимум 1%: если цена уходит дальше, обмен отменяется, а не проходит по плохой цене.",
         l2t: "Как избежать рагпула?",
         l2d: "Рагпул — это когда создатели забирают ликвидность и цена падает до нуля. Тревожные признаки: <strong>токену меньше 24 часов</strong>, <strong>ликвидность меньше $10k</strong>, <strong>несколько кошельков держат большую часть токенов</strong>, а создатель всё ещё может выпускать новые токены. Проверяй перед покупкой и торгуй только тем, что готов потерять.",
         l3t: "Как работает Автопилот?",
-        l3d: "Ты выбираешь сумму на сделку и правила выхода. Тейк-профит продаёт, когда цена выросла на твою цель, Стоп-лосс — когда упала на твой лимит. Умный режим использует +50% / −15%. Автопилот в режиме предпросмотра: настройки сохраняются, но сделки пока не совершаются.",
+        l3d: "Ты выбираешь сумму на сделку и правила выхода. Каждые 2 минуты бот ищет трендовый токен, который проходит фильтры безопасности, и присылает его в чат. Покупку ты подтверждаешь в кошельке. Когда цена достигает Тейк-профита или Стоп-лосса, бот присылает ссылку на продажу. Сам бот средства не двигает.",
         desktopTitle: "Компьютер", desktopSub: "Профессиональная торговля на большом экране.",
         chromeTitle: "SolTradeBot для Chrome",
         chromeDesc: "Для профессиональной торговли используй расширение для браузера: большие графики, быстрый ввод заявок и кошелёк Phantom прямо в Chrome.",
@@ -1011,6 +1052,10 @@
         riskNoData: "• Нет рыночных данных по токену",
         signDescSellPct: "Ты продаёшь {pct}% своих {sym} за SOL. Цена обновится, когда нажмёшь кнопку, затем кошелёк попросит подтверждение.",
         signNoBalance: "В этом кошельке нет этого токена для продажи.", signFeeWaived: "0% (продажа в убыток)",
+        notifyReentry: "🔔 Оповестить при повторном входе",
+        notifyReentrySub: "После продажи по Тейк-профиту бот 30 минут следит за токеном и напишет, если цена пробьёт максимум.",
+        apModalTitle: "Включить Автопилот", apModalGo: "↩️ Включить и в чат",
+        apModalText: "Нажми кнопку, чтобы включить его и вернуться в чат с ботом. Бот будет сканировать рынок и пришлёт сообщение, когда найдёт безопасный токен.",
         signTitleBuy: "Покупка {sym}", signTitleSell: "Продажа {sym}",
         signDescBuy: "Ты тратишь {ui} SOL. Цена обновится, когда нажмёшь кнопку, затем кошелёк попросит подтверждение.",
         signDescSell: "Ты продаёшь {ui} {sym} за SOL. Цена обновится, когда нажмёшь кнопку, затем кошелёк попросит подтверждение.",
@@ -1113,6 +1158,7 @@
     };
     state.smart = state.smartDefault;
     state.demo = store.get("demo") === "1";      // Demo Mode: simulate, never send to the bot
+    state.notifyReentry = store.get("reentry") === "1";   // Auto-Pilot: "notify me on re-entry"
     state.balance = null;                        // number (SOL) | "err" | null (loading)
     state.balanceFor = null;                     // address the balance belongs to
     const t = (k) => (translations[state.lang] && translations[state.lang][k]) || translations.en[k] || k;
@@ -1199,6 +1245,7 @@
     function renderButtons() {
       const ok = !!state.wallet || state.demo;     // Demo Mode works without a wallet
       $("demoSwitch").setAttribute("aria-checked", String(state.demo));
+      $("reentrySwitch").setAttribute("aria-checked", String(state.notifyReentry));
       $("demoBadge").hidden = !state.demo;         // always visible while Demo Mode is on
       if (!state.cooling) {
         // No wallet yet -> the main buttons become "Connect Wallet"
@@ -1793,6 +1840,10 @@
       }
     }
 
+    $("reentrySwitch").addEventListener("click", () => {
+      state.notifyReentry = !state.notifyReentry; store.set("reentry", state.notifyReentry ? "1" : "0");
+      renderButtons(); haptic("select");
+    });
     $("demoSwitch").addEventListener("click", () => {
       state.demo = !state.demo; store.set("demo", state.demo ? "1" : "0");
       renderWallet(); renderButtons(); renderDemo(); demoTick();
@@ -1808,7 +1859,8 @@
       const amt = String(p.amount).replace(".", "-");
       const code = p.action === "buy" ? ["b", p.token, amt].join("_")
         : p.action === "sell" ? ["p", p.token, amt].join("_")            // amt = percent of the balance
-        : ["a", amt, p.smart_mode ? 1 : 0, p.tp, p.sl, p.wallet].join("_");
+        // one digit: bit 0 = Smart Mode, bit 1 = "notify me on re-entry"
+        : ["a", amt, (p.smart_mode ? 1 : 0) + (p.notify_reentry ? 2 : 0), p.tp, p.sl, p.wallet].join("_");
       return /^[A-Za-z0-9_-]{1,64}$/.test(code) ? code : null;
     }
 
@@ -1842,14 +1894,29 @@
       hideKeyboard();
       if (state.demo) { haptic("warning"); showAlert(t("demoAutoNote")); return; }
       if (!state.wallet) { haptic("warning"); showAlert(t("connectFirst"), connect); return; }   // ask to connect first
-      sendToBot({
+      // Sending data to the bot closes the Mini App, so the popup comes FIRST:
+      // "Go to chat" sends the settings (Telegram then returns to the chat); X cancels.
+      apPending = {
         action: "start_autopilot",
         amount: state.amount,
         wallet: state.wallet,
         smart_mode: state.smart,
         tp: state.smart ? SMART_TP : state.tp,
-        sl: state.smart ? SMART_SL : state.sl
-      }, $("startBtn"));
+        sl: state.smart ? SMART_SL : state.sl,
+        notify_reentry: state.notifyReentry
+      };
+      haptic("light"); $("apModal").classList.add("open");
+    });
+    let apPending = null;
+    function closeApModal() { $("apModal").classList.remove("open"); apPending = null; }
+    $("apModalClose").addEventListener("click", closeApModal);
+    $("apModal").addEventListener("click", (e) => { if (e.target === $("apModal")) closeApModal(); });   // tap outside
+    $("apModalGo").addEventListener("click", () => {
+      const payload = apPending;
+      closeApModal();
+      if (!payload) return;
+      sendToBot(payload, $("startBtn"));            // sendData / start link -> the bot turns Auto-Pilot on
+      if (tg && tg.close) setTimeout(() => { try { tg.close(); } catch (e) {} }, 400);   // in case the app is still open
     });
 
     $("buyBtn").addEventListener("click", () => {
@@ -2108,7 +2175,7 @@
       }
     }
 
-    let signBusy = false, signDoneSig = null;
+    let signBusy = false, signDoneSig = null, signNote = "";
     function signUi(status, error) {
       $("signStatus").textContent = status || "";
       $("signError").textContent = error || "";
@@ -2149,6 +2216,9 @@
           signUi(t("signApprove"));
           signDoneSig = await signAndSendTransaction(built.tx);
           ledgerRecord(signReq, built.raw, built.quote);
+          // n_b_<mint>_<lamports spent> / n_s_<mint>_<lamports received>_<percent> (numbers in base 36)
+          signNote = signReq.buy ? ["n", "b", signReq.mint, BigInt(built.raw).toString(36)].join("_")
+                                 : ["n", "s", signReq.mint, BigInt(built.quote.outAmount).toString(36), signReq.pct || 100].join("_");
         }
         haptic("success"); signUi(t("signDone"));
         $("signBtn").hidden = true;
@@ -2171,7 +2241,8 @@
     function signBackToBot() {
       if (!botName || !signReq || signReq.bad) return;
       window.location.href = "https://t.me/" + botName
-        + (signReq.setup ? "?start=f" : signReq.cb ? "?start=s_" + signReq.id : "");
+        + (signReq.setup ? "?start=f" : signReq.cb ? "?start=s_" + signReq.id
+           : signNote && signNote.length <= 64 ? "?start=" + signNote : "");
     }
     function initSignMode() {
       if (!signReq) return;
