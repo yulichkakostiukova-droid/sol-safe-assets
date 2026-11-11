@@ -108,6 +108,11 @@
     .wallet-btn:active { transform: scale(.96); }
     .wallet-btn svg { width: 16px; height: 16px; flex: none; }
     .wallet-btn.waiting { white-space: normal; text-align: center; font-size: 12px; line-height: 1.15; max-width: 132px; padding: 0 12px; }
+    .balance-line { margin: 14px 6px 16px; font-size: 13px; color: var(--text-2); text-align: right; font-variant-numeric: tabular-nums; }
+    .balance-line b { color: #fff; font-weight: 500; }
+    .demo-badge { position: fixed; z-index: 25; top: calc(6px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%);
+      padding: 3px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; pointer-events: none;
+      color: #1a1200; background: #ffd66b; box-shadow: 0 0 14px rgba(255,214,107,.6); }
     .wait-row { text-align: center; margin: 14px 0 0; }
     .link-btn { font-size: 13px; color: var(--b-100); text-decoration: underline; text-underline-offset: 3px; padding: 6px 10px; }
     .wallet-btn.connected { background: rgba(255,255,255,.07); color: #fff; padding: 0 14px 0 6px;
@@ -418,6 +423,8 @@
       </div>
       <button class="wallet-btn" id="walletBtn"></button>
     </header>
+    <div class="demo-badge" id="demoBadge" hidden data-i18n="demoBadge">DEMO</div>
+    <div class="balance-line" id="balanceLine" hidden></div>
     <div class="wait-row" id="waitRow" hidden><button class="link-btn" id="alreadyLink" type="button" data-i18n="alreadyLink">Already connected? Click here</button></div>
     <p class="wallet-note" id="walletNote" data-i18n="walletWarning" style="margin-top: 24px !important; margin-bottom: 24px !important; display: block;"></p>
 
@@ -689,6 +696,11 @@
           <button class="switch" id="smartDefaultSwitch" role="switch" aria-checked="true" aria-label="Smart Mode by default"></button>
         </div>
         <div class="settings-row">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg></div>
+          <div class="grow"><div class="t" data-i18n="demoMode">Demo Mode</div><div class="s" data-i18n="demoModeSub">Simulation only — nothing is sent to the bot</div></div>
+          <button class="switch" id="demoSwitch" role="switch" aria-checked="false" aria-label="Demo Mode"></button>
+        </div>
+        <div class="settings-row">
           <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h14a2 2 0 0 1 2 2v3"/><path d="M3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3"/><path d="M21 12h-4a2 2 0 0 0 0 4h4"/></svg></div>
           <div class="grow"><div class="t" data-i18n="wallet">Wallet</div><div class="s" id="settingsWallet"></div></div>
           <button class="btn-dark" id="settingsWalletBtn"></button>
@@ -697,7 +709,7 @@
       <div class="card">
         <div class="kv"><span data-i18n="tradingFee">Trading fee</span><b>1%</b></div>
         <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>1%</b></div>
-        <div class="kv"><span data-i18n="version">Version</span><b>1.10</b></div>
+        <div class="kv"><span data-i18n="version">Version</span><b>1.11</b></div>
       </div>
     </section>
   </main>
@@ -828,6 +840,9 @@
         takeProfit: "Take Profit", stopLoss: "Stop Loss", reset: "Reset", save: "Save", saved: "Saved",
         connectWalletTitle: "Connect Wallet",
         autoConnectFailed: "Could not auto-connect. Please paste your public address manually.",
+        balance: "Balance", demoBadge: "DEMO", demoMode: "Demo Mode", demoModeSub: "Simulation only — nothing is sent to the bot",
+        demoOk: "✅ Simulation successful! (Demo Mode)", demoTp: "Simulated result: +{p}% (Take Profit hit)", demoSl: "Simulated result: −{p}% (Stop Loss hit)",
+        demoNote: "Not a real trade. No funds were used.", demoHint: "Demo Mode: nothing is sent, no real funds", demoOn: "Demo Mode is on", demoOff: "Demo Mode is off",
         waitingBtn: "⏳ Waiting for wallet...", alreadyLink: "Already connected? Click here",
         phantomBtn: "👻 Open in Phantom", orPaste: "or paste public address",
         manualHint: "Phantom isn't available inside Telegram. Paste your wallet's public address instead — never your seed phrase.",
@@ -875,6 +890,9 @@
         takeProfit: "Тейк-профит", stopLoss: "Стоп-лосс", reset: "Сброс", save: "Сохранить", saved: "Сохранено",
         connectWalletTitle: "Подключить кошелёк",
         autoConnectFailed: "Не удалось подключить автоматически. Вставь публичный адрес вручную.",
+        balance: "Баланс", demoBadge: "ДЕМО", demoMode: "Демо-режим", demoModeSub: "Только симуляция — боту ничего не отправляется",
+        demoOk: "✅ Симуляция прошла успешно! (Демо-режим)", demoTp: "Результат симуляции: +{p}% (сработал Тейк-профит)", demoSl: "Результат симуляции: −{p}% (сработал Стоп-лосс)",
+        demoNote: "Это не настоящая сделка. Средства не использовались.", demoHint: "Демо-режим: ничего не отправляется, реальные средства не используются", demoOn: "Демо-режим включён", demoOff: "Демо-режим выключен",
         waitingBtn: "⏳ Ожидание кошелька...", alreadyLink: "Уже подключили? Нажмите сюда",
         phantomBtn: "👻 Открыть в Phantom", orPaste: "или вставь публичный адрес",
         manualHint: "Phantom недоступен внутри Telegram. Вставь публичный адрес кошелька — никогда не сид-фразу.",
@@ -964,6 +982,9 @@
       cooling: false
     };
     state.smart = state.smartDefault;
+    state.demo = store.get("demo") === "1";      // Demo Mode: simulate, never send to the bot
+    state.balance = null;                        // number (SOL) | "err" | null (loading)
+    state.balanceFor = null;                     // address the balance belongs to
     const t = (k) => (translations[state.lang] && translations[state.lang][k]) || translations.en[k] || k;
 
     // =====================================================================
@@ -996,6 +1017,14 @@
         btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h14a2 2 0 0 1 2 2v3"/><path d="M3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3"/><path d="M21 12h-4a2 2 0 0 0 0 4h4"/></svg><span>' + t("connectWalletShort") + '</span>';
         $("settingsWallet").textContent = t("notConnected");
         $("settingsWalletBtn").textContent = t("connect");
+      }
+      // SOL balance of the connected wallet (fetched once per address)
+      if (state.wallet && state.balanceFor !== state.wallet) fetchBalance(state.wallet);
+      if (!state.wallet) { state.balance = null; state.balanceFor = null; }
+      $("balanceLine").hidden = !state.wallet;
+      if (state.wallet) {
+        const val = state.balance === null ? "…" : state.balance === "err" ? "—" : fmt(Math.floor(state.balance * 1000) / 1000) + " SOL";
+        $("balanceLine").innerHTML = t("balance") + ": <b>" + val + "</b>";
       }
       // Waiting for the wallet app: "⏳ Waiting for wallet..." + "Already connected? Click here"
       const waiting = !state.wallet && isWaiting();
@@ -1036,7 +1065,9 @@
     }
 
     function renderButtons() {
-      const ok = !!state.wallet;
+      const ok = !!state.wallet || state.demo;     // Demo Mode works without a wallet
+      $("demoSwitch").setAttribute("aria-checked", String(state.demo));
+      $("demoBadge").hidden = !state.demo;         // always visible while Demo Mode is on
       if (!state.cooling) {
         // No wallet yet -> the main buttons become "Connect Wallet"
         $("startBtn").disabled = false;
@@ -1044,8 +1075,8 @@
         $("startBtn").querySelector("span").textContent = ok ? t("startAutoPilot") : (isWaiting() ? t("waitingBtn") : t("connectWallet"));
         $("buyBtn").querySelector("span").textContent = ok ? t("buyToken") : (isWaiting() ? t("waitingBtn") : t("connectWallet"));
       }
-      $("autoHint").textContent = ok ? t("readyAuto") : t("connectFirst");
-      $("manualHint").textContent = ok ? t("readyBuy") : t("connectFirst");
+      $("autoHint").textContent = state.demo ? t("demoHint") : ok ? t("readyAuto") : t("connectFirst");
+      $("manualHint").textContent = state.demo ? t("demoHint") : ok ? t("readyBuy") : t("connectFirst");
       $("chromeHint").textContent = CHROME_EXTENSION_URL ? "" : t("comingSoon");
     }
 
@@ -1412,6 +1443,42 @@
     window.addEventListener("pageshow", (e) => { if (e.persisted) handleReturnFromWallet(); });
 
     // =====================================================================
+    // BALANCE (read-only: asks a public Solana RPC for the SOL balance of a public address)
+    // =====================================================================
+    const RPC_URLS = ["https://api.mainnet-beta.solana.com", "https://solana-rpc.publicnode.com"];
+    async function fetchBalance(addr) {
+      state.balanceFor = addr; state.balance = null;
+      for (const url of RPC_URLS) {
+        try {
+          const res = await fetch(url, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getBalance", params: [addr] })
+          });
+          const data = await res.json();
+          const lamports = data && data.result && data.result.value;
+          if (typeof lamports !== "number") throw new Error("no value");
+          if (state.balanceFor !== addr) return;            // wallet changed meanwhile
+          state.balance = lamports / 1e9; renderWallet(); return;
+        } catch (e) { /* try the next RPC */ }
+      }
+      if (state.balanceFor === addr) { state.balance = "err"; renderWallet(); }
+    }
+
+    // =====================================================================
+    // DEMO MODE (simulation only: nothing is sent to the bot, no funds are used)
+    // =====================================================================
+    function runDemo(tp, sl) {
+      haptic("success");
+      const win = Math.random() < 0.5;                      // a simulation can hit TP or SL
+      const line = (win ? t("demoTp") : t("demoSl")).replace("{p}", String(win ? tp : sl));
+      showAlert(t("demoOk") + "\n\n" + line + "\n" + t("demoNote"));
+    }
+    $("demoSwitch").addEventListener("click", () => {
+      state.demo = !state.demo; store.set("demo", state.demo ? "1" : "0");
+      renderButtons(); toast(t(state.demo ? "demoOn" : "demoOff")); haptic("select");
+    });
+
+    // =====================================================================
     // SEND TO BOT (closes the keyboard; 3-second double-click guard)
     // =====================================================================
     // Start-link code for apps opened from an INLINE button (sendData doesn't work there).
@@ -1452,6 +1519,7 @@
 
     $("startBtn").addEventListener("click", () => {
       hideKeyboard();
+      if (state.demo) { runDemo(state.smart ? SMART_TP : state.tp, state.smart ? SMART_SL : state.sl); return; }
       if (!state.wallet) { haptic("warning"); showAlert(t("connectFirst"), connect); return; }   // ask to connect first
       sendToBot({
         action: "start_autopilot",
@@ -1465,12 +1533,13 @@
 
     $("buyBtn").addEventListener("click", () => {
       hideKeyboard();
-      if (!state.wallet) { haptic("warning"); showAlert(t("connectFirst"), connect); return; }   // ask to connect first
+      if (!state.demo && !state.wallet) { haptic("warning"); showAlert(t("connectFirst"), connect); return; }   // ask to connect first
       const ca = $("caInput").value.trim();
       const amount = parseAmount($("buyAmount").value);
       if (!isPubkey(ca)) { $("manualError").textContent = t("badCa"); haptic("error"); return; }
       if (isNaN(amount) || amount < MANUAL_MIN || amount > AMOUNT_MAX) { $("manualError").textContent = t("badAmount"); haptic("error"); return; }
       $("manualError").textContent = "";
+      if (state.demo) { runDemo(SMART_TP, SMART_SL); return; }
       sendToBot({ action: "buy", token: ca, amount: amount, wallet: state.wallet }, $("buyBtn"));
     });
     $("caInput").addEventListener("keydown", (e) => { if (e.key === "Enter") $("buyAmount").focus(); });
