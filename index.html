@@ -484,7 +484,7 @@
         <p class="card-desc" id="signDesc"></p>
         <div id="signRows">
           <div class="kv"><span data-i18n="signFee">Fee</span><b id="signFeeVal"></b></div>
-          <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>1%</b></div>
+          <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>3%</b></div>
         </div>
         <div class="error" id="signError"></div>
         <button class="btn-white" id="signBtn" type="button"><span id="signBtnLabel"></span></button>
@@ -574,7 +574,7 @@
           <div class="error" id="manualError"></div>
           <div class="note">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-            <span data-i18n="feeNote">1% fee and max 1% slippage. Nothing is bought until you confirm in the chat.</span>
+            <span data-i18n="feeNote">1% fee and max 3% slippage. Nothing is bought until you confirm in the chat.</span>
           </div>
           <button class="btn-white" id="buyBtn" disabled>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
@@ -799,8 +799,8 @@
       </div>
       <div class="card">
         <div class="kv"><span data-i18n="tradingFee">Trading fee</span><b>1%</b></div>
-        <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>1%</b></div>
-        <div class="kv"><span data-i18n="version">Version</span><b>1.18</b></div>
+        <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>3%</b></div>
+        <div class="kv"><span data-i18n="version">Version</span><b>1.19</b></div>
       </div>
     </section>
   </main>
@@ -911,7 +911,7 @@
         connectFirst: "Connect a wallet to continue", readyAuto: "The bot finds tokens; you approve every trade in your wallet",
         buyAToken: "Buy a token", buyDesc: "Paste the token address and the amount. Your wallet opens with a fresh quote, and you approve the trade there.",
         tokenAddress: "Token Address (CA)", caPh: "e.g. DezXAZ8z7Pnrn…", amountSol: "Amount (SOL)",
-        feeNote: "1% fee and max 1% slippage. Nothing is bought until you approve it in your wallet.",
+        feeNote: "1% fee and max 3% slippage. Nothing is bought until you approve it in your wallet.",
         buyToken: "Buy Token", readyBuy: "You approve the trade in your wallet",
         badCa: "That's not a valid token address.", badAmount: "Enter an amount between 0,001 and 1 000 SOL.",
         subtitle: "Fast trading for Solana tokens & memecoins",
@@ -977,7 +977,11 @@
         signFee: "Fee", signBtn: "✍️ Sign & send", signRetry: "Try again", signOpenPhantom: "👻 Open in Phantom",
         signView: "View on Solscan", signBack: "↩ Back to Telegram",
         signConnecting: "Connecting to your wallet…", signQuoting: "Getting a fresh price…", signBuilding: "Building the transaction…",
-        signApprove: "Approve the trade in your wallet…", signDone: "✅ Sent! The network is confirming it.",
+        signApprove: "Approve the trade in your wallet…", signDone: "✅ Confirmed on the network.",
+        signConfirming: "⏳ Sent. Waiting for the network to confirm…",
+        signUnconfirmed: "⏳ Sent, but not confirmed yet. Check the transaction on Solscan.",
+        signTxSlippage: "❌ Transaction failed on the network: the price moved too much (slippage). The trade amount was not spent, only the small network fee. Tap the button to try again with a fresh price.",
+        signTxFailed: "❌ Transaction failed on the network. The trade amount was not spent, only the small network fee. Tap the button to try again.",
         signNoWallet: "No Solana wallet found here. Open this page in Phantom, or in a browser with a wallet extension.",
         signWrongWallet: "This is a different wallet from the one connected in the bot. Switch the account in your wallet and try again.",
         signRejected: "You cancelled the trade in your wallet. Nothing was sent.",
@@ -1000,7 +1004,7 @@
         connectFirst: "Подключи кошелёк, чтобы продолжить", readyAuto: "Бот находит токены, а каждую сделку ты подтверждаешь в кошельке",
         buyAToken: "Купить токен", buyDesc: "Вставь адрес токена и сумму. Откроется кошелёк со свежей котировкой, там ты подтверждаешь сделку.",
         tokenAddress: "Адрес токена (CA)", caPh: "например, DezXAZ8z7Pnrn…", amountSol: "Сумма (SOL)",
-        feeNote: "Комиссия 1% и проскальзывание не более 1%. Ничего не покупается, пока ты не подтвердишь в кошельке.",
+        feeNote: "Комиссия 1% и проскальзывание не более 3%. Ничего не покупается, пока ты не подтвердишь в кошельке.",
         buyToken: "Купить токен", readyBuy: "Сделку подтверждаешь в своём кошельке",
         badCa: "Это не адрес токена.", badAmount: "Введи сумму от 0,001 до 1 000 SOL.",
         subtitle: "Быстрая торговля токенами и мемкоинами на Solana",
@@ -1066,7 +1070,11 @@
         signFee: "Комиссия", signBtn: "✍️ Подписать и отправить", signRetry: "Попробовать снова", signOpenPhantom: "👻 Открыть в Phantom",
         signView: "Открыть в Solscan", signBack: "↩ Вернуться в Telegram",
         signConnecting: "Подключаюсь к кошельку…", signQuoting: "Получаю свежую цену…", signBuilding: "Собираю транзакцию…",
-        signApprove: "Подтверди сделку в кошельке…", signDone: "✅ Отправлено! Сеть подтверждает сделку.",
+        signApprove: "Подтверди сделку в кошельке…", signDone: "✅ Подтверждено сетью.",
+        signConfirming: "⏳ Отправлено. Жду подтверждения сети…",
+        signUnconfirmed: "⏳ Отправлено, но пока не подтверждено. Проверь транзакцию в Solscan.",
+        signTxSlippage: "❌ Транзакция не прошла в сети: цена изменилась слишком сильно (проскальзывание). Сумма сделки не потрачена, списана только небольшая комиссия сети. Нажми кнопку, чтобы повторить по свежей цене.",
+        signTxFailed: "❌ Транзакция не прошла в сети. Сумма сделки не потрачена, списана только небольшая комиссия сети. Нажми кнопку, чтобы повторить.",
         signNoWallet: "Solana-кошелёк здесь не найден. Открой эту страницу в Phantom или в браузере с расширением кошелька.",
         signWrongWallet: "Это другой кошелёк, не тот, что подключён в боте. Переключи аккаунт в кошельке и попробуй снова.",
         signRejected: "Ты отменил сделку в кошельке. Ничего не отправлено.",
@@ -2090,7 +2098,7 @@
     async function jupQuote(req, raw, feeBps) {
       const q = new URLSearchParams({
         inputMint: req.buy ? WSOL_MINT : req.mint, outputMint: req.buy ? req.mint : WSOL_MINT,
-        amount: raw, slippageBps: "100"
+        amount: raw, slippageBps: "300"
       });
       if (feeBps > 0) q.set("platformFeeBps", String(feeBps));
       const res = await jupFetch(JUP_SWAP_API + "/quote?" + q.toString());
@@ -2180,7 +2188,27 @@
       }
     }
 
-    let signBusy = false, signDoneSig = null, signNote = "";
+    let signBusy = false, signDoneSig = null, signNote = "", signBuilt = null;
+    // Ask the network what happened to the transaction (up to 60 s). Only "ok" counts as success.
+    async function confirmOnNetwork(signature) {
+      const started = Date.now();
+      while (Date.now() - started < 60000) {
+        try {
+          const res = await rpcRequest("getSignatureStatuses", [[signature], { searchTransactionHistory: true }]);
+          const st = res && res.value && res.value[0];
+          if (st) {
+            if (st.err) return { state: "failed", err: st.err };
+            if (st.confirmationStatus === "confirmed" || st.confirmationStatus === "finalized") return { state: "ok" };
+          }
+        } catch (e) { /* try again */ }
+        await new Promise((r) => setTimeout(r, 2000));
+      }
+      return { state: "unknown" };
+    }
+    function isSlippageError(err) {
+      const c = err && err.InstructionError && err.InstructionError[1] && err.InstructionError[1].Custom;
+      return c === 6001 || c === 6014;                 // Jupiter: slippage tolerance exceeded
+    }
     function signUi(status, error) {
       $("signStatus").textContent = status || "";
       $("signError").textContent = error || "";
@@ -2236,14 +2264,27 @@
                                       : String(built.fee / 100).replace(".", ",") + "%";
           signUi(t("signApprove"));
           signDoneSig = await signAndSendTransaction(built.tx);
-          ledgerRecord(signReq, built.raw, built.quote);
-          // n_b_<mint>_<lamports spent> / n_s_<mint>_<lamports received>_<percent> (numbers in base 36)
-          signNote = signReq.buy ? ["n", "b", signReq.mint, BigInt(built.raw).toString(36)].join("_")
-                                 : ["n", "s", signReq.mint, BigInt(built.quote.outAmount).toString(36), signReq.pct || 100].join("_");
+          signBuilt = built;
         }
-        haptic("success"); signUi(t("signDone"));
-        $("signBtn").hidden = true;
+        // Signed and sent. That is NOT success yet: wait until the network confirms it.
+        signUi(t("signConfirming"));
         $("signView").href = "https://solscan.io/tx/" + encodeURIComponent(signDoneSig); $("signView").hidden = false;
+        const outcome = await confirmOnNetwork(signDoneSig);
+        if (outcome.state === "failed") {
+          signDoneSig = null;                                   // not done: the button works again (fresh price)
+          haptic("error"); signUi("", t(isSlippageError(outcome.err) ? "signTxSlippage" : "signTxFailed"));
+          $("signBtnLabel").textContent = t("signRetry");
+          if (botName && signReq.cb) setTimeout(signBackToBot, 2500);   // the bot checks too and sends a fresh link
+          return;
+        }
+        if (signBuilt) {
+          if (outcome.state === "ok") ledgerRecord(signReq, signBuilt.raw, signBuilt.quote);
+          // n_b_<mint>_<lamports spent> / n_s_<mint>_<lamports received>_<percent> (numbers in base 36)
+          signNote = signReq.buy ? ["n", "b", signReq.mint, BigInt(signBuilt.raw).toString(36)].join("_")
+                                 : ["n", "s", signReq.mint, BigInt(signBuilt.quote.outAmount).toString(36), signReq.pct || 100].join("_");
+        }
+        if (outcome.state === "ok") { haptic("success"); signUi(t("signDone")); } else { haptic("warning"); signUi(t("signUnconfirmed")); }
+        $("signBtn").hidden = true;
         if (botName) {
           $("signBack").hidden = false;
           // Fee setup and chat-menu orders report back to the bot. Mini App trades don't:
