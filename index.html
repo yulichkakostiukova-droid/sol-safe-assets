@@ -137,6 +137,10 @@
       color: #ffc2c2; background: rgba(255,90,90,.12); box-shadow: inset 0 0 0 1px rgba(255,90,90,.4); transition: transform .12s, opacity .2s; }
     .sell-btn:active { transform: scale(.975); }
     .sell-btn:disabled, .sell-btn.busy { opacity: .6; }
+    .spinner { width: 16px; height: 16px; flex: none; display: inline-block; border-radius: 50%;
+      border: 2px solid currentColor; border-right-color: transparent; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .sell-btn { display: flex; align-items: center; justify-content: center; gap: 9px; }
     .wait-row { text-align: center; margin: 14px 0 0; }
     .link-btn { font-size: 13px; color: var(--b-100); text-decoration: underline; text-underline-offset: 3px; padding: 6px 10px; }
     .wallet-btn.connected { background: rgba(255,255,255,.07); color: #fff; padding: 0 14px 0 6px;
@@ -531,7 +535,7 @@
       <div id="mode-manual" hidden>
         <div class="card featured">
           <div class="card-title" data-i18n="buyAToken">Buy a token</div>
-          <p class="card-desc" data-i18n="buyDesc">Paste the token address and the amount. You'll get a live quote in the chat and confirm there.</p>
+          <p class="card-desc" data-i18n="buyDesc">Paste the token address and the amount. Your wallet opens with a fresh quote, and you approve the trade there.</p>
           <div class="field">
             <div class="label" data-i18n="tokenAddress">Token Address (CA)</div>
             <input class="input mono" id="caInput" type="text" autocomplete="off" spellcheck="false" enterkeyhint="next" data-i18n-ph="caPh" placeholder="e.g. DezXAZ8z7Pnrn…">
@@ -769,7 +773,7 @@
       <div class="card">
         <div class="kv"><span data-i18n="tradingFee">Trading fee</span><b>1%</b></div>
         <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>1%</b></div>
-        <div class="kv"><span data-i18n="version">Version</span><b>1.14</b></div>
+        <div class="kv"><span data-i18n="version">Version</span><b>1.15</b></div>
       </div>
     </section>
   </main>
@@ -868,10 +872,10 @@
         smartOn: "🤖 <b>Smart Mode:</b> the bot sets Take Profit / Stop Loss for you (now <b>+50% / −15%</b>). No settings needed.",
         setTpSl: "⚙️ Set Take Profit / Stop Loss", startAutoPilot: "Start Auto-Pilot",
         connectFirst: "Connect a wallet to continue", readyAuto: "Settings go to the bot — it confirms in the chat",
-        buyAToken: "Buy a token", buyDesc: "Paste the token address and the amount. You'll get a live quote in the chat and confirm there.",
+        buyAToken: "Buy a token", buyDesc: "Paste the token address and the amount. Your wallet opens with a fresh quote, and you approve the trade there.",
         tokenAddress: "Token Address (CA)", caPh: "e.g. DezXAZ8z7Pnrn…", amountSol: "Amount (SOL)",
-        feeNote: "1% fee and max 1% slippage. Nothing is bought until you confirm in the chat.",
-        buyToken: "Buy Token", readyBuy: "The quote will appear in the chat",
+        feeNote: "1% fee and max 1% slippage. Nothing is bought until you approve it in your wallet.",
+        buyToken: "Buy Token", readyBuy: "You approve the trade in your wallet",
         badCa: "That's not a valid token address.", badAmount: "Enter an amount between 0,001 and 1 000 SOL.",
         subtitle: "Fast trading for Solana tokens & memecoins",
         walletWarning: "⚠️ Only Solana wallets supported: Phantom, Solflare, Backpack. Do not use MetaMask.",
@@ -911,11 +915,19 @@
         demoOk: "✅ Simulation successful! (Demo Mode)", demoTp: "Simulated result: +{p}% (Take Profit hit)", demoSl: "Simulated result: −{p}% (Stop Loss hit)",
         demoNote: "Not a real trade. No funds were used.", demoHint: "Demo Mode: nothing is sent, no real funds", demoOn: "Demo Mode is on", demoOff: "Demo Mode is off",
         sellTitle: "Sell this token", sellToken: "Sell",
-        sellDesc: "Sells a share of your balance of the token address above. You'll see the quote in the chat and confirm there.",
+        sellDesc: "Sells a share of your balance of the token address above. Your wallet opens, and you approve the trade there.",
         demoNoPos: "No demo position in this token.",
         setupTitle: "Create the fee account",
         setupDesc: "One-time step. It creates the wrapped-SOL account for the fee wallet {owner}. It costs about 0,0021 SOL from the wallet that signs.",
         setupBuilding: "Building the transaction…",
+        tokenNotFound: "Token not found. Check the address.", tradeFailed: "Couldn't prepare the trade. Try again.",
+        tradeWaiting: "Approve the trade in your wallet, then come back here.",
+        riskTitle: "⚠️ High-risk token", riskAsk: "Buy anyway?",
+        riskTooNew: "• Trading for less than 24 hours", riskLowLiq: "• Low liquidity (under $10,000)",
+        riskFdv: "• Valuation looks inflated for its liquidity", riskWhales: "• Top holders own more than 50%",
+        riskNoData: "• No market data for this token",
+        signDescSellPct: "You sell {pct}% of your {sym} for SOL. The price is fetched fresh when you tap the button, then your wallet asks you to approve.",
+        signNoBalance: "This wallet has none of this token to sell.", signFeeWaived: "0% (sale at a loss)",
         signTitleBuy: "Buy {sym}", signTitleSell: "Sell {sym}",
         signDescBuy: "You spend {ui} SOL. The price is fetched fresh when you tap the button, then your wallet asks you to approve.",
         signDescSell: "You sell {ui} {sym} for SOL. The price is fetched fresh when you tap the button, then your wallet asks you to approve.",
@@ -943,10 +955,10 @@
         smartOn: "🤖 <b>Умный режим:</b> бот сам выставляет Тейк-профит / Стоп-лосс (сейчас <b>+50% / −15%</b>). Ничего настраивать не нужно.",
         setTpSl: "⚙️ Настроить TP / SL", startAutoPilot: "Запустить Автопилот",
         connectFirst: "Подключи кошелёк, чтобы продолжить", readyAuto: "Настройки уйдут боту — он подтвердит в чате",
-        buyAToken: "Купить токен", buyDesc: "Вставь адрес токена и сумму. Котировка придёт в чат, там же подтвердишь покупку.",
+        buyAToken: "Купить токен", buyDesc: "Вставь адрес токена и сумму. Откроется кошелёк со свежей котировкой, там ты подтверждаешь сделку.",
         tokenAddress: "Адрес токена (CA)", caPh: "например, DezXAZ8z7Pnrn…", amountSol: "Сумма (SOL)",
-        feeNote: "Комиссия 1% и проскальзывание не более 1%. Ничего не покупается, пока ты не подтвердишь в чате.",
-        buyToken: "Купить токен", readyBuy: "Котировка появится в чате",
+        feeNote: "Комиссия 1% и проскальзывание не более 1%. Ничего не покупается, пока ты не подтвердишь в кошельке.",
+        buyToken: "Купить токен", readyBuy: "Сделку подтверждаешь в своём кошельке",
         badCa: "Это не адрес токена.", badAmount: "Введи сумму от 0,001 до 1 000 SOL.",
         subtitle: "Быстрая торговля токенами и мемкоинами на Solana",
         walletWarning: "⚠️ Поддерживаются только кошельки Solana: Phantom, Solflare, Backpack. Не используйте MetaMask.",
@@ -986,11 +998,19 @@
         demoOk: "✅ Симуляция прошла успешно! (Демо-режим)", demoTp: "Результат симуляции: +{p}% (сработал Тейк-профит)", demoSl: "Результат симуляции: −{p}% (сработал Стоп-лосс)",
         demoNote: "Это не настоящая сделка. Средства не использовались.", demoHint: "Демо-режим: ничего не отправляется, реальные средства не используются", demoOn: "Демо-режим включён", demoOff: "Демо-режим выключен",
         sellTitle: "Продать этот токен", sellToken: "Продать",
-        sellDesc: "Продаёт часть твоего баланса токена, адрес которого указан выше. Котировка придёт в чат, подтверждаешь там.",
+        sellDesc: "Продаёт часть твоего баланса токена, адрес которого указан выше. Откроется кошелёк, там ты подтверждаешь сделку.",
         demoNoPos: "Нет демо-позиции по этому токену.",
         setupTitle: "Создать счёт для комиссии",
         setupDesc: "Разовый шаг. Создаётся счёт wrapped SOL для кошелька комиссии {owner}. Стоит около 0,0021 SOL с кошелька, который подписывает.",
         setupBuilding: "Собираю транзакцию…",
+        tokenNotFound: "Токен не найден. Проверь адрес.", tradeFailed: "Не удалось подготовить сделку. Попробуй ещё раз.",
+        tradeWaiting: "Подтверди сделку в кошельке и возвращайся сюда.",
+        riskTitle: "⚠️ Токен с высоким риском", riskAsk: "Всё равно купить?",
+        riskTooNew: "• Торгуется меньше 24 часов", riskLowLiq: "• Низкая ликвидность (меньше $10 000)",
+        riskFdv: "• Оценка выглядит завышенной для такой ликвидности", riskWhales: "• Крупнейшие держатели владеют больше 50%",
+        riskNoData: "• Нет рыночных данных по токену",
+        signDescSellPct: "Ты продаёшь {pct}% своих {sym} за SOL. Цена обновится, когда нажмёшь кнопку, затем кошелёк попросит подтверждение.",
+        signNoBalance: "В этом кошельке нет этого токена для продажи.", signFeeWaived: "0% (продажа в убыток)",
         signTitleBuy: "Покупка {sym}", signTitleSell: "Продажа {sym}",
         signDescBuy: "Ты тратишь {ui} SOL. Цена обновится, когда нажмёшь кнопку, затем кошелёк попросит подтверждение.",
         signDescSell: "Ты продаёшь {ui} {sym} за SOL. Цена обновится, когда нажмёшь кнопку, затем кошелёк попросит подтверждение.",
@@ -1699,6 +1719,80 @@
     }
     setInterval(demoTick, 5000);
     $("demoResetBtn").addEventListener("click", demoReset);
+    // =====================================================================
+    // TRADE FROM THE MINI APP: scam check here, then the sign page opens over the app
+    // (Telegram.WebApp.openLink). The Mini App stays open underneath.
+    // =====================================================================
+    const TOKENS_API = "https://lite-api.jup.ag/tokens/v2/search?query=";
+    // Fee settings come from the bot in the app link: fa = the fee wallet's wrapped-SOL account.
+    const feeAccount = isPubkey(params.get("fa") || "") ? params.get("fa") : "";
+    const TRADE_FEE_BPS = feeAccount ? 100 : 0;          // 1%, or 0 until /setup_fee is done
+
+    // Same rules as the bot's anti-scam check, on Jupiter's token data:
+    // verified -> fine; else too new / low liquidity / inflated valuation / whale holders.
+    async function tokenReport(mint) {
+      const res = await fetch(TOKENS_API + mint);
+      const list = await res.json();
+      const tok = Array.isArray(list) && list.find((x) => x && x.id === mint);
+      if (!tok || tok.decimals == null) return null;
+      const warnings = [];
+      if (!tok.isVerified) {
+        const liq = Number(tok.liquidity) || 0, fdv = Number(tok.fdv) || 0;
+        const born = tok.firstPool && tok.firstPool.createdAt ? Date.parse(tok.firstPool.createdAt) : NaN;
+        const top = tok.audit && Number(tok.audit.topHoldersPercentage);
+        if (!liq) warnings.push("riskNoData");
+        else {
+          if (!(Date.now() - born >= 24 * 3600 * 1000)) warnings.push("riskTooNew");
+          if (liq < 10000) warnings.push("riskLowLiq");
+          if (!fdv || (fdv > 10000000 && liq < 50000)) warnings.push("riskFdv");
+          if (liq < 1000000 && top > 50) warnings.push("riskWhales");
+        }
+      }
+      return { symbol: String(tok.symbol || short(mint)).slice(0, 14), warnings: warnings };
+    }
+    function askConfirm(message) {
+      return new Promise((resolve) => {
+        if (tg && tg.showConfirm && tg.isVersionAtLeast && tg.isVersionAtLeast("6.2")) tg.showConfirm(message, (ok) => resolve(!!ok));
+        else resolve(window.confirm(message));
+      });
+    }
+    let tradeBusy = false;
+    async function startTrade(isBuy, mint, value, btn) {
+      if (tradeBusy) return;
+      tradeBusy = true;
+      const spinner = document.createElement("i"); spinner.className = "spinner";
+      btn.disabled = true; btn.classList.add("busy"); btn.insertBefore(spinner, btn.firstChild);
+      try {
+        const info = await tokenReport(mint);
+        if (!info) { $("manualError").textContent = t("tokenNotFound"); haptic("error"); return; }
+        if (isBuy && info.warnings.length) {
+          haptic("warning");
+          const text = t("riskTitle") + ": " + info.symbol + "\n\n" + info.warnings.map((w) => t(w)).join("\n") + "\n\n" + t("riskAsk");
+          if (!(await askConfirm(text))) return;
+        }
+        const q = new URLSearchParams({
+          sign: Array.from(crypto.getRandomValues(new Uint8Array(4)), (b) => b.toString(16).padStart(2, "0")).join(""),
+          side: isBuy ? "b" : "s", mint: mint, fee: String(TRADE_FEE_BPS), w: state.wallet, sym: info.symbol,
+          lang: state.lang, t: String(Date.now())
+        });
+        if (isBuy) { q.set("raw", String(Math.round(value * 1e9))); q.set("ui", String(value)); }
+        else q.set("pct", String(value));
+        if (TRADE_FEE_BPS) q.set("fa", feeAccount);
+        if (botName) q.set("bot", botName);
+        const page = location.origin + location.pathname + "?" + q.toString();
+        // Phone: open the page inside Phantom. Computer: open it in the browser (wallet extension).
+        const link = isMobile ? "https://phantom.app/ul/browse/" + encodeURIComponent(page) + "?ref=" + encodeURIComponent(location.origin) : page;
+        haptic("success");
+        if (inTelegram && tg.openLink) tg.openLink(link);     // opens over the Mini App, which stays open
+        else window.location.href = link;
+        toast(t("tradeWaiting"));
+      } catch (e) {
+        $("manualError").textContent = t("tradeFailed"); haptic("error");
+      } finally {
+        setTimeout(() => { spinner.remove(); btn.classList.remove("busy"); btn.disabled = false; tradeBusy = false; }, 1200);
+      }
+    }
+
     $("demoSwitch").addEventListener("click", () => {
       state.demo = !state.demo; store.set("demo", state.demo ? "1" : "0");
       renderWallet(); renderButtons(); renderDemo(); demoTick();
@@ -1767,7 +1861,7 @@
       if (isNaN(amount) || amount < MANUAL_MIN || amount > AMOUNT_MAX) { $("manualError").textContent = t("badAmount"); haptic("error"); return; }
       $("manualError").textContent = "";
       if (state.demo) { demoBuy(ca, amount); return; }
-      sendToBot({ action: "buy", token: ca, amount: amount, wallet: state.wallet }, $("buyBtn"));
+      startTrade(true, ca, amount, $("buyBtn"));     // scam check -> sign page opens over the Mini App
     });
     // Sell: a percentage of the wallet's balance of the token in the address field
     state.sellPct = 100;
@@ -1783,8 +1877,7 @@
       if (!isPubkey(ca)) { $("manualError").textContent = t("badCa"); haptic("error"); return; }
       $("manualError").textContent = "";
       if (state.demo) { demoSell(ca, state.sellPct); return; }
-      // The bot looks up the real balance, shows the quote, and sends the "sign in your wallet" link
-      sendToBot({ action: "sell", token: ca, amount: state.sellPct, wallet: state.wallet }, $("sellBtn"));
+      startTrade(false, ca, state.sellPct, $("sellBtn"));   // the sign page reads the real balance
     });
     $("caInput").addEventListener("keydown", (e) => { if (e.key === "Enter") $("buyAmount").focus(); });
     $("buyAmount").addEventListener("keydown", (e) => { if (e.key === "Enter") hideKeyboard(); });
@@ -1851,11 +1944,14 @@
       if (!params.has("sign")) return null;
       const side = params.get("side"), mint = params.get("mint") || "", raw = params.get("raw") || "";
       const fee = parseInt(params.get("fee") || "0", 10), fa = params.get("fa") || "", w = params.get("w") || "";
+      const pct = parseInt(params.get("pct") || "0", 10);
       const ok = /^[0-9a-f]{8}$/.test(params.get("sign")) && (side === "b" || side === "s") && isPubkey(mint)
-              && mint !== WSOL_MINT && /^[1-9]\d{0,19}$/.test(raw) && fee >= 0 && fee <= MAX_FEE_BPS
+              && mint !== WSOL_MINT && (/^[1-9]\d{0,19}$/.test(raw) || (side === "s" && !raw && pct >= 1 && pct <= 100))
+              && fee >= 0 && fee <= MAX_FEE_BPS
               && (fee === 0 || isPubkey(fa)) && (!w || isPubkey(w));
       if (!ok) return { bad: true };
-      return { id: params.get("sign"), buy: side === "b", mint: mint, raw: raw, fee: fee, fa: fa, wallet: w,
+      return { id: params.get("sign"), buy: side === "b", mint: mint, raw: raw, pct: pct, fee: fee, fa: fa, wallet: w,
+               cb: params.get("cb") === "1",      // order created by the bot's chat menu: report back to the bot
                sym: (params.get("sym") || short(mint)).slice(0, 14), ui: signAmountText(params.get("ui") || "") };
     }
     // The bot writes amounts like "1,234.5" -> show them the app's way: "1 234,5"
@@ -1899,28 +1995,66 @@
         await new Promise((r) => setTimeout(r, 1500 * (attempt + 1)));
       }
     }
-    async function buildSwapTransaction(req, userPublicKey) {
+    // What was bought on THIS device/browser (kept where trades are signed), for the
+    // "no fee when you sell at a loss" rule: mint -> { tokens (raw units), cost (lamports) }.
+    function ledgerLoad() { try { return JSON.parse(localStorage.getItem("stb_ledger") || "{}") || {}; } catch (e) { return {}; } }
+    function ledgerSave(l) { try { localStorage.setItem("stb_ledger", JSON.stringify(l)); } catch (e) {} }
+    function ledgerRecord(req, raw, quote) {
+      const l = ledgerLoad(), pos = l[req.mint] || { tokens: 0, cost: 0 };
+      if (req.buy) { pos.tokens += Number(quote.outAmount); pos.cost += Number(raw); l[req.mint] = pos; }
+      else if (pos.tokens > 0) {
+        const share = Math.min(1, Number(raw) / pos.tokens);
+        pos.tokens -= pos.tokens * share; pos.cost -= pos.cost * share;
+        if (pos.tokens < 1) delete l[req.mint]; else l[req.mint] = pos;
+      }
+      ledgerSave(l);
+    }
+    async function tokenBalanceRaw(owner, mint) {
+      const res = await jupFetch("https://lite-api.jup.ag/ultra/v1/holdings/" + owner);
+      const data = await res.json();
+      const accounts = (data && data.tokens && data.tokens[mint]) || [];
+      return accounts.reduce((sum, acc) => sum + BigInt(acc.amount || "0"), 0n);
+    }
+    async function jupQuote(req, raw, feeBps) {
       const q = new URLSearchParams({
         inputMint: req.buy ? WSOL_MINT : req.mint, outputMint: req.buy ? req.mint : WSOL_MINT,
-        amount: req.raw, slippageBps: "100"
+        amount: raw, slippageBps: "100"
       });
-      if (req.fee > 0) q.set("platformFeeBps", String(req.fee));
-      const quoteRes = await jupFetch(JUP_SWAP_API + "/quote?" + q.toString());
-      const quote = await quoteRes.json();
-      if (!quoteRes.ok || !quote.outAmount) {
-        const noRoute = /route/i.test((quote && (quote.errorCode || quote.error)) || "");
+      if (feeBps > 0) q.set("platformFeeBps", String(feeBps));
+      const res = await jupFetch(JUP_SWAP_API + "/quote?" + q.toString());
+      const quote = await res.json();
+      if (!res.ok || !quote.outAmount) {
+        const noRoute = /route|tradable/i.test((quote && (quote.errorCode || quote.error)) || "");
         throw Object.assign(new Error("quote failed"), { key: noRoute ? "signNoRoute" : "signFailed" });
       }
+      return quote;
+    }
+    // Returns { tx (base64), quote, raw, fee } for the user's own wallet.
+    async function buildSwapTransaction(req, userPublicKey) {
+      let raw = req.raw;
+      if (!raw) {                                  // "sell N%": read the real balance now
+        const balance = await tokenBalanceRaw(userPublicKey, req.mint);
+        raw = (req.pct >= 100 ? balance : balance * BigInt(req.pct) / 100n).toString();
+        if (raw === "0") throw Object.assign(new Error("no balance"), { key: "signNoBalance" });
+      }
+      let fee = req.fee, quote = null;
+      if (!req.buy && fee > 0) {                   // SELL: no fee when SOL received < SOL paid
+        const pos = ledgerLoad()[req.mint];
+        if (pos && pos.tokens > 0) {
+          const gross = await jupQuote(req, raw, 0);
+          if (Number(gross.outAmount) < pos.cost * Math.min(1, Number(raw) / pos.tokens)) { fee = 0; quote = gross; }
+        }
+      }
+      if (!quote) quote = await jupQuote(req, raw, fee);
       const body = { quoteResponse: quote, userPublicKey: userPublicKey, wrapAndUnwrapSol: true, dynamicComputeUnitLimit: true };
-      if (req.fee > 0) body.feeAccount = req.fa;
+      if (fee > 0) body.feeAccount = req.fa;
       const swapRes = await jupFetch(JUP_SWAP_API + "/swap", {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
       });
       const swap = await swapRes.json();
       if (!swapRes.ok || !swap.swapTransaction) throw Object.assign(new Error("swap build failed"), { key: "signFailed" });
-      return swap.swapTransaction;
+      return { tx: swap.swapTransaction, quote: quote, raw: raw, fee: fee };
     }
-
     async function rpcRequest(method, rpcParams) {
       let lastError = null;
       for (const url of RPC_URLS) {
@@ -2009,16 +2143,21 @@
         } else {
           if (signReq.wallet && signReq.wallet !== pub) throw Object.assign(new Error("wrong wallet"), { key: "signWrongWallet" });
           signUi(t("signQuoting"));
-          const base64Tx = await buildSwapTransaction(signReq, pub);
+          const built = await buildSwapTransaction(signReq, pub);
+          $("signFeeVal").textContent = built.fee === 0 && signReq.fee > 0 ? t("signFeeWaived")
+                                      : String(built.fee / 100).replace(".", ",") + "%";
           signUi(t("signApprove"));
-          signDoneSig = await signAndSendTransaction(base64Tx);
+          signDoneSig = await signAndSendTransaction(built.tx);
+          ledgerRecord(signReq, built.raw, built.quote);
         }
         haptic("success"); signUi(t("signDone"));
         $("signBtn").hidden = true;
         $("signView").href = "https://solscan.io/tx/" + encodeURIComponent(signDoneSig); $("signView").hidden = false;
         if (botName) {
           $("signBack").hidden = false;
-          setTimeout(signBackToBot, 2500);         // tell the bot (it records the position), no tap needed
+          // Fee setup and chat-menu orders report back to the bot. Mini App trades don't:
+          // the user just returns to Telegram, where the Mini App is still open.
+          if (signReq.setup || signReq.cb) setTimeout(signBackToBot, 2500);
         }
       } catch (e) {
         haptic("error");
@@ -2031,7 +2170,8 @@
     }
     function signBackToBot() {
       if (!botName || !signReq || signReq.bad) return;
-      window.location.href = "https://t.me/" + botName + "?start=" + (signReq.setup ? "f" : "s_" + signReq.id);
+      window.location.href = "https://t.me/" + botName
+        + (signReq.setup ? "?start=f" : signReq.cb ? "?start=s_" + signReq.id : "");
     }
     function initSignMode() {
       if (!signReq) return;
@@ -2048,9 +2188,9 @@
         if (!signDoneSig) $("signBtnLabel").textContent = t("signBtn");
         return;
       }
-      const fill = (k) => t(k).replace("{sym}", signReq.sym).replace("{ui}", signReq.ui);
+      const fill = (k) => t(k).replace("{sym}", signReq.sym).replace("{ui}", signReq.ui).replace("{pct}", String(signReq.pct));
       $("signTitle").textContent = fill(signReq.buy ? "signTitleBuy" : "signTitleSell");
-      $("signDesc").textContent = fill(signReq.buy ? "signDescBuy" : "signDescSell");
+      $("signDesc").textContent = fill(signReq.buy ? "signDescBuy" : signReq.raw ? "signDescSell" : "signDescSellPct");
       $("signFeeVal").textContent = String(signReq.fee / 100).replace(".", ",") + "%";
       if (!signDoneSig) $("signBtnLabel").textContent = t("signBtn");
     }
