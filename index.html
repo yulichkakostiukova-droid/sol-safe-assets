@@ -800,7 +800,7 @@
       <div class="card">
         <div class="kv"><span data-i18n="tradingFee">Trading fee</span><b>1%</b></div>
         <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>1%</b></div>
-        <div class="kv"><span data-i18n="version">Version</span><b>1.17</b></div>
+        <div class="kv"><span data-i18n="version">Version</span><b>1.18</b></div>
       </div>
     </section>
   </main>
@@ -969,6 +969,8 @@
         notifyReentrySub: "After a Take Profit sale the bot watches the token for 30 minutes and messages you if it breaks its high.",
         apModalTitle: "Turn on Auto-Pilot", apModalGo: "↩️ Turn on & go to chat",
         apModalText: "Tap the button to turn it on and go back to the Telegram chat. The bot will scan the market and send you a message when a safe token is found.",
+        signExpiredBot: "🔄 This link expired. Opening the chat for a new price and a new link…",
+        signRefreshed: "🔄 Price updated. Tap the button to continue. It's valid for 3 minutes.",
         signTitleBuy: "Buy {sym}", signTitleSell: "Sell {sym}",
         signDescBuy: "You spend {ui} SOL. The price is fetched fresh when you tap the button, then your wallet asks you to approve.",
         signDescSell: "You sell {ui} {sym} for SOL. The price is fetched fresh when you tap the button, then your wallet asks you to approve.",
@@ -1056,6 +1058,8 @@
         notifyReentrySub: "После продажи по Тейк-профиту бот 30 минут следит за токеном и напишет, если цена пробьёт максимум.",
         apModalTitle: "Включить Автопилот", apModalGo: "↩️ Включить и в чат",
         apModalText: "Нажми кнопку, чтобы включить его и вернуться в чат с ботом. Бот будет сканировать рынок и пришлёт сообщение, когда найдёт безопасный токен.",
+        signExpiredBot: "🔄 Ссылка устарела. Открываю чат за новой ценой и новой ссылкой…",
+        signRefreshed: "🔄 Цена обновлена. Нажми кнопку, чтобы продолжить. Действует 3 минуты.",
         signTitleBuy: "Покупка {sym}", signTitleSell: "Продажа {sym}",
         signDescBuy: "Ты тратишь {ui} SOL. Цена обновится, когда нажмёшь кнопку, затем кошелёк попросит подтверждение.",
         signDescSell: "Ты продаёшь {ui} {sym} за SOL. Цена обновится, когда нажмёшь кнопку, затем кошелёк попросит подтверждение.",
@@ -1820,7 +1824,7 @@
         const q = new URLSearchParams({
           sign: Array.from(crypto.getRandomValues(new Uint8Array(4)), (b) => b.toString(16).padStart(2, "0")).join(""),
           side: isBuy ? "b" : "s", mint: mint, fee: String(TRADE_FEE_BPS), w: state.wallet, sym: info.symbol,
-          lang: state.lang, t: String(Date.now())
+          lang: state.lang, t: String(Date.now()), exp: String(Math.floor(Date.now() / 1000) + 180)
         });
         if (isBuy) { q.set("raw", String(Math.round(value * 1e9))); q.set("ui", String(value)); }
         else q.set("pct", String(value));
@@ -2017,7 +2021,8 @@
               && fee >= 0 && fee <= MAX_FEE_BPS
               && (fee === 0 || isPubkey(fa)) && (!w || isPubkey(w));
       if (!ok) return { bad: true };
-      return { id: params.get("sign"), buy: side === "b", mint: mint, raw: raw, pct: pct, fee: fee, fa: fa, wallet: w,
+      const exp = parseInt(params.get("exp") || "0", 10);          // deadline, unix seconds (0 = none)
+      return { exp: exp > 0 ? exp : 0, id: params.get("sign"), buy: side === "b", mint: mint, raw: raw, pct: pct, fee: fee, fa: fa, wallet: w,
                cb: params.get("cb") === "1",      // order created by the bot's chat menu: report back to the bot
                sym: (params.get("sym") || short(mint)).slice(0, 14), ui: signAmountText(params.get("ui") || "") };
     }
@@ -2184,8 +2189,24 @@
       for (let waited = 0; waited < ms && !getPhantom(); waited += 100) await new Promise((r) => setTimeout(r, 100));
       return getPhantom();
     }
+    // A link is valid for 3 minutes. After that the page doesn't sign:
+    //  - orders made by the bot (cb=1): open the bot, which fetches a new price and sends a NEW link;
+    //  - Mini App orders: the page takes a new 3-minute deadline (the price is fetched at tap anyway).
+    function signExpired() { return signReq && signReq.exp && Date.now() / 1000 > signReq.exp; }
+    function handleExpiredLink() {
+      haptic("warning");
+      if (signReq.cb && botName) {
+        signUi(t("signExpiredBot"), "");
+        window.location.href = "https://t.me/" + botName + "?start=r_" + signReq.id;
+        return;
+      }
+      signReq.exp = Math.floor(Date.now() / 1000) + 180;
+      signUi(t("signRefreshed"), "");
+      $("signBtnLabel").textContent = t("signBtn");
+    }
     async function runSign() {
       if (signBusy || signDoneSig) return;
+      if (signExpired()) { handleExpiredLink(); return; }
       signBusy = true; $("signBtn").disabled = true; $("signBtn").classList.add("busy");
       try {
         signUi(t("signConnecting"));
@@ -2264,6 +2285,7 @@
       $("signDesc").textContent = fill(signReq.buy ? "signDescBuy" : signReq.raw ? "signDescSell" : "signDescSellPct");
       $("signFeeVal").textContent = String(signReq.fee / 100).replace(".", ",") + "%";
       if (!signDoneSig) $("signBtnLabel").textContent = t("signBtn");
+      if (signExpired()) handleExpiredLink();                      // opened after the deadline
     }
     $("signBtn").addEventListener("click", runSign);
     $("signBack").addEventListener("click", signBackToBot);
