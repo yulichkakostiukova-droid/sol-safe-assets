@@ -126,9 +126,17 @@
     body.signing .tabbar, body.signing .screen:not(#screen-sign), body.signing #walletNote,
     body.signing #balanceLine, body.signing #waitRow, body.signing #demoBadge, body.signing #walletBtn { display: none !important; }
     #screen-sign { margin-top: 18px; }
-    #screen-sign .kv:first-of-type { margin-top: 16px; }
+    #signRows { margin-top: 16px; }
     .sign-link { display: flex; align-items: center; justify-content: center; margin-top: 12px; text-decoration: none; height: 48px; }
     #signBack { width: 100%; height: 48px; margin-top: 10px; }
+    .chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+    .chip { height: 36px; border-radius: 999px; font-size: 13.5px; font-weight: 500; color: var(--text-2);
+      background: rgba(255,255,255,.04); box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); transition: background .2s, color .2s; }
+    .chip.active { background: #fff; color: #000; box-shadow: 0 0 16px rgba(203,233,253,.45); }
+    .sell-btn { width: 100%; height: 52px; margin-top: 14px; border-radius: 999px; font-size: 16px; font-weight: 500; letter-spacing: -.02em;
+      color: #ffc2c2; background: rgba(255,90,90,.12); box-shadow: inset 0 0 0 1px rgba(255,90,90,.4); transition: transform .12s, opacity .2s; }
+    .sell-btn:active { transform: scale(.975); }
+    .sell-btn:disabled, .sell-btn.busy { opacity: .6; }
     .wait-row { text-align: center; margin: 14px 0 0; }
     .link-btn { font-size: 13px; color: var(--b-100); text-decoration: underline; text-underline-offset: 3px; padding: 6px 10px; }
     .wallet-btn.connected { background: rgba(255,255,255,.07); color: #fff; padding: 0 14px 0 6px;
@@ -449,8 +457,10 @@
       <div class="card featured">
         <div class="card-title" id="signTitle"></div>
         <p class="card-desc" id="signDesc"></p>
-        <div class="kv"><span data-i18n="signFee">Fee</span><b id="signFeeVal"></b></div>
-        <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>1%</b></div>
+        <div id="signRows">
+          <div class="kv"><span data-i18n="signFee">Fee</span><b id="signFeeVal"></b></div>
+          <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>1%</b></div>
+        </div>
         <div class="error" id="signError"></div>
         <button class="btn-white" id="signBtn" type="button"><span id="signBtnLabel"></span></button>
         <a class="btn-dark sign-link" id="signView" hidden target="_blank" rel="noopener" data-i18n="signView">View on Solscan</a>
@@ -540,6 +550,16 @@
             <span data-i18n="buyToken">Buy Token</span>
           </button>
           <div class="hint" id="manualHint"></div>
+
+          <div class="divider"></div>
+          <div class="card-title" data-i18n="sellTitle">Sell this token</div>
+          <p class="card-desc" data-i18n="sellDesc">Sells a share of your balance of the token address above. You'll see the quote in the chat and confirm there.</p>
+          <div class="chips" id="sellPcts">
+            <button class="chip" type="button" data-p="25">25%</button>
+            <button class="chip" type="button" data-p="50">50%</button>
+            <button class="chip active" type="button" data-p="100">100%</button>
+          </div>
+          <button class="sell-btn" id="sellBtn" type="button"><span data-i18n="sellToken">Sell</span></button>
         </div>
       </div>
 
@@ -749,7 +769,7 @@
       <div class="card">
         <div class="kv"><span data-i18n="tradingFee">Trading fee</span><b>1%</b></div>
         <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>1%</b></div>
-        <div class="kv"><span data-i18n="version">Version</span><b>1.13</b></div>
+        <div class="kv"><span data-i18n="version">Version</span><b>1.14</b></div>
       </div>
     </section>
   </main>
@@ -890,6 +910,12 @@
         balance: "Balance", demoBadge: "DEMO", demoMode: "Demo Mode", demoModeSub: "Virtual 100 SOL, real prices — nothing is sent to the bot",
         demoOk: "✅ Simulation successful! (Demo Mode)", demoTp: "Simulated result: +{p}% (Take Profit hit)", demoSl: "Simulated result: −{p}% (Stop Loss hit)",
         demoNote: "Not a real trade. No funds were used.", demoHint: "Demo Mode: nothing is sent, no real funds", demoOn: "Demo Mode is on", demoOff: "Demo Mode is off",
+        sellTitle: "Sell this token", sellToken: "Sell",
+        sellDesc: "Sells a share of your balance of the token address above. You'll see the quote in the chat and confirm there.",
+        demoNoPos: "No demo position in this token.",
+        setupTitle: "Create the fee account",
+        setupDesc: "One-time step. It creates the wrapped-SOL account for the fee wallet {owner}. It costs about 0,0021 SOL from the wallet that signs.",
+        setupBuilding: "Building the transaction…",
         signTitleBuy: "Buy {sym}", signTitleSell: "Sell {sym}",
         signDescBuy: "You spend {ui} SOL. The price is fetched fresh when you tap the button, then your wallet asks you to approve.",
         signDescSell: "You sell {ui} {sym} for SOL. The price is fetched fresh when you tap the button, then your wallet asks you to approve.",
@@ -959,6 +985,12 @@
         balance: "Баланс", demoBadge: "ДЕМО", demoMode: "Демо-режим", demoModeSub: "Виртуальные 100 SOL, реальные цены — боту ничего не отправляется",
         demoOk: "✅ Симуляция прошла успешно! (Демо-режим)", demoTp: "Результат симуляции: +{p}% (сработал Тейк-профит)", demoSl: "Результат симуляции: −{p}% (сработал Стоп-лосс)",
         demoNote: "Это не настоящая сделка. Средства не использовались.", demoHint: "Демо-режим: ничего не отправляется, реальные средства не используются", demoOn: "Демо-режим включён", demoOff: "Демо-режим выключен",
+        sellTitle: "Продать этот токен", sellToken: "Продать",
+        sellDesc: "Продаёт часть твоего баланса токена, адрес которого указан выше. Котировка придёт в чат, подтверждаешь там.",
+        demoNoPos: "Нет демо-позиции по этому токену.",
+        setupTitle: "Создать счёт для комиссии",
+        setupDesc: "Разовый шаг. Создаётся счёт wrapped SOL для кошелька комиссии {owner}. Стоит около 0,0021 SOL с кошелька, который подписывает.",
+        setupBuilding: "Собираю транзакцию…",
         signTitleBuy: "Покупка {sym}", signTitleSell: "Продажа {sym}",
         signDescBuy: "Ты тратишь {ui} SOL. Цена обновится, когда нажмёшь кнопку, затем кошелёк попросит подтверждение.",
         signDescSell: "Ты продаёшь {ui} {sym} за SOL. Цена обновится, когда нажмёшь кнопку, затем кошелёк попросит подтверждение.",
@@ -1152,6 +1184,7 @@
         // No wallet yet -> the main buttons become "Connect Wallet"
         $("startBtn").disabled = false;
         $("buyBtn").disabled = false;
+        $("sellBtn").disabled = false;
         $("startBtn").querySelector("span").textContent = ok ? t("startAutoPilot") : (isWaiting() ? t("waitingBtn") : t("connectWallet"));
         $("buyBtn").querySelector("span").textContent = ok ? t("buyToken") : (isWaiting() ? t("waitingBtn") : t("connectWallet"));
       }
@@ -1604,22 +1637,26 @@
         $("manualError").textContent = t("demoPriceErr"); haptic("error");
       } finally { demoBusy = false; }
     }
-    async function demoSell(mint) {
+    async function demoSell(mint, percent) {
       if (demoBusy) return;
       const pos = demo.positions.find(x => x.mint === mint);
-      if (!pos) return;
+      if (!pos) { toast(t("demoNoPos")); haptic("error"); return; }
+      const share = Math.min(1, Math.max(0.01, (percent || 100) / 100));
       demoBusy = true;
       try {
         const price = (await fetchPricesSol([mint]))[mint];
         if (!(price > 0)) throw new Error("no price");
-        const gross = pos.tokens * price;
-        const net = gross > pos.cost ? gross * (1 - DEMO_FEE) : gross;   // no fee on a losing trade
-        const pnl = net - pos.cost;
+        const tokens = pos.tokens * share, cost = pos.cost * share;
+        const gross = tokens * price;
+        const net = gross > cost ? gross * (1 - DEMO_FEE) : gross;       // no fee on a losing trade
+        const pnl = net - cost;
         demo.balance += net;
-        demo.positions = demo.positions.filter(x => x.mint !== mint);
+        demo.prices[mint] = price;
+        if (share >= 1) demo.positions = demo.positions.filter(x => x.mint !== mint);
+        else { pos.tokens -= tokens; pos.cost -= cost; }
         demoSave(); renderWallet(); renderDemo();
         haptic(pnl >= 0 ? "success" : "warning");
-        toast(t("demoSold").replace("{pnl}", signed(pnl)).replace("{pct}", signed(pnl / pos.cost * 100, 1)));
+        toast(t("demoSold").replace("{pnl}", signed(pnl)).replace("{pct}", signed(pnl / cost * 100, 1)));
       } catch (e) { toast(t("demoPriceErr")); haptic("error"); }
       finally { demoBusy = false; }
     }
@@ -1675,8 +1712,8 @@
     // Max 64 chars of [A-Za-z0-9_-]; "-" stands for the decimal point.
     function startCode(p) {
       const amt = String(p.amount).replace(".", "-");
-      const code = p.action === "buy"
-        ? ["b", p.token, amt].join("_")
+      const code = p.action === "buy" ? ["b", p.token, amt].join("_")
+        : p.action === "sell" ? ["p", p.token, amt].join("_")            // amt = percent of the balance
         : ["a", amt, p.smart_mode ? 1 : 0, p.tp, p.sl, p.wallet].join("_");
       return /^[A-Za-z0-9_-]{1,64}$/.test(code) ? code : null;
     }
@@ -1731,6 +1768,23 @@
       $("manualError").textContent = "";
       if (state.demo) { demoBuy(ca, amount); return; }
       sendToBot({ action: "buy", token: ca, amount: amount, wallet: state.wallet }, $("buyBtn"));
+    });
+    // Sell: a percentage of the wallet's balance of the token in the address field
+    state.sellPct = 100;
+    document.querySelectorAll("#sellPcts .chip").forEach((b) => b.addEventListener("click", () => {
+      state.sellPct = parseInt(b.dataset.p, 10);
+      document.querySelectorAll("#sellPcts .chip").forEach((x) => x.classList.toggle("active", x === b));
+      haptic("select");
+    }));
+    $("sellBtn").addEventListener("click", () => {
+      hideKeyboard();
+      if (!state.demo && !state.wallet) { haptic("warning"); showAlert(t("connectFirst"), connect); return; }
+      const ca = $("caInput").value.trim();
+      if (!isPubkey(ca)) { $("manualError").textContent = t("badCa"); haptic("error"); return; }
+      $("manualError").textContent = "";
+      if (state.demo) { demoSell(ca, state.sellPct); return; }
+      // The bot looks up the real balance, shows the quote, and sends the "sign in your wallet" link
+      sendToBot({ action: "sell", token: ca, amount: state.sellPct, wallet: state.wallet }, $("sellBtn"));
     });
     $("caInput").addEventListener("keydown", (e) => { if (e.key === "Enter") $("buyAmount").focus(); });
     $("buyAmount").addEventListener("keydown", (e) => { if (e.key === "Enter") hideKeyboard(); });
@@ -1790,6 +1844,10 @@
     const MAX_FEE_BPS = 100;                       // the page never accepts a fee above 1%
 
     function parseSignRequest() {
+      if (params.get("setup") === "fee") {
+        const owner = params.get("owner") || "";
+        return isPubkey(owner) ? { setup: true, owner: owner } : { bad: true };
+      }
       if (!params.has("sign")) return null;
       const side = params.get("side"), mint = params.get("mint") || "", raw = params.get("raw") || "";
       const fee = parseInt(params.get("fee") || "0", 10), fa = params.get("fa") || "", w = params.get("w") || "";
@@ -1863,6 +1921,59 @@
       return swap.swapTransaction;
     }
 
+    async function rpcRequest(method, rpcParams) {
+      let lastError = null;
+      for (const url of RPC_URLS) {
+        try {
+          const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" },
+                                         body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: method, params: rpcParams }) });
+          const data = await res.json();
+          if (data && data.result !== undefined) return data.result;
+          lastError = new Error("rpc error");
+        } catch (e) { lastError = e; }
+      }
+      throw lastError || new Error("rpc failed");
+    }
+    // One-time transaction that creates the fee wallet's wrapped-SOL token account.
+    // "Idempotent": if the account already exists, it does nothing.
+    async function buildFeeAccountTransaction(owner, payer) {
+      await loadWeb3();
+      const w3 = window.solanaWeb3;
+      const TOKEN_PROGRAM = new w3.PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
+      const ATA_PROGRAM = new w3.PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL");
+      const mint = new w3.PublicKey(WSOL_MINT), ownerKey = new w3.PublicKey(owner), payerKey = new w3.PublicKey(payer);
+      const account = w3.PublicKey.findProgramAddressSync(
+        [ownerKey.toBuffer(), TOKEN_PROGRAM.toBuffer(), mint.toBuffer()], ATA_PROGRAM)[0];
+      const instruction = new w3.TransactionInstruction({
+        programId: ATA_PROGRAM,
+        keys: [
+          { pubkey: payerKey, isSigner: true, isWritable: true },
+          { pubkey: account, isSigner: false, isWritable: true },
+          { pubkey: ownerKey, isSigner: false, isWritable: false },
+          { pubkey: mint, isSigner: false, isWritable: false },
+          { pubkey: w3.SystemProgram.programId, isSigner: false, isWritable: false },
+          { pubkey: TOKEN_PROGRAM, isSigner: false, isWritable: false }
+        ],
+        data: ownerKey.toBuffer().subarray(0, 0).constructor.from([1])   // instruction 1 = CreateIdempotent
+      });
+      const latest = await rpcRequest("getLatestBlockhash", [{ commitment: "finalized" }]);
+      const tx = new w3.Transaction({ feePayer: payerKey, recentBlockhash: latest.value.blockhash });
+      tx.add(instruction);
+      return tx;
+    }
+    async function sendWithWallet(tx) {
+      const provider = getPhantom();
+      try {
+        const res = await provider.signAndSendTransaction(tx);
+        const signature = typeof res === "string" ? res : res && res.signature;
+        if (!signature) throw new Error("no signature returned");
+        return signature;
+      } catch (e) {
+        const rejected = e && (e.code === 4001 || /reject|denied|cancel/i.test(e.message || ""));
+        throw Object.assign(new Error((e && e.message) || "wallet error"), { key: rejected ? "signRejected" : "signFailed" });
+      }
+    }
+
     let signBusy = false, signDoneSig = null;
     function signUi(status, error) {
       $("signStatus").textContent = status || "";
@@ -1890,11 +2001,18 @@
         const key = (resp && resp.publicKey) || provider.publicKey;
         const pub = key && key.toString();
         if (!pub || !isPubkey(pub)) throw Object.assign(new Error("no key"), { key: "signFailed" });
-        if (signReq.wallet && signReq.wallet !== pub) throw Object.assign(new Error("wrong wallet"), { key: "signWrongWallet" });
-        signUi(t("signQuoting"));
-        const base64Tx = await buildSwapTransaction(signReq, pub);
-        signUi(t("signApprove"));
-        signDoneSig = await signAndSendTransaction(base64Tx);
+        if (signReq.setup) {
+          signUi(t("setupBuilding"));
+          const setupTx = await buildFeeAccountTransaction(signReq.owner, pub);
+          signUi(t("signApprove"));
+          signDoneSig = await sendWithWallet(setupTx);
+        } else {
+          if (signReq.wallet && signReq.wallet !== pub) throw Object.assign(new Error("wrong wallet"), { key: "signWrongWallet" });
+          signUi(t("signQuoting"));
+          const base64Tx = await buildSwapTransaction(signReq, pub);
+          signUi(t("signApprove"));
+          signDoneSig = await signAndSendTransaction(base64Tx);
+        }
         haptic("success"); signUi(t("signDone"));
         $("signBtn").hidden = true;
         $("signView").href = "https://solscan.io/tx/" + encodeURIComponent(signDoneSig); $("signView").hidden = false;
@@ -1912,7 +2030,8 @@
       }
     }
     function signBackToBot() {
-      if (botName && signReq && signReq.id) window.location.href = "https://t.me/" + botName + "?start=s_" + signReq.id;
+      if (!botName || !signReq || signReq.bad) return;
+      window.location.href = "https://t.me/" + botName + "?start=" + (signReq.setup ? "f" : "s_" + signReq.id);
     }
     function initSignMode() {
       if (!signReq) return;
@@ -1921,6 +2040,13 @@
       if (signReq.bad) {
         $("signTitle").textContent = "SolTradeBot"; $("signDesc").textContent = "";
         $("signBtn").hidden = true; signUi("", t("signBadLink")); return;
+      }
+      if (signReq.setup) {
+        $("signRows").hidden = true;
+        $("signTitle").textContent = t("setupTitle");
+        $("signDesc").textContent = t("setupDesc").replace("{owner}", short(signReq.owner));
+        if (!signDoneSig) $("signBtnLabel").textContent = t("signBtn");
+        return;
       }
       const fill = (k) => t(k).replace("{sym}", signReq.sym).replace("{ui}", signReq.ui);
       $("signTitle").textContent = fill(signReq.buy ? "signTitleBuy" : "signTitleSell");
