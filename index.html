@@ -793,7 +793,7 @@
         </div>
         <div class="settings-row">
           <div class="ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5 13.9 8 19.5 10l-5.6 2L12 17.5 10.1 12 4.5 10l5.6-2z"/></svg></div>
-          <div class="grow"><div class="t" data-i18n="smartDefault">Smart Mode by default</div><div class="s" data-i18n="smartDefaultSub">TP +50% · SL −15%</div></div>
+          <div class="grow"><div class="t" data-i18n="smartDefault">Smart Mode by default</div><div class="s" data-i18n="smartDefaultSub">TP +100% · SL −15%</div></div>
           <button class="switch" id="smartDefaultSwitch" role="switch" aria-checked="true" aria-label="Smart Mode by default"></button>
         </div>
         <div class="settings-row">
@@ -810,7 +810,7 @@
       <div class="card">
         <div class="kv"><span data-i18n="tradingFee">Trading fee</span><b>1%</b></div>
         <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>3%</b></div>
-        <div class="kv"><span data-i18n="version">Version</span><b>1.20</b></div>
+        <div class="kv"><span data-i18n="version">Version</span><b>1.21</b></div>
       </div>
     </section>
   </main>
@@ -839,8 +839,8 @@
     <h3 data-i18n="tpslTitle">Take Profit / Stop Loss</h3>
     <p class="sheet-sub" data-i18n="tpslSub">Auto-Pilot sells when the price reaches one of these levels.</p>
     <div class="sl-block">
-      <div class="sl-head"><span class="n" data-i18n="takeProfit">Take Profit</span><span class="v tp" id="tpVal">+50%</span></div>
-      <input class="range tp" type="range" id="tpSlider" min="10" max="500" step="5" value="50" aria-label="Take Profit">
+      <div class="sl-head"><span class="n" data-i18n="takeProfit">Take Profit</span><span class="v tp" id="tpVal">+100%</span></div>
+      <input class="range tp" type="range" id="tpSlider" min="10" max="500" step="5" value="100" aria-label="Take Profit">
       <div class="scale"><span>+10%</span><span>+500%</span></div>
     </div>
     <div class="sl-block">
@@ -888,7 +888,7 @@
     const CHROME_EXTENSION_URL = "";   // put your Chrome Web Store link here when it's published
     const AMOUNT_MIN = 0.005, AMOUNT_MAX = 1000, SLIDER_MAX = 10;   // Auto-Pilot
     const MANUAL_MIN = 0.001;                                     // Manual Trade (bot accepts 0.001+)
-    const SMART_TP = 50, SMART_SL = 15;
+    const SMART_TP = 100, SMART_SL = 15;   // must match SMART_TP_PCT / SMART_SL_PCT in trade_bot.py
     const PAGE_COLOR = "#050505";
     const COOLDOWN_MS = 3000;
 
@@ -916,7 +916,7 @@
       en: {
         connectWallet: "Connect Wallet", connectWalletShort: "Connect", autoPilot: "Auto-Pilot", manualTrade: "Manual Trade",
         amountPerTrade: "Amount per trade", smartMode: "Smart Mode",
-        smartOn: "🤖 <b>Smart Mode:</b> the bot sets Take Profit / Stop Loss for you (now <b>+50% / −15%</b>). No settings needed.",
+        smartOn: "🤖 <b>Smart Mode:</b> the bot sets Take Profit / Stop Loss for you (now <b>+100% / −15%</b>). No settings needed.",
         setTpSl: "⚙️ Set Take Profit / Stop Loss", startAutoPilot: "Start Auto-Pilot",
         connectFirst: "Connect a wallet to continue", readyAuto: "The bot finds tokens; you approve every trade in your wallet",
         buyAToken: "Buy a token", buyDesc: "Paste the token address and the amount. Your wallet opens with a fresh quote, and you approve the trade there.",
@@ -943,7 +943,7 @@
         c1: "Works directly with the Phantom extension", c2: "Full-size charts and order history", c3: "Same settings as your Telegram bot",
         downloadChrome: "Download for Chrome", comingSoon: "The Chrome extension is coming soon.",
         settingsTitle: "Settings", settingsSub: "Saved on this device.", language: "Language",
-        smartDefault: "Smart Mode by default", smartDefaultSub: "TP +50% · SL −15%", wallet: "Wallet",
+        smartDefault: "Smart Mode by default", smartDefaultSub: "TP +100% · SL −15%", wallet: "Wallet",
         notConnected: "Not connected", connect: "Connect", disconnect: "Disconnect",
         tradingFee: "Trading fee", maxSlippage: "Max slippage", version: "Version",
         tabTrade: "Trade", tabLearn: "Learn", tabDesktop: "Desktop", tabSettings: "Settings",
@@ -1012,7 +1012,7 @@
       ru: {
         connectWallet: "Подключить кошелёк", connectWalletShort: "Подключить", autoPilot: "Автопилот", manualTrade: "Вручную",
         amountPerTrade: "Сумма на сделку", smartMode: "Умный режим",
-        smartOn: "🤖 <b>Умный режим:</b> бот сам выставляет Тейк-профит / Стоп-лосс (сейчас <b>+50% / −15%</b>). Ничего настраивать не нужно.",
+        smartOn: "🤖 <b>Умный режим:</b> бот сам выставляет Тейк-профит / Стоп-лосс (сейчас <b>+100% / −15%</b>). Ничего настраивать не нужно.",
         setTpSl: "⚙️ Настроить TP / SL", startAutoPilot: "Запустить Автопилот",
         connectFirst: "Подключи кошелёк, чтобы продолжить", readyAuto: "Бот находит токены, а каждую сделку ты подтверждаешь в кошельке",
         buyAToken: "Купить токен", buyDesc: "Вставь адрес токена и сумму. Откроется кошелёк со свежей котировкой, там ты подтверждаешь сделку.",
@@ -1039,7 +1039,7 @@
         c1: "Работает напрямую с расширением Phantom", c2: "Полноразмерные графики и история сделок", c3: "Те же настройки, что и в Telegram-боте",
         downloadChrome: "Скачать для Chrome", comingSoon: "Расширение для Chrome скоро появится.",
         settingsTitle: "Настройки", settingsSub: "Сохраняются на этом устройстве.", language: "Язык",
-        smartDefault: "Умный режим по умолчанию", smartDefaultSub: "TP +50% · SL −15%", wallet: "Кошелёк",
+        smartDefault: "Умный режим по умолчанию", smartDefaultSub: "TP +100% · SL −15%", wallet: "Кошелёк",
         notConnected: "Не подключён", connect: "Подключить", disconnect: "Отключить",
         tradingFee: "Комиссия", maxSlippage: "Макс. проскальзывание", version: "Версия",
         tabTrade: "Торговля", tabLearn: "Обучение", tabDesktop: "Компьютер", tabSettings: "Настройки",
