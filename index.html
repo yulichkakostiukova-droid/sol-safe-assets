@@ -527,6 +527,16 @@
           </button>
 
           <div class="row reentry-row">
+            <div class="reentry-label" data-i18n="trailingStop">🛡 Trailing Stop</div>
+            <button class="switch" id="trailSwitch" role="switch" aria-checked="true" aria-label="Trailing Stop"></button>
+          </div>
+          <div class="reentry-sub" data-i18n="trailingStopSub">When the price is up 20%, the stop moves to break-even. At +40% it moves to +15%.</div>
+          <div class="row reentry-row">
+            <div class="reentry-label" data-i18n="dynamicTp">🚀 Dynamic Take Profit</div>
+            <button class="switch" id="dynTpSwitch" role="switch" aria-checked="true" aria-label="Dynamic Take Profit"></button>
+          </div>
+          <div class="reentry-sub" data-i18n="dynamicTpSub">If your target is hit on very high volume, the target is raised to +100%. If buying slows, the bot sends the sell link.</div>
+          <div class="row reentry-row">
             <div class="reentry-label" data-i18n="notifyReentry">🔔 Notify me on re-entry</div>
             <button class="switch" id="reentrySwitch" role="switch" aria-checked="false" aria-label="Notify me on re-entry"></button>
           </div>
@@ -800,7 +810,7 @@
       <div class="card">
         <div class="kv"><span data-i18n="tradingFee">Trading fee</span><b>1%</b></div>
         <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>3%</b></div>
-        <div class="kv"><span data-i18n="version">Version</span><b>1.19</b></div>
+        <div class="kv"><span data-i18n="version">Version</span><b>1.20</b></div>
       </div>
     </section>
   </main>
@@ -965,6 +975,9 @@
         riskNoData: "• No market data for this token",
         signDescSellPct: "You sell {pct}% of your {sym} for SOL. The price is fetched fresh when you tap the button, then your wallet asks you to approve.",
         signNoBalance: "This wallet has none of this token to sell.", signFeeWaived: "0% (sale at a loss)",
+        trailingStop: "🛡 Trailing Stop", dynamicTp: "🚀 Dynamic Take Profit",
+        trailingStopSub: "When the price is up 20%, the stop moves to break-even. At +40% it moves to +15%.",
+        dynamicTpSub: "If your target is hit on very high volume, the target is raised to +100%. If buying slows, the bot sends the sell link.",
         notifyReentry: "🔔 Notify me on re-entry",
         notifyReentrySub: "After a Take Profit sale the bot watches the token for 30 minutes and messages you if it breaks its high.",
         apModalTitle: "Turn on Auto-Pilot", apModalGo: "↩️ Turn on & go to chat",
@@ -1058,6 +1071,9 @@
         riskNoData: "• Нет рыночных данных по токену",
         signDescSellPct: "Ты продаёшь {pct}% своих {sym} за SOL. Цена обновится, когда нажмёшь кнопку, затем кошелёк попросит подтверждение.",
         signNoBalance: "В этом кошельке нет этого токена для продажи.", signFeeWaived: "0% (продажа в убыток)",
+        trailingStop: "🛡 Трейлинг-стоп", dynamicTp: "🚀 Динамический Тейк-профит",
+        trailingStopSub: "Когда цена вырастет на 20%, стоп переносится в безубыток. При +40% он переносится на +15%.",
+        dynamicTpSub: "Если цель достигнута при очень высоком объёме, цель повышается до +100%. Если покупки замедлятся, бот пришлёт ссылку на продажу.",
         notifyReentry: "🔔 Оповестить при повторном входе",
         notifyReentrySub: "После продажи по Тейк-профиту бот 30 минут следит за токеном и напишет, если цена пробьёт максимум.",
         apModalTitle: "Включить Автопилот", apModalGo: "↩️ Включить и в чат",
@@ -1171,6 +1187,8 @@
     state.smart = state.smartDefault;
     state.demo = store.get("demo") === "1";      // Demo Mode: simulate, never send to the bot
     state.notifyReentry = store.get("reentry") === "1";   // Auto-Pilot: "notify me on re-entry"
+    state.trailingStop = store.get("trail") !== "0";      // Auto-Pilot: Trailing Stop (default ON)
+    state.dynamicTp = store.get("dyntp") !== "0";         // Auto-Pilot: Dynamic Take Profit (default ON)
     state.balance = null;                        // number (SOL) | "err" | null (loading)
     state.balanceFor = null;                     // address the balance belongs to
     const t = (k) => (translations[state.lang] && translations[state.lang][k]) || translations.en[k] || k;
@@ -1258,6 +1276,8 @@
       const ok = !!state.wallet || state.demo;     // Demo Mode works without a wallet
       $("demoSwitch").setAttribute("aria-checked", String(state.demo));
       $("reentrySwitch").setAttribute("aria-checked", String(state.notifyReentry));
+      $("trailSwitch").setAttribute("aria-checked", String(state.trailingStop));
+      $("dynTpSwitch").setAttribute("aria-checked", String(state.dynamicTp));
       $("demoBadge").hidden = !state.demo;         // always visible while Demo Mode is on
       if (!state.cooling) {
         // No wallet yet -> the main buttons become "Connect Wallet"
@@ -1852,6 +1872,14 @@
       }
     }
 
+    $("trailSwitch").addEventListener("click", () => {
+      state.trailingStop = !state.trailingStop; store.set("trail", state.trailingStop ? "1" : "0");
+      renderButtons(); haptic("select");
+    });
+    $("dynTpSwitch").addEventListener("click", () => {
+      state.dynamicTp = !state.dynamicTp; store.set("dyntp", state.dynamicTp ? "1" : "0");
+      renderButtons(); haptic("select");
+    });
     $("reentrySwitch").addEventListener("click", () => {
       state.notifyReentry = !state.notifyReentry; store.set("reentry", state.notifyReentry ? "1" : "0");
       renderButtons(); haptic("select");
@@ -1871,8 +1899,9 @@
       const amt = String(p.amount).replace(".", "-");
       const code = p.action === "buy" ? ["b", p.token, amt].join("_")
         : p.action === "sell" ? ["p", p.token, amt].join("_")            // amt = percent of the balance
-        // one digit: bit 0 = Smart Mode, bit 1 = "notify me on re-entry"
-        : ["a", amt, (p.smart_mode ? 1 : 0) + (p.notify_reentry ? 2 : 0), p.tp, p.sl, p.wallet].join("_");
+        // one hex digit: bit 0 = Smart Mode, bit 1 = re-entry alerts, bit 2 = Trailing Stop, bit 3 = Dynamic TP
+        : ["a", amt, ((p.smart_mode ? 1 : 0) + (p.notify_reentry ? 2 : 0) + (p.trailing_stop ? 4 : 0) + (p.dynamic_tp ? 8 : 0)).toString(16),
+           p.tp, p.sl, p.wallet].join("_");
       return /^[A-Za-z0-9_-]{1,64}$/.test(code) ? code : null;
     }
 
@@ -1915,7 +1944,9 @@
         smart_mode: state.smart,
         tp: state.smart ? SMART_TP : state.tp,
         sl: state.smart ? SMART_SL : state.sl,
-        notify_reentry: state.notifyReentry
+        notify_reentry: state.notifyReentry,
+        trailing_stop: state.trailingStop,
+        dynamic_tp: state.dynamicTp
       };
       haptic("light"); $("apModal").classList.add("open");
     });
