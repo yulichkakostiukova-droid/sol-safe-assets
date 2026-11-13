@@ -484,7 +484,7 @@
         <p class="card-desc" id="signDesc"></p>
         <div id="signRows">
           <div class="kv"><span data-i18n="signFee">Fee</span><b id="signFeeVal"></b></div>
-          <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>3%</b></div>
+          <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b id="signSlipVal">3%</b></div>
         </div>
         <div class="error" id="signError"></div>
         <button class="btn-white" id="signBtn" type="button"><span id="signBtnLabel"></span></button>
@@ -817,7 +817,7 @@
       <div class="card">
         <div class="kv"><span data-i18n="tradingFee">Trading fee</span><b>1%</b></div>
         <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>3%</b></div>
-        <div class="kv"><span data-i18n="version">Version</span><b>1.24</b></div>
+        <div class="kv"><span data-i18n="version">Version</span><b>1.26</b></div>
       </div>
     </section>
   </main>
@@ -987,7 +987,7 @@
         dynamicTpSub: "If your target is hit on very high volume, the target is raised to +100%. If buying slows, the bot sends the sell link.",
         riskSafe: "🛡️ Safe Mode", riskDegen: "🚀 Degen Mode",
         riskSafeSub: "Safer picks: 15 minutes to 6 hours old, liquidity over $20,000, 5-minute volume over $50,000, 80% of liquidity locked. Few proposals.",
-        riskDegenSub: "Riskier picks: 2 minutes to 2 hours old, liquidity over $1,500, 5-minute volume over $2,000, 30% locked. More proposals, more losses.",
+        riskDegenSub: "Riskier picks: 2 to 45 minutes old, liquidity over $1,500, 5-minute volume over $10,000, at least 15% of liquidity locked, slippage up to 15%. More proposals, more losses.",
         notifyReentry: "🔔 Notify me on re-entry",
         notifyReentrySub: "After a Take Profit sale the bot watches the token for 30 minutes and messages you if it breaks its high.",
         apModalTitle: "Turn on Auto-Pilot", apModalGo: "↩️ Turn on & go to chat",
@@ -1086,7 +1086,7 @@
         dynamicTpSub: "Если цель достигнута при очень высоком объёме, цель повышается до +100%. Если покупки замедлятся, бот пришлёт ссылку на продажу.",
         riskSafe: "🛡️ Безопасный", riskDegen: "🚀 Деген",
         riskSafeSub: "Более безопасный выбор: возраст от 15 минут до 6 часов, ликвидность от $20 000, объём за 5 минут от $50 000, заблокировано 80% ликвидности. Предложений мало.",
-        riskDegenSub: "Более рискованный выбор: возраст от 2 минут до 2 часов, ликвидность от $1 500, объём за 5 минут от $2 000, заблокировано 30%. Предложений больше, убытков тоже.",
+        riskDegenSub: "Более рискованный выбор: возраст от 2 до 45 минут, ликвидность от $1 500, объём за 5 минут от $10 000, заблокировано не меньше 15% ликвидности, проскальзывание до 15%. Предложений больше, убытков тоже.",
         notifyReentry: "🔔 Оповестить при повторном входе",
         notifyReentrySub: "После продажи по Тейк-профиту бот 30 минут следит за токеном и напишет, если цена пробьёт максимум.",
         apModalTitle: "Включить Автопилот", apModalGo: "↩️ Включить и в чат",
@@ -2066,6 +2066,7 @@
     const JUP_SWAP_API = "https://lite-api.jup.ag/swap/v1";
     const WEB3_URL = "https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js";
     const WSOL_MINT = "So11111111111111111111111111111111111111112";
+    const MAX_SLIPPAGE_BPS = 1500;                 // the page never accepts slippage above 15%
     const MAX_FEE_BPS = 100;                       // the page never accepts a fee above 1%
 
     function parseSignRequest() {
@@ -2083,7 +2084,9 @@
               && (fee === 0 || isPubkey(fa)) && (!w || isPubkey(w));
       if (!ok) return { bad: true };
       const exp = parseInt(params.get("exp") || "0", 10);          // deadline, unix seconds (0 = none)
-      return { exp: exp > 0 ? exp : 0, id: params.get("sign"), buy: side === "b", mint: mint, raw: raw, pct: pct, fee: fee, fa: fa, wallet: w,
+      let slip = parseInt(params.get("slip") || "300", 10);        // max slippage in basis points (300 = 3%)
+      if (!(slip >= 1 && slip <= MAX_SLIPPAGE_BPS)) slip = 300;    // anything odd -> the normal 3%
+      return { slip: slip, exp: exp > 0 ? exp : 0, id: params.get("sign"), buy: side === "b", mint: mint, raw: raw, pct: pct, fee: fee, fa: fa, wallet: w,
                cb: params.get("cb") === "1",      // order created by the bot's chat menu: report back to the bot
                sym: (params.get("sym") || short(mint)).slice(0, 14), ui: signAmountText(params.get("ui") || "") };
     }
@@ -2151,7 +2154,7 @@
     async function jupQuote(req, raw, feeBps) {
       const q = new URLSearchParams({
         inputMint: req.buy ? WSOL_MINT : req.mint, outputMint: req.buy ? req.mint : WSOL_MINT,
-        amount: raw, slippageBps: "300"
+        amount: raw, slippageBps: String(req.slip || 300)
       });
       if (feeBps > 0) q.set("platformFeeBps", String(feeBps));
       const res = await jupFetch(JUP_SWAP_API + "/quote?" + q.toString());
@@ -2378,6 +2381,7 @@
       $("signTitle").textContent = fill(signReq.buy ? "signTitleBuy" : "signTitleSell");
       $("signDesc").textContent = fill(signReq.buy ? "signDescBuy" : signReq.raw ? "signDescSell" : "signDescSellPct");
       $("signFeeVal").textContent = String(signReq.fee / 100).replace(".", ",") + "%";
+      $("signSlipVal").textContent = String(signReq.slip / 100).replace(".", ",") + "%";
       if (!signDoneSig) $("signBtnLabel").textContent = t("signBtn");
       if (signExpired()) handleExpiredLink();                      // opened after the deadline
     }
