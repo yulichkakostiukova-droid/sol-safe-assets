@@ -817,7 +817,7 @@
       <div class="card">
         <div class="kv"><span data-i18n="tradingFee">Trading fee</span><b>1%</b></div>
         <div class="kv"><span data-i18n="maxSlippage">Max slippage</span><b>3%</b></div>
-        <div class="kv"><span data-i18n="version">Version</span><b>1.28</b></div>
+        <div class="kv"><span data-i18n="version">Version</span><b>1.29</b></div>
       </div>
     </section>
   </main>
@@ -986,8 +986,8 @@
         trailingStopSub: "At +20% the stop moves to break-even, at +40% to +15%. After the 2x sale the rest follows the high: it is sold after a drop of 25% (Safe) or 35% (Degen) from the top.",
         dynamicTpSub: "If your target is hit on very high volume, the target is raised to +100%. If buying slows, the bot sends the sell link.",
         riskSafe: "🛡️ Safe Mode", riskDegen: "🚀 Degen Mode",
-        riskSafeSub: "Calmer picks: 30 minutes to 6 hours old, market cap $100k to $2M, liquidity over $15,000, 5-minute volume over $5,000, 300+ holders, 80% of liquidity locked or burned. Full trade size, stop loss no wider than −15%, slippage up to 3%.",
-        riskDegenSub: "Fresh picks: 10 to 60 minutes old, market cap $30k to $300k, liquidity over $8,000, 5-minute volume over $5,000, 100+ holders, at least 50% of liquidity locked or burned. Half the trade size, stop loss no wider than −25%, slippage up to 15%. More proposals, more risk.",
+        riskSafeSub: "Calmer picks: 30 minutes to 6 hours old, market cap $100k to $2M, liquidity over $15,000, 5-minute volume over $5,000, 300+ holders, 80% of liquidity locked or burned. Full trade size, stop loss no wider than −15%, slippage up to 3%. It does not enter if the price rose more than 150% in the last hour or the number of holders grew more than 300%.",
+        riskDegenSub: "Fresh picks: 20 to 60 minutes old, market cap $30k to $300k, liquidity over $8,000, 5-minute volume over $5,000, 100+ holders, at least 50% of liquidity locked or burned. Half the trade size, stop loss no wider than −25%, slippage up to 15%. It does not enter if the price rose more than 150% in the last hour or the number of holders grew more than 300%. More proposals, more risk.",
         notifyReentry: "🔔 Notify me on re-entry",
         notifyReentrySub: "After a Take Profit sale the bot watches the token for 30 minutes and messages you if it breaks its high.",
         apModalTitle: "Turn on Auto-Pilot", apModalGo: "↩️ Turn on & go to chat",
@@ -1085,8 +1085,8 @@
         trailingStopSub: "При +20% стоп переносится в безубыток, при +40% — на +15%. После продажи половины на 2x остаток идёт за максимумом: продаётся при падении на 25% (Безопасный) или 35% (Деген) от вершины.",
         dynamicTpSub: "Если цель достигнута при очень высоком объёме, цель повышается до +100%. Если покупки замедлятся, бот пришлёт ссылку на продажу.",
         riskSafe: "🛡️ Безопасный", riskDegen: "🚀 Деген",
-        riskSafeSub: "Спокойные токены: возраст от 30 минут до 6 часов, капитализация от $100 000 до $2 млн, ликвидность от $15 000, объём за 5 минут от $5 000, от 300 держателей, заблокировано или сожжено 80% ликвидности. Полная сумма сделки, стоп-лосс не шире −15%, проскальзывание до 3%.",
-        riskDegenSub: "Свежие токены: возраст от 10 до 60 минут, капитализация от $30 000 до $300 000, ликвидность от $8 000, объём за 5 минут от $5 000, от 100 держателей, заблокировано или сожжено не меньше 50% ликвидности. Половина суммы сделки, стоп-лосс не шире −25%, проскальзывание до 15%. Предложений больше, риск выше.",
+        riskSafeSub: "Спокойные токены: возраст от 30 минут до 6 часов, капитализация от $100 000 до $2 млн, ликвидность от $15 000, объём за 5 минут от $5 000, от 300 держателей, заблокировано или сожжено 80% ликвидности. Полная сумма сделки, стоп-лосс не шире −15%, проскальзывание до 3%. Не входит, если цена за час выросла больше чем на 150% или держателей стало больше чем на 300%.",
+        riskDegenSub: "Свежие токены: возраст от 20 до 60 минут, капитализация от $30 000 до $300 000, ликвидность от $8 000, объём за 5 минут от $5 000, от 100 держателей, заблокировано или сожжено не меньше 50% ликвидности. Половина суммы сделки, стоп-лосс не шире −25%, проскальзывание до 15%. Не входит, если цена за час выросла больше чем на 150% или держателей стало больше чем на 300%. Предложений больше, риск выше.",
         notifyReentry: "🔔 Оповестить при повторном входе",
         notifyReentrySub: "После продажи по Тейк-профиту бот 30 минут следит за токеном и напишет, если цена пробьёт максимум.",
         apModalTitle: "Включить Автопилот", apModalGo: "↩️ Включить и в чат",
